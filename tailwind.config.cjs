@@ -1,14 +1,13 @@
 /** @type {import('tailwindcss').Config} */
-const defaultConfig = require("tailwindcss/defaultConfig")
-
 module.exports = {
   darkMode: ["class"],
-  content: ["./src/**/*.{js,jsx,ts,tsx}", "*.{js,ts,jsx,tsx,mdx}", "app/**/*.{ts,tsx}", "components/**/*.{ts,tsx}"],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,jsx,ts,tsx}"
+  ],
   theme: {
-    ...defaultConfig.theme,
     extend: {
       colors: {
-        ...defaultConfig.theme.extend.colors,
         resort: {
           cream: "#e7e6e4",
           olive: "#968260",
@@ -71,5 +70,7 @@ module.exports = {
       }
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [],
 }
+
+
