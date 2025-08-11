@@ -1,12 +1,25 @@
-# React + Vite
+# Sea View Resort App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Reglas de Ingeniería - Principios SOLID (Obligatorio)
 
-Currently, two official plugins are available:
+Este proyecto debe desarrollarse respetando los principios SOLID. Toda contribución y refactorización debe cumplirlos.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Single Responsibility (SRP): cada módulo/componente debe tener una única razón de cambio.
+- Open/Closed (OCP): abierto a extensión, cerrado a modificación. Extiende mediante composición o nuevas implementaciones.
+- Liskov Substitution (LSP): componentes intercambiables no deben romper el contrato esperado.
+- Interface Segregation (ISP): evita interfaces/props demasiado grandes; divide en props enfocadas.
+- Dependency Inversion (DIP): los componentes de alto nivel no deben depender de detalles de bajo nivel; depende de abstracciones.
 
-## Expanding the ESLint configuration
+### Guía práctica (checklist por PR)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- [ ] ¿Cada componente hace una sola cosa clara? (SRP)
+- [ ] ¿Pudimos extender sin tocar código estable? (OCP)
+- [ ] ¿Los componentes hijos pueden sustituirse sin romper al padre? (LSP)
+- [ ] ¿Las props están segmentadas y son mínimas? (ISP)
+- [ ] ¿No hay dependencias rígidas con detalles? (DIP)
+
+### Organización sugerida
+
+- `src/components/layout/*`: componentes de layout (Nav, MobileMenu, Footer).
+- `src/components/home/*`: secciones de la Home (SearchFilters, Facilities, RoomsShowcase, Testimonials).
+- `src/lib/*`: utilidades puras (por ejemplo `classNames`).

@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fuente base opcional para mejorar la apariencia general */
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+  body {
+    @apply bg-white text-gray-900 font-sans;
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  .hero-standard {
+    /* Altura consistente para todos los heros aumentada un 20% */
+    @apply h-[576px] md:h-[672px];
+  }
+  .section-standard {
+    /* Altura mínima equivalente al hero para secciones de contenido */
+    @apply min-h-[576px] md:min-h-[672px];
+  }
+}
+
