@@ -13,7 +13,7 @@ export default function RoomCard({ imageUrl, imageUrls = [], title, price, avail
   const [openModal, setOpenModal] = useState(false);
 
   return (
-    <Card className="group overflow-hidden bg-white rounded-2xl border border-gray-200/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+    <Card className="group overflow-hidden bg-white rounded-xl border border-gray-200/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
       <div className="relative cursor-pointer overflow-hidden" onClick={() => setOpenModal(true)}>
         <img src={images[currentIndex]} alt={title} className="w-full h-56 md:h-64 lg:h-72 object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />

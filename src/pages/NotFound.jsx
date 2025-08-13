@@ -8,17 +8,13 @@ export default function NotFound() {
       </h1>
 
       <div className="max-w-2xl space-y-4">
-        <p className="text-2xl md:text-3xl font-semibold">
-          404 - Page not found.
-        </p>
-        <p className="text-gray-600 md:text-lg">
-          This page took an unexpected detour. But your suite is still waiting.
-        </p>
-        <p className="text-gray-600 md:text-lg">Get back to enjoying the luxury.</p>
+bi        <p className="text-2xl md:text-3xl font-semibold">404 - Página no encontrada.</p>
+        <p className="text-gray-600 md:text-lg">Esta página tomó un desvío inesperado. Su suite lo sigue esperando.</p>
+        <p className="text-gray-600 md:text-lg">Regrese y continúe disfrutando del lujo.</p>
       </div>
 
       <Button size="lg" className="px-8">
-        <a href="/">GO TO HOME</a>
+        <a href="/">Volver al inicio</a>
       </Button>
     </section>
   );

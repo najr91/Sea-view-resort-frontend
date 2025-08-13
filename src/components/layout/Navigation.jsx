@@ -2,16 +2,16 @@ import { NavLink } from 'react-router-dom';
 import { classNames } from '../../lib/classNames';
 
 const navItems = [
-  { name: 'Home', to: '/' },
-  { name: 'Explore', to: '/explore' },
-  { name: 'Rooms', to: '/rooms' },
-  { name: 'About', to: '/about' },
-  { name: 'Contact', to: '/contact' },
+  { name: 'Inicio', to: '/' },
+  { name: 'Explorar', to: '/explore' },
+  { name: 'Habitaciones', to: '/rooms' },
+  { name: 'Nosotros', to: '/about' },
+  { name: 'Contacto', to: '/contact' },
 ];
 
 export default function Navigation() {
   return (
-    <nav className="hidden md:flex items-center space-x-10 lg:space-x-12">
+    <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
       {navItems.map((item) => (
         <NavLink
           key={item.to}

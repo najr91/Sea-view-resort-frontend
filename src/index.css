@@ -4,6 +4,9 @@
 
 /* Fuente base opcional para mejorar la apariencia general */
 @layer base {
+  :root {
+    --radius: 0.75rem; /* radio consistente para rounded-lg */
+  }
   * {
     @apply border-gray-200;
   }

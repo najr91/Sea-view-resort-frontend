@@ -9,9 +9,9 @@ export default function AboutHero() {
     >
       <div className="absolute inset-0 bg-black/35" />
       <div className="relative z-10 text-center px-4">
-        <h1 className="text-white text-4xl md:text-5xl font-serif mb-4">About us</h1>
+        <h1 className="text-white text-4xl md:text-5xl font-serif mb-4">Sobre nosotros</h1>
         <p className="max-w-2xl mx-auto text-resort-cream/90 text-sm md:text-base leading-relaxed">
-          Discover our story, our commitment to exceptional hospitality and the values that guide Sea View Resort.
+          Conozca nuestra historia, nuestro compromiso con la hospitalidad excepcional y los valores que nos guían.
         </p>
       </div>
     </section>

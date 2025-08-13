@@ -1,17 +1,39 @@
 export default function ContactMap() {
   return (
-    <section className="bg-white">
-      <div className="w-full h-[360px] md:h-[440px]">
-        <iframe
-          title="map"
-          width="100%"
-          height="100%"
-          style={{ border: 0 }}
-          loading="lazy"
-          allowFullScreen
-          referrerPolicy="no-referrer-when-downgrade"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3763.0277296077495!2d-99.16236192397388!3d19.41382084100139!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ff3e2b2fd6a7%3A0xb3a4e9c5fb2a1a6!2sRoma%20Nte.%2C%2006700%20Ciudad%20de%20M%C3%A9xico%2C%20CDMX%2C%20Mexico!5e0!3m2!1sen!2sus!4v1700000000000"
-        />
+    <section className="bg-white py-12">
+      <div className="container">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+          <div className="md:col-span-2 w-full h-[280px] md:h-[360px] rounded-md overflow-hidden border border-gray-200">
+            <iframe
+              title="mapa-caribe"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              loading="lazy"
+              allowFullScreen
+              referrerPolicy="no-referrer-when-downgrade"
+              src="https://www.google.com/maps?q=21.1619,-86.8515&z=12&hl=es&output=embed"
+            />
+          </div>
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-resort-slate">Nuestra ubicación</h3>
+            <p className="text-sm text-resort-slate/80">
+              Sea View Resort, costa del Caribe mexicano (Cancún, Q.R.). A pasos de playas turquesa y arena blanca.
+            </p>
+            <div className="space-y-2 text-sm">
+              <p className="font-medium text-resort-slate">Teléfono</p>
+              <a href="tel:+18001234567" className="text-resort-olive hover:underline">+1 (800) 123-4567</a>
+            </div>
+            <div className="space-y-2 text-sm">
+              <p className="font-medium text-resort-slate">Email</p>
+              <a href="mailto:reservas@seaviewresort.com" className="text-resort-olive hover:underline">reservas@seaviewresort.com</a>
+            </div>
+            <div className="space-y-2 text-sm">
+              <p className="font-medium text-resort-slate">Horario de atención</p>
+              <p className="text-resort-slate/80">Lun a Dom, 9:00 - 20:00 (GMT-5)</p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

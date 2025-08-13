@@ -1,17 +1,17 @@
 import { Waves, Coffee, Dumbbell, Wifi } from 'lucide-react';
 
 const stats = [
-  { label: 'Years of Excellence', value: '12+' },
-  { label: 'Rooms & Suites', value: '80+' },
-  { label: 'Awards', value: '15' },
-  { label: 'Happy Guests', value: '25k+' },
+  { label: 'Años de excelencia', value: '12+' },
+  { label: 'Habitaciones y suites', value: '80+' },
+  { label: 'Premios', value: '15' },
+  { label: 'Huéspedes satisfechos', value: '25k+' },
 ];
 
 const values = [
-  { icon: Waves, title: 'Seaside Luxury', text: 'Rooms designed to offer breathtaking ocean views and serenity.' },
-  { icon: Wifi, title: 'Modern Comfort', text: 'High-speed connectivity and amenities for a seamless stay.' },
-  { icon: Coffee, title: 'Culinary Delight', text: 'Gourmet dining experiences with fresh, local ingredients.' },
-  { icon: Dumbbell, title: 'Wellness', text: 'Spa and fitness facilities to relax, recharge and feel your best.' },
+  { icon: Waves, title: 'Lujo frente al mar', text: 'Habitaciones diseñadas para ofrecer vistas al océano y serenidad.' },
+  { icon: Wifi, title: 'Confort moderno', text: 'Conectividad de alta velocidad y comodidades para una estadía perfecta.' },
+  { icon: Coffee, title: 'Delicias culinarias', text: 'Experiencias gastronómicas gourmet con ingredientes frescos y locales.' },
+  { icon: Dumbbell, title: 'Bienestar', text: 'Spa y fitness para relajarse, recargar energías y sentirse mejor.' },
 ];
 
 export default function AboutContent() {
@@ -20,11 +20,11 @@ export default function AboutContent() {
       <div className="container">
         <div className="grid md:grid-cols-2 gap-10 items-start">
           <div>
-            <h2 className="text-2xl font-serif text-resort-olive mb-4">Our Story</h2>
+            <h2 className="text-2xl font-serif text-resort-olive mb-4">Nuestra historia</h2>
             <p className="text-resort-slate leading-relaxed">
-              Since opening our doors, Sea View Resort has welcomed travelers from around the world with a promise of
-              comfort, elegance, and unforgettable experiences. Blending contemporary design with coastal charm, our
-              resort offers an oasis where every detail is crafted for your delight.
+              Desde nuestros inicios, Sea View Resort ha recibido a viajeros de todo el mundo con una promesa de
+              confort, elegancia y experiencias memorables. Combinamos diseño contemporáneo con encanto costero para
+              crear un oasis donde cada detalle está pensado para su disfrute.
             </p>
           </div>
 

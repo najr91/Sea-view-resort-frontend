@@ -26,7 +26,7 @@ const rooms = Array.from({ length: 6 }).map((_, idx) => {
   const base = {
     imageUrl: ROOM_IMAGE,
     imageUrls: [],
-    title: 'Room',
+    title: 'Habitación',
     price: 190000,
     available: 'Yes',
   };
@@ -34,21 +34,21 @@ const rooms = Array.from({ length: 6 }).map((_, idx) => {
   if (idx === 0)
     return {
       ...base,
-      title: 'StandardRoom',
+      title: 'Standard',
       imageUrl: standard1,
       imageUrls: [standard1, standard2, standard3, standard4, standard5],
     };
   if (idx === 1)
     return {
       ...base,
-      title: 'SuperiorRoom',
+      title: 'Superior',
       imageUrl: superior1,
       imageUrls: [superior1, superior2, superior3, superior4, superior5, superior6],
     };
   if (idx === 2)
     return {
       ...base,
-      title: 'HoneymoonSuite',
+      title: 'Honeymoon Suite',
       imageUrl: honeymoon1,
       imageUrls: [honeymoon1, honeymoon2, honeymoon3, honeymoon4, honeymoon5],
     };
@@ -57,7 +57,7 @@ const rooms = Array.from({ length: 6 }).map((_, idx) => {
 
 export default function RoomsGrid() {
   return (
-    <section className="py-14">
+    <section id="rooms-grid" className="py-14">
       <div className="container">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {rooms.map((room, idx) => (
