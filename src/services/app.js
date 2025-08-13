@@ -1,4 +1,4 @@
-const urlRooms = ""
+const urlRooms = import.meta.env.VITE_APP_ROOMS;
 export const getRooms = async () => {
     try {
         const respuesta = await fetch(urlRooms);
