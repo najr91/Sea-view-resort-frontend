@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { Button } from '../components/ui/Button';
@@ -8,9 +8,32 @@ import Footer from '../components/layout/Footer.jsx';
 
 export default function MainLayout() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const headerRef = useRef(null);
+
+  useEffect(() => {
+    const updateHeaderHeightVar = () => {
+      const height = headerRef.current ? Math.ceil(headerRef.current.getBoundingClientRect().height) : 0;
+      document.documentElement.style.setProperty('--app-header-height', `${height}px`);
+    };
+
+    updateHeaderHeightVar();
+
+    let resizeObserver;
+    if (headerRef.current && 'ResizeObserver' in window) {
+      resizeObserver = new ResizeObserver(updateHeaderHeightVar);
+      resizeObserver.observe(headerRef.current);
+    } else {
+      window.addEventListener('resize', updateHeaderHeightVar);
+    }
+
+    return () => {
+      if (resizeObserver && headerRef.current) resizeObserver.disconnect();
+      window.removeEventListener('resize', updateHeaderHeightVar);
+    };
+  }, []);
   return (
     <div className="min-h-screen bg-resort-cream flex flex-col">
-      <header className="sticky top-0 z-30 grid grid-cols-[1fr_auto_1fr] items-center px-8 py-5 bg-white shadow-sm">
+      <header ref={headerRef} className="sticky top-0 z-30 grid grid-cols-[1fr_auto_1fr] items-center px-8 py-5 bg-white shadow-sm">
         <div className="flex items-center">
           <Link to="/" className="inline-flex items-baseline leading-none select-none" aria-label="Sea View Resort">
             <span className="font-display text-resort-olive text-2xl md:text-3xl tracking-wide">Sea View</span>

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Wifi, Coffee, Waves, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -65,7 +66,9 @@ export default function RoomCard({ imageUrl, imageUrls = [], title, price, avail
         </div>
 
         <div className="px-4 pb-4">
-          <Button className="w-full">Book now</Button>
+          <Link to={`/rooms/demo-room`}>
+            <Button className="w-full">Book now</Button>
+          </Link>
         </div>
       </CardContent>
 
