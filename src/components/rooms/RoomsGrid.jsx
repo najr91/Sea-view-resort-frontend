@@ -59,7 +59,7 @@ export default function RoomsGrid() {
   return (
     <section id="rooms-grid" className="py-14">
       <div className="container">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {rooms.map((room, idx) => (
             <RoomCard key={idx} {...room} />
           ))}

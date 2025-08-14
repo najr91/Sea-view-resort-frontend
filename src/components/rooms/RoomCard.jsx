@@ -1,16 +1,16 @@
-import { useState } from 'react';
-import { Card, CardContent } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
+import { useState, useMemo } from 'react';
+import { Card, CardContent } from '../ui/Card';
+import { Button } from '../ui/Button';
 import { Wifi, Coffee, Waves, ChevronLeft, ChevronRight } from 'lucide-react';
 import ImageGalleryModal from './ImageGalleryModal.jsx';
 
 export default function RoomCard({ imageUrl, imageUrls = [], title, price, available = 'Yes' }) {
-  const images = imageUrls && imageUrls.length ? imageUrls : [imageUrl];
+  const images = useMemo(() => (imageUrls && imageUrls.length > 0 ? imageUrls : [imageUrl]), [imageUrl, imageUrls]);
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  const showPrev = () => setCurrentIndex((i) => (i - 1 + images.length) % images.length);
-  const showNext = () => setCurrentIndex((i) => (i + 1) % images.length);
   const [openModal, setOpenModal] = useState(false);
+
+  const showPrev = () => setCurrentIndex((idx) => (idx - 1 + images.length) % images.length);
+  const showNext = () => setCurrentIndex((idx) => (idx + 1) % images.length);
 
   return (
     <Card className="group overflow-hidden bg-white rounded-xl border border-gray-200/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
@@ -49,26 +49,27 @@ export default function RoomCard({ imageUrl, imageUrls = [], title, price, avail
           </>
         )}
       </div>
-      <ImageGalleryModal open={openModal} onClose={() => setOpenModal(false)} images={images} initialIndex={currentIndex} />
       <CardContent className="px-0">
         <div className="px-4 pt-4 pb-2">
           <div className="flex items-start justify-between text-sm text-resort-slate">
-            <h3 className="text-gray-900 font-semibold text-lg font-serif">{title}</h3>
-            <span className="text-[11px] text-gray-500">Capacidad: 2-3</span>
+            <h3 className="text-gray-900 font-medium">{title}</h3>
+            <span className="text-[11px]">Available: {available}</span>
           </div>
-          <div className="mt-2 text-gray-900 font-semibold text-lg">${price.toLocaleString()}</div>
+          <div className="mt-2 text-gray-900 font-medium">${price.toLocaleString()}</div>
         </div>
 
-        <div className="px-4 py-3 flex items-center gap-3 text-resort-slate border-t border-gray-100">
-          <span className="inline-flex items-center gap-1.5 text-xs bg-gray-50 rounded-full px-2.5 py-1"><Wifi className="w-4 h-4" /> WiFi</span>
-          <span className="inline-flex items-center gap-1.5 text-xs bg-gray-50 rounded-full px-2.5 py-1"><Coffee className="w-4 h-4" /> Desayuno</span>
-          <span className="inline-flex items-center gap-1.5 text-xs bg-gray-50 rounded-full px-2.5 py-1"><Waves className="w-4 h-4" /> Piscina</span>
+        <div className="px-4 py-3 flex items-center gap-4 text-resort-slate">
+          <span className="inline-flex items-center gap-1 text-xs"><Wifi className="w-4 h-4" /> WiFi</span>
+          <span className="inline-flex items-center gap-1 text-xs"><Coffee className="w-4 h-4" /> Breakfast</span>
+          <span className="inline-flex items-center gap-1 text-xs"><Waves className="w-4 h-4" /> Pool</span>
         </div>
 
         <div className="px-4 pb-4">
-          <Button className="w-full">Reservar</Button>
+          <Button className="w-full">Book now</Button>
         </div>
       </CardContent>
+
+      <ImageGalleryModal open={openModal} onClose={() => setOpenModal(false)} images={images} initialIndex={currentIndex} />
     </Card>
   );
 }
