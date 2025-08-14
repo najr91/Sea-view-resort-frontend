@@ -1,5 +1,15 @@
 import { Card, CardContent } from '../ui/Card';
 
+/**
+ * Lista de características de la habitación.
+ *
+ * Solo renderiza la lista de características.
+ *
+ * @component
+ * @param {Object} props - Propiedades del componente.
+ * @param {string[]} props.features - Características a mostrar.
+ * @returns {JSX.Element|null}
+ */
 export default function Features({ features = [] }) {
     if (!features || features.length === 0) return null;
     return (

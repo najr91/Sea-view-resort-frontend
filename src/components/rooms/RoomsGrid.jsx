@@ -57,6 +57,12 @@ const rooms = Array.from({ length: 6 }).map((_, idx) => {
   return base;
 });
 
+/**
+ * Grilla de habitaciones.
+ *
+ * @component
+ * @returns {JSX.Element}
+ */
 export default function RoomsGrid() {
   return (
     <section id="rooms-grid" className="py-14">

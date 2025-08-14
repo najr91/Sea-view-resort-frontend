@@ -29,6 +29,15 @@ const roomFeatures = [
     'Minibar con selección premium',
 ];
 
+/**
+ * Página de detalle de habitación.
+ *
+ * Obtiene datos desde `services/rooms` en lugar de depender de mocks internos.
+ * Delega UI en componentes especializados (`Gallery`, `Features`, `Amenities`, `BookingSidebar`).
+ *
+ * @component
+ * @returns {JSX.Element}
+ */
 export default function RoomDetail() {
     const { id } = useParams();
     const room = useMemo(() => getRoomById(id || 'demo-room'), [id]);

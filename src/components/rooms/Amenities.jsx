@@ -1,5 +1,15 @@
 import { Card, CardContent } from '../ui/Card';
 
+/**
+ * Grid de amenidades con ícono y etiqueta.
+ *
+ * Solo se encarga de renderizar la grilla de amenidades.
+ *
+ * @component
+ * @param {Object} props - Propiedades del componente.
+ * @param {{icon: React.ComponentType<any>, label: string}[]} props.items - Amenidades a mostrar.
+ * @returns {JSX.Element|null}
+ */
 export default function Amenities({ items = [] }) {
     if (!items || items.length === 0) return null;
     return (

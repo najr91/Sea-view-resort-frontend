@@ -2,6 +2,17 @@ import { useState } from 'react';
 import { Button } from '../ui/Button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+/**
+ * Galería de imágenes con navegación y puntos indicadores.
+ *
+ * Este componente se encarga únicamente de mostrar y navegar imágenes.
+ *
+ * @component
+ * @param {Object} props - Propiedades del componente.
+ * @param {string[]} props.images - Lista de URLs de imágenes a renderizar.
+ * @param {string} [props.altPrefix="Vista habitación"] - Prefijo para el atributo alt de cada imagen.
+ * @returns {JSX.Element|null}
+ */
 export default function Gallery({ images = [], altPrefix = 'Vista habitación' }) {
     const [currentIndex, setCurrentIndex] = useState(0);
 

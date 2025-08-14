@@ -7,6 +7,23 @@ import honeymoon3 from '../assets/Habitaciones/HoneymoonSuite/pexels-ahmetcotur-
 import honeymoon4 from '../assets/Habitaciones/HoneymoonSuite/pexels-ahmetcotur-31817165.webp';
 import honeymoon5 from '../assets/Habitaciones/HoneymoonSuite/pexels-ahmetcotur-31817169 (1).webp';
 
+/**
+ * @typedef {Object} Room
+ * @property {string} id
+ * @property {string} title
+ * @property {number} pricePerNight
+ * @property {string[]} images
+ * @property {string[]} features
+ */
+
+/**
+ * Obtiene una habitación por su `id`.
+ *
+ * Nota: implementación mockeada. Reemplazar por fetch cuando exista API.
+ *
+ * @param {string} id - Identificador de la habitación.
+ * @returns {Room}
+ */
 export function getRoomById(id) {
     if (id === 'demo-room') {
         return {

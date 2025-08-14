@@ -2,6 +2,16 @@ import { Card, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Calendar, Users } from 'lucide-react';
 
+/**
+ * Sidebar de reserva con cálculo de costos.
+ *
+ * Encapsula UI y lógica de cálculo del resumen.
+ *
+ * @component
+ * @param {Object} props - Propiedades del componente.
+ * @param {number} props.pricePerNight - Precio por noche de la habitación.
+ * @returns {JSX.Element}
+ */
 export default function BookingSidebar({ pricePerNight }) {
     const nights = 3;
     const serviceFee = 25000;
