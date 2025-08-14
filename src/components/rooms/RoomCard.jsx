@@ -5,7 +5,7 @@ import { Button } from '../ui/Button';
 import { Wifi, Coffee, Waves, ChevronLeft, ChevronRight } from 'lucide-react';
 import ImageGalleryModal from './ImageGalleryModal.jsx';
 
-export default function RoomCard({ imageUrl, imageUrls = [], title, price, available = 'Yes' }) {
+export default function RoomCard({ id = 'demo-room', imageUrl, imageUrls = [], title, price, available = 'Yes' }) {
   const images = useMemo(() => (imageUrls && imageUrls.length > 0 ? imageUrls : [imageUrl]), [imageUrl, imageUrls]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [openModal, setOpenModal] = useState(false);
@@ -66,7 +66,7 @@ export default function RoomCard({ imageUrl, imageUrls = [], title, price, avail
         </div>
 
         <div className="px-4 pb-4">
-          <Link to={`/rooms/demo-room`}>
+          <Link to={`/rooms/${id}`}>
             <Button className="w-full">Book now</Button>
           </Link>
         </div>
