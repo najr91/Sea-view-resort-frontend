@@ -24,6 +24,7 @@ import honeymoon5 from '../../assets/Habitaciones/HoneymoonSuite/pexels-ahmetcot
 
 const rooms = Array.from({ length: 6 }).map((_, idx) => {
   const base = {
+    id: 'demo-room',
     imageUrl: ROOM_IMAGE,
     imageUrls: [],
     title: 'Habitación',
@@ -34,6 +35,7 @@ const rooms = Array.from({ length: 6 }).map((_, idx) => {
   if (idx === 0)
     return {
       ...base,
+      id: 'demo-room',
       title: 'Standard',
       imageUrl: standard1,
       imageUrls: [standard1, standard2, standard3, standard4, standard5],
@@ -55,6 +57,12 @@ const rooms = Array.from({ length: 6 }).map((_, idx) => {
   return base;
 });
 
+/**
+ * Grilla de habitaciones.
+ *
+ * @component
+ * @returns {JSX.Element}
+ */
 export default function RoomsGrid() {
   return (
     <section id="rooms-grid" className="py-14">
