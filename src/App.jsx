@@ -8,6 +8,7 @@ import Contact from './pages/Contact.jsx';
 import NotFound from './pages/NotFound.jsx';
 import ImageOptimizer from './pages/ImageOptimizer.jsx';
 import RoomDetail from './pages/RoomDetail.jsx';
+import AdminRooms from "./pages/admin/AdminRooms";
 
 export default function App() {
   return (
@@ -21,6 +22,8 @@ export default function App() {
         <Route path="contact" element={<Contact />} />
         <Route path="optimize" element={<ImageOptimizer />} />
         <Route path="*" element={<NotFound />} />
+        <Route path="/admin/rooms" element={<AdminRooms />} />
+        
       </Route>
     </Routes>
   );
