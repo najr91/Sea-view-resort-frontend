@@ -5,17 +5,10 @@ import { Button } from "../components/ui/Button";
 import Navigation from "../components/layout/Navigation.jsx";
 import MobileMenu from "../components/layout/MobileMenu.jsx";
 import Footer from "../components/layout/Footer.jsx";
-import { useAuth } from "../context/AuthContext.jsx";
 
 export default function MainLayout() {
-  const { user, profileImage } = useAuth();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const headerRef = useRef(null);
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
-  };
 
   useEffect(() => {
     const updateHeaderHeightVar = () => {
@@ -65,31 +58,6 @@ export default function MainLayout() {
         </div>
 
         <Navigation />
-
-        <div className="flex gap-4 items-center">
-          {user && (
-            <>
-              <span className="text-sm hidden sm:block">
-                Bienvenido, <strong>{user.username}</strong>
-              </span>
-              {profileImage && (
-                <Link to="/profile">
-                  <img
-                    src={profileImage}
-                    alt="Perfil"
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                </Link>
-              )}
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded text-sm"
-              >
-                Cerrar sesión
-              </button>
-            </>
-          )}
-        </div>
 
         <div className="flex items-center justify-end gap-3">
           <div className="hidden md:block">

@@ -36,20 +36,20 @@ export const AuthProvider = ({ children }) => {
       };
   };
 
-  const getProfile = async () => {
-    const token = getToken();
-    if (!token) {
-      console.log("No se encontro token");
-      return;
-    }
-    const data = await authService.profile();
+  // const getProfile = async () => {
+  //   const token = getToken();
+  //   if (!token) {
+  //     console.log("No hay token");
+  //     return;
+  //   }
+  //   const data = await authService.profile();
 
-    setUser(data);
+  //   setUser(data);
 
-    if (data.profileImage) {
-      setProfileImage(`http://localhost:4002${data.profileImage}`);
-    }
-  };
+  //   if (data.profileImage) {
+  //     setProfileImage(`http://localhost:4002${data.profileImage}`);
+  //   }
+  // };
 
   useEffect(() => {
     const token = getToken();
@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
-        profileImage,
+
         getProfile,
         loading,
       }}

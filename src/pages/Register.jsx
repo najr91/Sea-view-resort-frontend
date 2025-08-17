@@ -20,24 +20,14 @@ function Register() {
       toast.success("Gracias por registrarte. Revisa tu email.");
       navigate("/login");
     } catch (err) {
-      const messages = err.response?.data?.error;
-      if (Array.isArray(messages)) {
-        messages.forEach((msg) =>
-          toast.error(msg, {
-            iconTheme: {
-              primary: "#968260",
-              secondary: "#fff",
-            },
-          })
-        );
-      } else {
-        toast.error(messages || "Error al registrarse", {
-          iconTheme: {
-            primary: "#968260",
-            secondary: "#fff",
-          },
-        });
-      }
+      const errorMsg = err.response?.data?.message || "Error al registrarse";
+
+      toast.error(errorMsg, {
+        iconTheme: {
+          primary: "#968260",
+          secondary: "#fff",
+        },
+      });
     }
   };
 
