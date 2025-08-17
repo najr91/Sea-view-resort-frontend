@@ -1,55 +1,65 @@
-import { useState } from "react";
+import React, { useState } from "react";
+
+// Datos mock
+const initialRooms = [
+  { id: 1, name: "Suite Deluxe", price: 120, description: "Amplia suite con vista al mar" },
+  { id: 2, name: "Habitación Doble", price: 80, description: "Cómoda habitación para dos personas" },
+  { id: 3, name: "Habitación Simple", price: 50, description: "Opción económica con todas las comodidades" },
+];
 
 export default function AdminRooms() {
-  
-  const [rooms, setRooms] = useState([
-    { id: 1, name: "Habitación Simple", price: 50, description: "Cama individual, baño privado" },
-    { id: 2, name: "Habitación Doble", price: 80, description: "Cama doble, vista al mar" },
-    { id: 3, name: "Suite Familiar", price: 120, description: "Dos habitaciones, cocina equipada" },
-  ]);
-
+  const [rooms, setRooms] = useState(initialRooms);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
   const [formData, setFormData] = useState({ name: "", price: "", description: "" });
 
-  
   const openModal = (room = null) => {
-    setEditingRoom(room);
     if (room) {
+      setEditingRoom(room);
       setFormData(room);
     } else {
+      setEditingRoom(null);
       setFormData({ name: "", price: "", description: "" });
     }
     setIsModalOpen(true);
   };
 
-  
-  const handleSave = () => {
-    if (editingRoom) {
-      setRooms(rooms.map(r => (r.id === editingRoom.id ? { ...formData, id: editingRoom.id } : r)));
-    } else {
-      setRooms([...rooms, { ...formData, id: Date.now() }]);
-    }
-    setIsModalOpen(false);
+  const closeModal = () => setIsModalOpen(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  
+  const handleSave = () => {
+    if (editingRoom) {
+      // Editar
+      setRooms(rooms.map((r) => (r.id === editingRoom.id ? { ...formData, id: r.id } : r)));
+    } else {
+      // Crear
+      setRooms([...rooms, { ...formData, id: Date.now() }]);
+    }
+    closeModal();
+  };
+
   const handleDelete = (id) => {
-    setRooms(rooms.filter(r => r.id !== id));
+    setRooms(rooms.filter((r) => r.id !== id));
   };
 
   return (
     <div className="container py-8">
       <h1 className="text-2xl font-bold mb-6">Gestión de Habitaciones</h1>
 
+      {/* Botón agregar */}
       <button
         onClick={() => openModal()}
-        className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        className="mb-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
       >
         + Agregar Habitación
       </button>
 
-      <div className="overflow-x-auto">
+      {/* Tabla - solo desktop */}
+      <div className="overflow-x-auto hidden md:block">
         <table className="min-w-full bg-white rounded-lg shadow">
           <thead>
             <tr className="bg-gray-100 text-left">
@@ -85,45 +95,71 @@ export default function AdminRooms() {
         </table>
       </div>
 
-     
+      {/* Versión mobile - tarjetas */}
+      <div className="grid gap-4 md:hidden">
+        {rooms.map((room) => (
+          <div key={room.id} className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-lg font-bold">{room.name}</h3>
+            <p className="text-gray-600">Precio: ${room.price}</p>
+            <p className="text-gray-500">{room.description}</p>
+            <div className="mt-3 flex space-x-2">
+              <button
+                onClick={() => openModal(room)}
+                className="flex-1 bg-yellow-500 text-white px-3 py-2 rounded hover:bg-yellow-600 text-sm"
+              >
+                Editar
+              </button>
+              <button
+                onClick={() => handleDelete(room.id)}
+                className="flex-1 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 text-sm"
+              >
+                Borrar
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 w-96">
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
+          <div className="bg-white p-6 rounded-lg shadow w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">
               {editingRoom ? "Editar Habitación" : "Agregar Habitación"}
             </h2>
-
             <input
               type="text"
+              name="name"
               placeholder="Nombre"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full border px-3 py-2 mb-3 rounded"
+              onChange={handleChange}
+              className="w-full border p-2 rounded mb-3"
             />
             <input
               type="number"
+              name="price"
               placeholder="Precio"
               value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-              className="w-full border px-3 py-2 mb-3 rounded"
+              onChange={handleChange}
+              className="w-full border p-2 rounded mb-3"
             />
             <textarea
+              name="description"
               placeholder="Descripción"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full border px-3 py-2 mb-3 rounded"
+              onChange={handleChange}
+              className="w-full border p-2 rounded mb-3"
             />
-
             <div className="flex justify-end space-x-2">
               <button
-                onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
+                onClick={closeModal}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
               >
                 Guardar
               </button>
