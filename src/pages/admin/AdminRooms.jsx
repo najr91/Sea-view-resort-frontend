@@ -2,10 +2,48 @@ import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
 const initialRooms = [
-  { id: 1, name: "Suite Deluxe", price: 120, description: "Amplia suite con vista al mar", image: null },
-  { id: 2, name: "Habitación Doble", price: 80, description: "Cómoda habitación para dos personas", image: null },
-  { id: 3, name: "Habitación Simple", price: 50, description: "Opción económica con todas las comodidades", image: null },
+  {
+    id: 1,
+    name: "Standard Room",
+    price: 80000,
+    description:
+      "Confort esencial para una escapada tropical. Descansá en una habitación cómoda y funcional, con diseño relajado y todos los servicios básicos. Ideal para quienes buscan una opción accesible sin resignar confort. Vista al jardín. Hasta 2 adultos. Cama Queen. Aire acondicionado, Wi-Fi, TV LED. Sin terraza.",
+    image: null,
+  },
+  {
+    id: 2,
+    name: "Superior Room",
+    price: 95000,
+    description:
+      "Espacio, luz natural y conexión con la naturaleza. Una opción más amplia, con decoración moderna y una terraza privada para disfrutar de los jardines tropicales o la piscina. Perfecta para una estadía relajante en pareja o en familia. Vista al jardín o piscina. Hasta 2 adultos + 1 niño. Cama King o Twin. Terraza privada. Minibar, Wi-Fi, caja fuerte.",
+    image: null,
+  },
+  {
+    id: 3,
+    name: "Ocean View Room",
+    price: 130000,
+    description:
+      "Vistas al mar Caribe desde la comodidad de tu habitación. Disfrutá de la brisa marina y una vista parcial o frontal al océano, sin salir de tu habitación. Una experiencia visual única cada mañana. Vista parcial o frontal al mar. Hasta 2 adultos. Cama Queen. Sin terraza. Aire acondicionado, TV, escritorio.",
+    image: null,
+  },
+  {
+    id: 4,
+    name: "Ocean View Deluxe",
+    price: 150000,
+    description:
+      "Lujo frente al mar con terraza privada. Relajate en tu terraza privada con vista directa al mar Caribe. Esta categoría combina confort, estilo y una ubicación privilegiada para ver el amanecer sobre el océano. Vista frontal al mar. Hasta 2 adultos + 1 niño. Cama King. Terraza privada con mobiliario. Cafetera premium, amenities exclusivos.",
+    image: null,
+  },
+  {
+    id: 5,
+    name: "Honeymoon Suite",
+    price: 200000,
+    description:
+      "Romance, privacidad y lujo con vista al mar. Diseñada especialmente para parejas, esta suite ofrece jacuzzi privado, cama King y una terraza íntima con vista al mar. Ideal para lunas de miel, aniversarios o escapadas románticas. Vista al mar y piscina. Hasta 2 adultos. Jacuzzi en la habitación. Terraza con camastros. Decoración especial y vino de cortesía.",
+    image: null,
+  },
 ];
+
 
 export default function AdminRooms() {
   const [rooms, setRooms] = useState(initialRooms);
