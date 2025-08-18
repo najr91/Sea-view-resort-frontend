@@ -12,4 +12,14 @@
   .container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
+
+  .hero-standard {
+    /* Altura del hero aumentada para ocupar más pantalla */
+    @apply h-[80vh] min-h-[600px] md:h-[85vh] lg:h-[90vh];
+  }
+
+  .section-standard {
+    /* Altura mínima para secciones de contenido */
+    @apply min-h-[600px] py-16;
+  }
 }

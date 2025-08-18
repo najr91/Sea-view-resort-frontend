@@ -7,27 +7,21 @@ import RoomTestPanel from '../components/home/RoomTestPanel.jsx';
 export default function Home() {
   return (
     <div className="bg-resort-cream">
-      
-      <section className="relative h-[80vh] w-full overflow-hidden">
-        <video
-          className="absolute top-0 left-0 w-full h-full object-cover"
-          src="https://res.cloudinary.com/dokpk3c2l/video/upload/v1755464603/Dise%C3%B1o_sin_t%C3%ADtulo_tn9f4u.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
-        
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
-          <h1 className="text-4xl md:text-5xl font-serif mb-6 drop-shadow-md">
+      <section
+        className="hero-standard relative bg-center bg-cover flex items-center justify-center"
+        style={{
+          backgroundImage: "url('https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/30"></div>
+        <div className="container mx-auto text-center relative z-10">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-6 animate-fade-in">
             Sea View Resort
           </h1>
-          <p className="text-lg md:text-xl mb-6">
-            Descubrí tu lugar frente al mar
+          <p className="text-xl md:text-2xl text-resort-cream mb-8 max-w-3xl mx-auto">
+            Tu escape perfecto al paraíso costero
           </p>
-          <div className="w-full max-w-3xl">
-            <SearchFilters />
-          </div>
+          <SearchFilters />
         </div>
       </section>
 

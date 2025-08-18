@@ -6,26 +6,36 @@ export default function ExploreHero() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <section className="relative w-full">
+      <section className="relative hero-standard w-full bg-center bg-cover flex items-center justify-center">
         <div
-          className="hero-standard w-full bg-center bg-cover"
+          className="absolute inset-0 w-full h-full bg-center bg-cover"
           style={{
             backgroundImage:
               "url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2000&auto=format&fit=crop')",
           }}
         />
-        <div className="absolute inset-0 bg-black/30" />
-        <button
-          type="button"
-          className="absolute inset-0 flex items-center justify-center"
-          onClick={() => setOpen(true)}
-          aria-label="Play video tour"
-        >
-          <span className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white/90 backdrop-blur shadow-md flex items-center justify-center ring-1 ring-black/10">
-            <Play className="w-8 h-8 text-gray-800" />
-          </span>
-        </button>
+        <div className="absolute inset-0 bg-black/40" />
+
+        <div className="relative z-10 text-center px-4">
+          <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-serif mb-6">
+            Explora Nuestro Resort
+          </h1>
+          <p className="max-w-3xl mx-auto text-resort-cream/90 text-lg md:text-xl leading-relaxed mb-8">
+            Descubre todas las comodidades y experiencias que te esperan en Sea View Resort
+          </p>
+
+          <button
+            type="button"
+            className="inline-flex items-center justify-center px-8 py-4 bg-white/90 backdrop-blur rounded-full shadow-lg hover:bg-white transition-colors"
+            onClick={() => setOpen(true)}
+            aria-label="Ver video tour"
+          >
+            <Play className="w-6 h-6 text-gray-800 mr-3" />
+            <span className="text-gray-800 font-medium text-lg">Ver Video Tour</span>
+          </button>
+        </div>
       </section>
+
       <VideoModal
         open={open}
         onClose={() => setOpen(false)}
