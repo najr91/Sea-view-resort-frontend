@@ -2,24 +2,27 @@ import React, { useState } from "react";
 
 // Datos mock
 const initialRooms = [
-  { id: 1, name: "Suite Deluxe", price: 120, description: "Amplia suite con vista al mar" },
-  { id: 2, name: "Habitación Doble", price: 80, description: "Cómoda habitación para dos personas" },
-  { id: 3, name: "Habitación Simple", price: 50, description: "Opción económica con todas las comodidades" },
+  { id: 1, name: "Suite Deluxe", price: 120, description: "Amplia suite con vista al mar", image: null },
+  { id: 2, name: "Habitación Doble", price: 80, description: "Cómoda habitación para dos personas", image: null },
+  { id: 3, name: "Habitación Simple", price: 50, description: "Opción económica con todas las comodidades", image: null },
 ];
 
 export default function AdminRooms() {
   const [rooms, setRooms] = useState(initialRooms);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
-  const [formData, setFormData] = useState({ name: "", price: "", description: "" });
+  const [formData, setFormData] = useState({ name: "", price: "", description: "", image: null });
+  const [preview, setPreview] = useState(null);
 
   const openModal = (room = null) => {
     if (room) {
       setEditingRoom(room);
       setFormData(room);
+      setPreview(room.image || null);
     } else {
       setEditingRoom(null);
-      setFormData({ name: "", price: "", description: "" });
+      setFormData({ name: "", price: "", description: "", image: null });
+      setPreview(null);
     }
     setIsModalOpen(true);
   };
@@ -31,12 +34,18 @@ export default function AdminRooms() {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, image: file });
+      setPreview(URL.createObjectURL(file)); // vista previa
+    }
+  };
+
   const handleSave = () => {
     if (editingRoom) {
-      // Editar
       setRooms(rooms.map((r) => (r.id === editingRoom.id ? { ...formData, id: r.id } : r)));
     } else {
-      // Crear
       setRooms([...rooms, { ...formData, id: Date.now() }]);
     }
     closeModal();
@@ -58,7 +67,7 @@ export default function AdminRooms() {
         + Agregar Habitación
       </button>
 
-      {/* Tabla - solo desktop */}
+      {/* Tabla - desktop */}
       <div className="overflow-x-auto hidden md:block">
         <table className="min-w-full bg-white rounded-lg shadow">
           <thead>
@@ -66,6 +75,7 @@ export default function AdminRooms() {
               <th className="py-3 px-4">Nombre</th>
               <th className="py-3 px-4">Precio</th>
               <th className="py-3 px-4">Descripción</th>
+              <th className="py-3 px-4">Imagen</th>
               <th className="py-3 px-4">Acciones</th>
             </tr>
           </thead>
@@ -75,6 +85,13 @@ export default function AdminRooms() {
                 <td className="py-3 px-4">{room.name}</td>
                 <td className="py-3 px-4">${room.price}</td>
                 <td className="py-3 px-4">{room.description}</td>
+                <td className="py-3 px-4">
+                  {room.image ? (
+                    <img src={URL.createObjectURL(room.image)} alt="preview" className="w-16 h-16 object-cover rounded" />
+                  ) : (
+                    <span className="text-gray-400">Sin imagen</span>
+                  )}
+                </td>
                 <td className="py-3 px-4 space-x-2">
                   <button
                     onClick={() => openModal(room)}
@@ -102,6 +119,9 @@ export default function AdminRooms() {
             <h3 className="text-lg font-bold">{room.name}</h3>
             <p className="text-gray-600">Precio: ${room.price}</p>
             <p className="text-gray-500">{room.description}</p>
+            {room.image && (
+              <img src={URL.createObjectURL(room.image)} alt="preview" className="w-full h-32 object-cover rounded my-2" />
+            )}
             <div className="mt-3 flex space-x-2">
               <button
                 onClick={() => openModal(room)}
@@ -150,6 +170,18 @@ export default function AdminRooms() {
               onChange={handleChange}
               className="w-full border p-2 rounded mb-3"
             />
+
+            {/* Input de imagen */}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full border p-2 rounded mb-3"
+            />
+            {preview && (
+              <img src={preview} alt="Vista previa" className="w-full h-32 object-cover rounded mb-3" />
+            )}
+
             <div className="flex justify-end space-x-2">
               <button
                 onClick={closeModal}
