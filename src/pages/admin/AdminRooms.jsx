@@ -3,7 +3,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useRooms } from "../../context/RoomsContext";
 
 export default function AdminRooms() {
-  const { rooms, setRooms } = useRooms(); // 👈 ahora usamos el contexto
+  const { rooms, setRooms } = useRooms(); 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
   const [formData, setFormData] = useState({ name: "", price: "", description: "", image: null });
@@ -111,7 +111,7 @@ export default function AdminRooms() {
         + Agregar Habitación
       </button>
 
-      {/* 🖥️ Vista en tabla para escritorio */}
+      
       <div className="overflow-x-auto hidden md:block">
         <table className="min-w-full bg-white rounded-lg shadow">
           <thead>
@@ -160,7 +160,7 @@ export default function AdminRooms() {
         </table>
       </div>
 
-      {/* 📱 Vista en cards para móvil */}
+     
       <div className="grid gap-4 md:hidden">
         {rooms.map((room) => (
           <div key={room.id} className="bg-white rounded-lg shadow p-4">
@@ -190,7 +190,7 @@ export default function AdminRooms() {
         ))}
       </div>
 
-      {/* 📝 Modal de formulario */}
+      
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-lg shadow w-full max-w-md">
@@ -252,7 +252,7 @@ export default function AdminRooms() {
         </div>
       )}
 
-      {/* 🔒 Confirmación */}
+      
       {confirmData.open && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-lg shadow w-full max-w-sm text-center">
