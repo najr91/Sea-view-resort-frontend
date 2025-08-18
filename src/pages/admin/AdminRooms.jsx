@@ -13,7 +13,6 @@ export default function AdminRooms() {
   const [editingRoom, setEditingRoom] = useState(null);
   const [formData, setFormData] = useState({ name: "", price: "", description: "", image: null });
 
-  
   const [confirmData, setConfirmData] = useState({ open: false, action: null, message: "" });
 
   const openModal = (room = null) => {
@@ -62,6 +61,11 @@ export default function AdminRooms() {
   const removeImage = () => setFormData({ ...formData, image: null });
 
   const handleSave = () => {
+    if (!formData.name.trim() || !formData.price || !formData.description.trim()) {
+      toast.error("Por favor completa todos los campos obligatorios");
+      return;
+    }
+
     setConfirmData({
       open: true,
       message: "¿Quieres guardar los cambios?",
@@ -91,12 +95,10 @@ export default function AdminRooms() {
 
   return (
     <div className="container py-8">
-     
       <Toaster position="top-right" />
 
       <h1 className="text-2xl font-bold mb-6">Gestión de Habitaciones</h1>
 
-     
       <button
         onClick={() => openModal()}
         className="mb-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -104,7 +106,6 @@ export default function AdminRooms() {
         + Agregar Habitación
       </button>
 
-      
       <div className="overflow-x-auto hidden md:block">
         <table className="min-w-full bg-white rounded-lg shadow">
           <thead>
@@ -149,7 +150,6 @@ export default function AdminRooms() {
         </table>
       </div>
 
-      
       <div className="grid gap-4 md:hidden">
         {rooms.map((room) => (
           <div key={room.id} className="bg-white rounded-lg shadow p-4">
@@ -177,7 +177,6 @@ export default function AdminRooms() {
         ))}
       </div>
 
-      
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-lg shadow w-full max-w-md">
@@ -208,7 +207,6 @@ export default function AdminRooms() {
               className="w-full border p-2 rounded mb-3"
             />
 
-            
             <div className="mb-4">
               <label className="block text-gray-700 font-medium mb-2">Imagen</label>
               <input type="file" accept="image/*" onChange={handleImageChange} className="w-full border p-2 rounded" />
@@ -238,7 +236,6 @@ export default function AdminRooms() {
         </div>
       )}
 
-     
       {confirmData.open && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-lg shadow w-full max-w-sm text-center">
