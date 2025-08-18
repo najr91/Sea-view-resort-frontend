@@ -12,22 +12,38 @@ export default function AdminRooms() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
   const [formData, setFormData] = useState({ name: "", price: "", description: "", image: null });
-  const [preview, setPreview] = useState(null);
+
+  // Para confirmaciones
+  const [confirmData, setConfirmData] = useState({ open: false, action: null, message: "" });
 
   const openModal = (room = null) => {
     if (room) {
       setEditingRoom(room);
       setFormData(room);
-      setPreview(room.image || null);
     } else {
       setEditingRoom(null);
       setFormData({ name: "", price: "", description: "", image: null });
-      setPreview(null);
     }
     setIsModalOpen(true);
   };
 
-  const closeModal = () => setIsModalOpen(false);
+  const closeModal = () => {
+    // Verificar si hay cambios antes de cerrar
+    if (
+      formData.name !== (editingRoom?.name || "") ||
+      formData.price !== (editingRoom?.price || "") ||
+      formData.description !== (editingRoom?.description || "") ||
+      formData.image !== (editingRoom?.image || null)
+    ) {
+      setConfirmData({
+        open: true,
+        message: "Tienes cambios sin guardar, ¿quieres salir igualmente?",
+        action: () => setIsModalOpen(false),
+      });
+    } else {
+      setIsModalOpen(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,22 +53,33 @@ export default function AdminRooms() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData({ ...formData, image: file });
-      setPreview(URL.createObjectURL(file)); // vista previa
+      setFormData({ ...formData, image: URL.createObjectURL(file) });
     }
   };
 
+  const removeImage = () => setFormData({ ...formData, image: null });
+
   const handleSave = () => {
-    if (editingRoom) {
-      setRooms(rooms.map((r) => (r.id === editingRoom.id ? { ...formData, id: r.id } : r)));
-    } else {
-      setRooms([...rooms, { ...formData, id: Date.now() }]);
-    }
-    closeModal();
+    setConfirmData({
+      open: true,
+      message: "¿Quieres guardar los cambios?",
+      action: () => {
+        if (editingRoom) {
+          setRooms(rooms.map((r) => (r.id === editingRoom.id ? { ...formData, id: r.id } : r)));
+        } else {
+          setRooms([...rooms, { ...formData, id: Date.now() }]);
+        }
+        setIsModalOpen(false);
+      },
+    });
   };
 
   const handleDelete = (id) => {
-    setRooms(rooms.filter((r) => r.id !== id));
+    setConfirmData({
+      open: true,
+      message: "¿Seguro que deseas borrar esta habitación?",
+      action: () => setRooms(rooms.filter((r) => r.id !== id)),
+    });
   };
 
   return (
@@ -87,7 +114,7 @@ export default function AdminRooms() {
                 <td className="py-3 px-4">{room.description}</td>
                 <td className="py-3 px-4">
                   {room.image ? (
-                    <img src={URL.createObjectURL(room.image)} alt="preview" className="w-16 h-16 object-cover rounded" />
+                    <img src={room.image} alt="preview" className="w-16 h-16 object-cover rounded" />
                   ) : (
                     <span className="text-gray-400">Sin imagen</span>
                   )}
@@ -112,7 +139,7 @@ export default function AdminRooms() {
         </table>
       </div>
 
-      {/* Versión mobile - tarjetas */}
+      {/* Cards - mobile */}
       <div className="grid gap-4 md:hidden">
         {rooms.map((room) => (
           <div key={room.id} className="bg-white rounded-lg shadow p-4">
@@ -120,7 +147,7 @@ export default function AdminRooms() {
             <p className="text-gray-600">Precio: ${room.price}</p>
             <p className="text-gray-500">{room.description}</p>
             {room.image && (
-              <img src={URL.createObjectURL(room.image)} alt="preview" className="w-full h-32 object-cover rounded my-2" />
+              <img src={room.image} alt="preview" className="w-full h-32 object-cover rounded mt-2" />
             )}
             <div className="mt-3 flex space-x-2">
               <button
@@ -140,7 +167,7 @@ export default function AdminRooms() {
         ))}
       </div>
 
-      {/* Modal */}
+      {/* Modal principal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-lg shadow w-full max-w-md">
@@ -171,29 +198,56 @@ export default function AdminRooms() {
               className="w-full border p-2 rounded mb-3"
             />
 
-            {/* Input de imagen */}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="w-full border p-2 rounded mb-3"
-            />
-            {preview && (
-              <img src={preview} alt="Vista previa" className="w-full h-32 object-cover rounded mb-3" />
-            )}
+            {/* Subida de imagen */}
+            <div className="mb-4">
+              <label className="block text-gray-700 font-medium mb-2">Imagen</label>
+              <input type="file" accept="image/*" onChange={handleImageChange} className="w-full border p-2 rounded" />
+              {formData.image && (
+                <div className="mt-3">
+                  <img src={formData.image} alt="preview" className="w-full h-32 object-cover rounded" />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="mt-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                  >
+                    Quitar imagen
+                  </button>
+                </div>
+              )}
+            </div>
 
             <div className="flex justify-end space-x-2">
+              <button onClick={closeModal} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                Cancelar
+              </button>
+              <button onClick={handleSave} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación */}
+      {confirmData.open && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
+          <div className="bg-white p-6 rounded-lg shadow w-full max-w-sm text-center">
+            <p className="mb-6 text-lg">{confirmData.message}</p>
+            <div className="flex justify-center space-x-4">
               <button
-                onClick={closeModal}
+                onClick={() => setConfirmData({ open: false, action: null, message: "" })}
                 className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
               >
                 Cancelar
               </button>
               <button
-                onClick={handleSave}
+                onClick={() => {
+                  confirmData.action();
+                  setConfirmData({ open: false, action: null, message: "" });
+                }}
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
               >
-                Guardar
+                Confirmar
               </button>
             </div>
           </div>
