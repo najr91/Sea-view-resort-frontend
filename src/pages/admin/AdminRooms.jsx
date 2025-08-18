@@ -44,7 +44,6 @@ const initialRooms = [
   },
 ];
 
-
 export default function AdminRooms() {
   const [rooms, setRooms] = useState(initialRooms);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -168,19 +167,23 @@ export default function AdminRooms() {
                     <span className="text-gray-400">Sin imagen</span>
                   )}
                 </td>
-                <td className="py-3 px-4 space-x-2">
-                  <button
-                    onClick={() => openModal(room)}
-                    className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => handleDelete(room.id)}
-                    className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                  >
-                    Borrar
-                  </button>
+                <td className="py-3 px-4 align-top">
+                  <div className="flex flex-col gap-2 w-max">
+                    <button
+                      onClick={() => openModal(room)}
+                      style={{ backgroundColor: "#968260" }}
+                      className="text-white px-3 py-1 rounded hover:opacity-90"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDelete(room.id)}
+                      style={{ backgroundColor: "#ceb996" }}
+                      className="text-white px-3 py-1 rounded hover:opacity-90"
+                    >
+                      Borrar
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -200,13 +203,15 @@ export default function AdminRooms() {
             <div className="mt-3 flex space-x-2">
               <button
                 onClick={() => openModal(room)}
-                className="flex-1 bg-yellow-500 text-white px-3 py-2 rounded hover:bg-yellow-600 text-sm"
+                style={{ backgroundColor: "#968260" }}
+                className="flex-1 text-white px-3 py-2 rounded hover:opacity-90 text-sm"
               >
                 Editar
               </button>
               <button
                 onClick={() => handleDelete(room.id)}
-                className="flex-1 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 text-sm"
+                style={{ backgroundColor: "#ceb996" }}
+                className="flex-1 text-white px-3 py-2 rounded hover:opacity-90 text-sm"
               >
                 Borrar
               </button>
