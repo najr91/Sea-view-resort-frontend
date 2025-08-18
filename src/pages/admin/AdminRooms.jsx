@@ -103,6 +103,16 @@ export default function AdminRooms() {
       return;
     }
 
+    if (formData.name.length > 25) {
+      toast.error("El nombre no puede tener más de 25 caracteres");
+      return;
+    }
+
+    if (formData.description.length > 440) {
+      toast.error("La descripción no puede tener más de 440 caracteres");
+      return;
+    }
+
     setConfirmData({
       open: true,
       message: "¿Quieres guardar los cambios?",
@@ -233,6 +243,7 @@ export default function AdminRooms() {
               value={formData.name}
               onChange={handleChange}
               className="w-full border p-2 rounded mb-3"
+              maxLength={25}
             />
             <input
               type="number"
@@ -248,6 +259,7 @@ export default function AdminRooms() {
               value={formData.description}
               onChange={handleChange}
               className="w-full border p-2 rounded mb-3"
+              maxLength={440}
             />
 
             <div className="mb-4">
