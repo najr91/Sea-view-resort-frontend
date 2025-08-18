@@ -1,6 +1,6 @@
 import React, { useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 
-// Datos mock
 const initialRooms = [
   { id: 1, name: "Suite Deluxe", price: 120, description: "Amplia suite con vista al mar", image: null },
   { id: 2, name: "Habitación Doble", price: 80, description: "Cómoda habitación para dos personas", image: null },
@@ -13,7 +13,7 @@ export default function AdminRooms() {
   const [editingRoom, setEditingRoom] = useState(null);
   const [formData, setFormData] = useState({ name: "", price: "", description: "", image: null });
 
-  // Para confirmaciones
+  
   const [confirmData, setConfirmData] = useState({ open: false, action: null, message: "" });
 
   const openModal = (room = null) => {
@@ -28,7 +28,6 @@ export default function AdminRooms() {
   };
 
   const closeModal = () => {
-    // Verificar si hay cambios antes de cerrar
     if (
       formData.name !== (editingRoom?.name || "") ||
       formData.price !== (editingRoom?.price || "") ||
@@ -38,7 +37,10 @@ export default function AdminRooms() {
       setConfirmData({
         open: true,
         message: "Tienes cambios sin guardar, ¿quieres salir igualmente?",
-        action: () => setIsModalOpen(false),
+        action: () => {
+          setIsModalOpen(false);
+          toast("Cambios descartados", { icon: "⚠️" });
+        },
       });
     } else {
       setIsModalOpen(false);
@@ -66,8 +68,10 @@ export default function AdminRooms() {
       action: () => {
         if (editingRoom) {
           setRooms(rooms.map((r) => (r.id === editingRoom.id ? { ...formData, id: r.id } : r)));
+          toast.success("Habitación actualizada");
         } else {
           setRooms([...rooms, { ...formData, id: Date.now() }]);
+          toast.success("Habitación agregada");
         }
         setIsModalOpen(false);
       },
@@ -78,15 +82,21 @@ export default function AdminRooms() {
     setConfirmData({
       open: true,
       message: "¿Seguro que deseas borrar esta habitación?",
-      action: () => setRooms(rooms.filter((r) => r.id !== id)),
+      action: () => {
+        setRooms(rooms.filter((r) => r.id !== id));
+        toast.error("Habitación eliminada");
+      },
     });
   };
 
   return (
     <div className="container py-8">
+     
+      <Toaster position="top-right" />
+
       <h1 className="text-2xl font-bold mb-6">Gestión de Habitaciones</h1>
 
-      {/* Botón agregar */}
+     
       <button
         onClick={() => openModal()}
         className="mb-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -94,7 +104,7 @@ export default function AdminRooms() {
         + Agregar Habitación
       </button>
 
-      {/* Tabla - desktop */}
+      
       <div className="overflow-x-auto hidden md:block">
         <table className="min-w-full bg-white rounded-lg shadow">
           <thead>
@@ -139,7 +149,7 @@ export default function AdminRooms() {
         </table>
       </div>
 
-      {/* Cards - mobile */}
+      
       <div className="grid gap-4 md:hidden">
         {rooms.map((room) => (
           <div key={room.id} className="bg-white rounded-lg shadow p-4">
@@ -167,7 +177,7 @@ export default function AdminRooms() {
         ))}
       </div>
 
-      {/* Modal principal */}
+      
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-lg shadow w-full max-w-md">
@@ -198,7 +208,7 @@ export default function AdminRooms() {
               className="w-full border p-2 rounded mb-3"
             />
 
-            {/* Subida de imagen */}
+            
             <div className="mb-4">
               <label className="block text-gray-700 font-medium mb-2">Imagen</label>
               <input type="file" accept="image/*" onChange={handleImageChange} className="w-full border p-2 rounded" />
@@ -228,7 +238,7 @@ export default function AdminRooms() {
         </div>
       )}
 
-      {/* Modal de confirmación */}
+     
       {confirmData.open && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-lg shadow w-full max-w-sm text-center">
