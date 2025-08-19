@@ -10,7 +10,7 @@ export default function AdminRooms() {
   const [formData, setFormData] = useState({ name: "", price: "", description: "", images: [] });
   const [confirmData, setConfirmData] = useState({ open: false, action: null, message: "" });
 
-  const API_URL = "http://localhost:4000/api/rooms";
+  const API_URL = "http://localhost:3000/api/rooms";
 
   const openModal = (room = null) => {
     if (room) {
