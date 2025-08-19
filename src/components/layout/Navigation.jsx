@@ -9,6 +9,7 @@ const navItems = [
   { name: "Habitaciones", to: "/rooms" },
   { name: "Nosotros", to: "/about" },
   { name: "Contacto", to: "/contact" },
+  { name: "Administrador", to: "/admin/rooms" }, 
 ];
 
 export default function Navigation() {
@@ -50,7 +51,7 @@ export default function Navigation() {
       <div className="flex gap-4 items-center">
         {user && (
           <>
-            <span className=" hidden lg:inline text-gray-700 text-sm">
+            <span className="hidden lg:inline text-gray-700 text-sm">
               Bienvenido, <strong>{user.username}</strong>
             </span>
 

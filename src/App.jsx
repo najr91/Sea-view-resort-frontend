@@ -15,6 +15,7 @@ import Profile from "./pages/Profile.jsx";
 import VerifyEmail from "./pages/VerifyEmail.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import PasswordChange from "./pages/PasswordChange.jsx";
+import AdminRooms from "./pages/admin/AdminRooms";
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -50,6 +51,7 @@ export default function App() {
         <Route path="contact" element={<Contact />} />
         <Route path="optimize" element={<ImageOptimizer />} />
         <Route path="*" element={<NotFound />} />
+        <Route path="/admin/rooms" element={<AdminRooms />} />
       </Route>
     </Routes>
   );
