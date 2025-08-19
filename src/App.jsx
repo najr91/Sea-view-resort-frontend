@@ -16,6 +16,7 @@ import VerifyEmail from "./pages/VerifyEmail.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import PasswordChange from "./pages/PasswordChange.jsx";
 import AdminRooms from "./pages/admin/AdminRooms";
+import { use } from "react";
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -42,16 +43,16 @@ export default function App() {
         <Route path="/password-change" element={<PasswordChange />} />
 
         <Route path="explore" element={<Explore />} />
-        <Route
-          path="rooms"
-          element={user ? <Rooms /> : <Navigate to="/login" />}
-        />
+        <Route path="rooms" element={<Rooms />} />
         <Route path="rooms/:id" element={<RoomDetail />} />
         <Route path="about" element={<About />} />
         <Route path="contact" element={<Contact />} />
         <Route path="optimize" element={<ImageOptimizer />} />
         <Route path="*" element={<NotFound />} />
-        <Route path="/admin/rooms" element={<AdminRooms />} />
+        <Route
+          path="/admin/rooms"
+          element={user ? <AdminRooms /> : <Navigate to="/login" />}
+        />
       </Route>
     </Routes>
   );

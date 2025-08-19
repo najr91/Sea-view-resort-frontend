@@ -9,7 +9,7 @@ const navItems = [
   { name: "Habitaciones", to: "/rooms" },
   { name: "Nosotros", to: "/about" },
   { name: "Contacto", to: "/contact" },
-  { name: "Administrador", to: "/admin/rooms" }, 
+  { name: "Administrador", to: "/admin/rooms" },
 ];
 
 export default function Navigation() {
@@ -31,23 +31,30 @@ export default function Navigation() {
 
   return (
     <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
-      {navItems.map((item) => (
-        <NavLink
-          key={item.to}
-          to={item.to}
-          className={({ isActive }) =>
-            classNames(
-              "font-medium transition-colors",
-              isActive
-                ? "text-resort-olive"
-                : "text-gray-700 hover:text-resort-olive"
-            )
+      {navItems
+        .filter((item) => {
+          if (item.name === "Administrador") {
+            return user?.role === "admin";
           }
-          end={item.to === "/"}
-        >
-          {item.name}
-        </NavLink>
-      ))}
+          return true;
+        })
+        .map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            className={({ isActive }) =>
+              classNames(
+                "font-medium transition-colors",
+                isActive
+                  ? "text-resort-olive"
+                  : "text-gray-700 hover:text-resort-olive"
+              )
+            }
+            end={item.to === "/"}
+          >
+            {item.name}
+          </NavLink>
+        ))}
       <div className="flex gap-4 items-center">
         {user && (
           <>
