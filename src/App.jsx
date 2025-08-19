@@ -8,6 +8,7 @@ import Contact from './pages/Contact.jsx';
 import NotFound from './pages/NotFound.jsx';
 import ImageOptimizer from './pages/ImageOptimizer.jsx';
 import RoomDetail from './pages/RoomDetail.jsx';
+import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 
 export default function App() {
   return (
@@ -22,6 +23,9 @@ export default function App() {
         <Route path="optimize" element={<ImageOptimizer />} />
         <Route path="*" element={<NotFound />} />
       </Route>
+      
+      {/* Admin Routes - Sin MainLayout */}
+      <Route path="admin" element={<AdminDashboard />} />
     </Routes>
   );
 }
