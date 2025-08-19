@@ -1,33 +1,6 @@
-// import { useRooms } from "../../context/RoomsContext";
-// import RoomCard from "./RoomCard.jsx";
-
-// export default function RoomsGrid() {
-//   const { rooms } = useRooms();
-
-//   return (
-//     <section id="rooms-grid" className="py-14">
-//       <div className="container">
-//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-//           {rooms.map((room) => (
-//             <RoomCard key={room.id} {...room} />
-//           ))}
-//         </div>
-//       </div>
-//     </section>
-//   );
-// }
-
-
-
 import RoomCard from './RoomCard.jsx';
-import { useRooms } from '../../context/RoomsContext.jsx'; // 👈 importamos el hook
+import { useRooms } from '../../context/RoomsContext.jsx'; 
 
-/**
- * Grilla de habitaciones.
- *
- * @component
- * @returns {JSX.Element}
- */
 export default function RoomsGrid() {
   const { rooms } = useRooms(); // 👈 obtenemos las habitaciones del contexto
 
@@ -43,7 +16,7 @@ export default function RoomsGrid() {
                 key={room.id}
                 id={room.id}
                 title={room.name}
-                imageUrl={room.image || "https://via.placeholder.com/400"} // fallback si no hay imagen
+                imageUrl={room.images[0] || "https://via.placeholder.com/400"} // <-- Cambiado a room.images[0]
                 price={room.price}
                 description={room.description}
               />
@@ -54,3 +27,4 @@ export default function RoomsGrid() {
     </section>
   );
 }
+

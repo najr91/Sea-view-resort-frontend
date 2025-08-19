@@ -5,19 +5,6 @@ import { Button } from '../ui/Button';
 import { Wifi, Coffee, Waves, ChevronLeft, ChevronRight } from 'lucide-react';
 import ImageGalleryModal from './ImageGalleryModal.jsx';
 
-/**
- * Tarjeta de habitación para listados.
- *
- * @component
- * @param {Object} props - Propiedades del componente.
- * @param {string} props.id - Identificador de la habitación.
- * @param {string} props.imageUrl - Imagen principal.
- * @param {string[]} [props.imageUrls] - Galería de imágenes.
- * @param {string} props.title - Título de la habitación.
- * @param {number} props.price - Precio por noche.
- * @param {'Yes'|'No'} [props.available] - Disponibilidad.
- * @returns {JSX.Element}
- */
 export default function RoomCard({ id = 'demo-room', imageUrl, imageUrls = [], title, price, available = 'Yes' }) {
   const images = useMemo(() => (imageUrls && imageUrls.length > 0 ? imageUrls : [imageUrl]), [imageUrl, imageUrls]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -29,7 +16,7 @@ export default function RoomCard({ id = 'demo-room', imageUrl, imageUrls = [], t
   return (
     <Card className="group overflow-hidden bg-white rounded-xl border border-gray-200/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
       <div className="relative cursor-pointer overflow-hidden" onClick={() => setOpenModal(true)}>
-        <img src={images[currentIndex]} alt={title} className="w-full h-56 md:h-64 lg:h-72 object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+        <img src={images[0]} alt={title} className="w-full h-56 md:h-64 lg:h-72 object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
         <div className="absolute top-3 left-3 flex items-center gap-2">
           <span className={`px-2.5 py-1 rounded-full text-xs font-medium backdrop-blur bg-white/80 ${available === 'Yes' ? 'text-emerald-700' : 'text-rose-700'}`}>{available === 'Yes' ? 'Disponible' : 'No disponible'}</span>
@@ -89,5 +76,3 @@ export default function RoomCard({ id = 'demo-room', imageUrl, imageUrls = [], t
     </Card>
   );
 }
-
-
