@@ -50,10 +50,13 @@ export default function App() {
         <Route path="optimize" element={<ImageOptimizer />} />
         <Route path="*" element={<NotFound />} />
         <Route
+          path="/admin/rooms"element={<AdminRooms /> } />
+      </Route>
+        {/* <Route
           path="/admin/rooms"
           element={user ? <AdminRooms /> : <Navigate to="/login" />}
         />
-      </Route>
+      </Route> */}
     </Routes>
   );
 }

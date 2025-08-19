@@ -10,6 +10,7 @@ const navItems = [
   { name: "Nosotros", to: "/about" },
   { name: "Contacto", to: "/contact" },
   { name: "Administrador", to: "/admin/rooms" },
+  
 ];
 
 export default function Navigation() {
