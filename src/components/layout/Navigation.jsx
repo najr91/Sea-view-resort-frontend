@@ -9,7 +9,7 @@ const navItems = [
   { name: "Habitaciones", to: "/rooms" },
   { name: "Nosotros", to: "/about" },
   { name: "Contacto", to: "/contact" },
-  { name: "Administrador", to: "/admin/rooms" },
+  { name: "Administrador", to: "/admin" },
   
 ];
 
