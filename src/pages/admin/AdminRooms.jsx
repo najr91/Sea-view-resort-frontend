@@ -6,17 +6,22 @@ export default function AdminRooms() {
   const { rooms, setRooms } = useRooms(); 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
-  const [formData, setFormData] = useState({ name: "", price: "", description: "", image: null });
+  const [formData, setFormData] = useState({ name: "", price: "", description: "", images: [] });
 
   const [confirmData, setConfirmData] = useState({ open: false, action: null, message: "" });
 
   const openModal = (room = null) => {
     if (room) {
       setEditingRoom(room);
-      setFormData(room);
+      setFormData({
+        name: room.name,
+        price: room.price,
+        description: room.description,
+        images: room.images || [],
+      });
     } else {
       setEditingRoom(null);
-      setFormData({ name: "", price: "", description: "", image: null });
+      setFormData({ name: "", price: "", description: "", images: [] });
     }
     setIsModalOpen(true);
   };
@@ -26,7 +31,7 @@ export default function AdminRooms() {
       formData.name !== (editingRoom?.name || "") ||
       formData.price !== (editingRoom?.price || "") ||
       formData.description !== (editingRoom?.description || "") ||
-      formData.image !== (editingRoom?.image || null)
+      formData.images !== (editingRoom?.images || [])
     ) {
       setConfirmData({
         open: true,
@@ -49,11 +54,15 @@ export default function AdminRooms() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData({ ...formData, image: URL.createObjectURL(file) });
+      setFormData({ ...formData, images: [...formData.images, URL.createObjectURL(file)] });
     }
   };
 
-  const removeImage = () => setFormData({ ...formData, image: null });
+  const removeImage = (index) => {
+    const newImages = [...formData.images];
+    newImages.splice(index, 1);
+    setFormData({ ...formData, images: newImages });
+  };
 
   const handleSave = () => {
     if (!formData.name.trim() || !formData.price || !formData.description.trim()) {
@@ -76,7 +85,13 @@ export default function AdminRooms() {
       message: "¿Quieres guardar los cambios?",
       action: () => {
         if (editingRoom) {
-          setRooms(rooms.map((r) => (r.id === editingRoom.id ? { ...formData, id: r.id } : r)));
+          setRooms(
+            rooms.map((r) =>
+              r.id === editingRoom.id
+                ? { ...formData, id: r.id }
+                : r
+            )
+          );
           toast.success("Habitación actualizada");
         } else {
           setRooms([...rooms, { ...formData, id: Date.now() }]);
@@ -98,6 +113,19 @@ export default function AdminRooms() {
     });
   };
 
+  const handleDeleteImage = (roomId, imageIndex) => {
+    setRooms(
+      rooms.map((room) =>
+        room.id === roomId
+          ? {
+              ...room,
+              images: room.images.filter((_, idx) => idx !== imageIndex),
+            }
+          : room
+      )
+    );
+  };
+
   return (
     <div className="container py-8">
       <Toaster position="top-right" />
@@ -111,7 +139,6 @@ export default function AdminRooms() {
         + Agregar Habitación
       </button>
 
-      
       <div className="overflow-x-auto hidden md:block">
         <table className="min-w-full bg-white rounded-lg shadow">
           <thead>
@@ -130,8 +157,8 @@ export default function AdminRooms() {
                 <td className="py-3 px-4">${room.price}</td>
                 <td className="py-3 px-4">{room.description}</td>
                 <td className="py-3 px-4">
-                  {room.image ? (
-                    <img src={room.image} alt="preview" className="w-16 h-16 object-cover rounded" />
+                  {room.images && room.images.length > 0 ? (
+                    <img src={room.images[0]} alt="preview" className="w-16 h-16 object-cover rounded" />
                   ) : (
                     <span className="text-gray-400">Sin imagen</span>
                   )}
@@ -160,15 +187,16 @@ export default function AdminRooms() {
         </table>
       </div>
 
-     
       <div className="grid gap-4 md:hidden">
         {rooms.map((room) => (
           <div key={room.id} className="bg-white rounded-lg shadow p-4">
             <h3 className="text-lg font-bold">{room.name}</h3>
             <p className="text-gray-600">Precio: ${room.price}</p>
             <p className="text-gray-500">{room.description}</p>
-            {room.image && (
-              <img src={room.image} alt="preview" className="w-full h-32 object-cover rounded mt-2" />
+            {room.images && room.images.length > 0 && (
+              <div className="flex gap-2">
+                <img src={room.images[0]} alt="preview" className="w-16 h-16 object-cover rounded" />
+              </div>
             )}
             <div className="mt-3 flex space-x-2">
               <button
@@ -190,7 +218,6 @@ export default function AdminRooms() {
         ))}
       </div>
 
-      
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-lg shadow w-full max-w-md">
@@ -226,25 +253,35 @@ export default function AdminRooms() {
             <div className="mb-4">
               <label className="block text-gray-700 font-medium mb-2">Imagen</label>
               <input type="file" accept="image/*" onChange={handleImageChange} className="w-full border p-2 rounded" />
-              {formData.image && (
-                <div className="mt-3">
-                  <img src={formData.image} alt="preview" className="w-full h-32 object-cover rounded" />
-                  <button
-                    type="button"
-                    onClick={removeImage}
-                    className="mt-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
-                  >
-                    Quitar imagen
-                  </button>
+              {formData.images && formData.images.length > 0 && (
+                <div className="flex gap-2 overflow-x-auto py-2">
+                  {formData.images.map((img, idx) => (
+                    <div key={idx} className="relative">
+                      <img src={img} alt={`image-${idx}`} className="w-16 h-16 object-cover rounded" />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(idx)}
+                        className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full p-1"
+                      >
+                        X
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
 
-            <div className="flex justify-end space-x-2">
-              <button onClick={closeModal} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={closeModal}
+                className="bg-gray-500 text-white px-4 py-2 rounded"
+              >
                 Cancelar
               </button>
-              <button onClick={handleSave} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+              <button
+                onClick={handleSave}
+                className="bg-blue-600 text-white px-4 py-2 rounded"
+              >
                 Guardar
               </button>
             </div>
@@ -252,15 +289,14 @@ export default function AdminRooms() {
         </div>
       )}
 
-      
       {confirmData.open && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
-          <div className="bg-white p-6 rounded-lg shadow w-full max-w-sm text-center">
-            <p className="mb-6 text-lg">{confirmData.message}</p>
-            <div className="flex justify-center space-x-4">
+          <div className="bg-white p-6 rounded-lg shadow w-full max-w-md">
+            <h3 className="text-lg">{confirmData.message}</h3>
+            <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => setConfirmData({ open: false, action: null, message: "" })}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                className="bg-gray-500 text-white px-4 py-2 rounded"
               >
                 Cancelar
               </button>
@@ -269,7 +305,7 @@ export default function AdminRooms() {
                   confirmData.action();
                   setConfirmData({ open: false, action: null, message: "" });
                 }}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="bg-red-600 text-white px-4 py-2 rounded"
               >
                 Confirmar
               </button>
