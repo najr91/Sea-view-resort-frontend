@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import axios from 'axios';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
@@ -5,6 +7,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { MapPin, Bed, Users, Calendar, CalendarDays } from 'lucide-react';
 
 export default function SearchFilters() {
+  const [filters, setFilters] = useState({
+    destino: '',
+    habitacion: '',
+    huespedes: '',
+    checkIn: '2024-08-15',
+    checkOut: '2024-08-20',
+  });
+
+  const handleChange = (field, value) => {
+    setFilters(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSearch = async () => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/busqueda', filters);
+      // Maneja la respuesta aquí
+      console.log(response.data);
+    } catch (error) {
+      // Maneja el error aquí
+      console.error(error);
+    }
+  };
+
   return (
     <Card className="max-w-6xl mx-auto shadow-lg">
       <CardContent className="p-4 md:p-6">
@@ -16,7 +41,7 @@ export default function SearchFilters() {
                 <span>Destino</span>
               </div>
               <div className="w-full">
-                <Select>
+                <Select onValueChange={v => handleChange('destino', v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccione un destino" />
                   </SelectTrigger>
@@ -37,7 +62,7 @@ export default function SearchFilters() {
                 <span>Tipo de habitación</span>
               </div>
               <div className="w-full">
-                <Select>
+                <Select onValueChange={v => handleChange('habitacion', v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Estándar" />
                   </SelectTrigger>
@@ -58,7 +83,7 @@ export default function SearchFilters() {
                 <span>Huéspedes</span>
               </div>
               <div className="w-full">
-                <Select>
+                <Select onValueChange={v => handleChange('huespedes', v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="2 Adultos" />
                   </SelectTrigger>
@@ -77,10 +102,14 @@ export default function SearchFilters() {
             <div className="flex flex-col items-start gap-2">
               <div className="flex items-center gap-2 text-sm text-resort-slate md:shrink-0">
                 <Calendar className="w-4 h-4" />
-                <span>Ingreso</span>
+                <span>Check-in</span>
               </div>
               <div className="w-full">
-                <Input type="date" defaultValue="2024-05-15" />
+                <Input
+                  type="date"
+                  value={filters.checkIn}
+                  onChange={e => handleChange('checkIn', e.target.value)}
+                />
               </div>
             </div>
           </div>
@@ -89,16 +118,22 @@ export default function SearchFilters() {
             <div className="flex flex-col items-start gap-2">
               <div className="flex items-center gap-2 text-sm text-resort-slate md:shrink-0">
                 <CalendarDays className="w-4 h-4" />
-                <span>Egreso</span>
+                <span>Check-out</span>
               </div>
               <div className="w-full">
-                <Input type="date" defaultValue="2024-05-20" />
+                <Input
+                  type="date"
+                  value={filters.checkOut}
+                  onChange={e => handleChange('checkOut', e.target.value)}
+                />
               </div>
             </div>
           </div>
 
           <div className="mt-2 md:mt-0 flex md:col-span-2 md:justify-start self-end">
-            <Button size="md" className="w-full md:w-full">Buscar</Button>
+            <Button size="md" className="w-full md:w-full" onClick={handleSearch}>
+              Buscar
+            </Button>
           </div>
         </div>
       </CardContent>
