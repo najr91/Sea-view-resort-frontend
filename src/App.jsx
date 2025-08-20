@@ -31,14 +31,16 @@ export default function App() {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  const protectedRoutes = [
+  const chatbotHiddenRoutes = [
     "/admin",
     "/admin/rooms",
     "/admin/users",
     "/admin/manage-users",
+    "/login",
+    "/register",
   ];
 
-  const isProtectedRoute = protectedRoutes.some(route =>
+  const isChatbotHidden = chatbotHiddenRoutes.some(route =>
     location.pathname.startsWith(route)
   );
 
@@ -55,8 +57,6 @@ export default function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
           <Route
             path="/profile"
             element={user ? <Profile /> : <Navigate to="/login" />}
@@ -94,6 +94,8 @@ export default function App() {
             element={user ? <ManageUsers /> : <Navigate to="/login" />}
           />
         </Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route
           path="/admin/reservations"
           element={
@@ -104,7 +106,7 @@ export default function App() {
         />
       </Routes>
 
-      {!isProtectedRoute && <ChatbotWidget />}
+      {!isChatbotHidden && <ChatbotWidget />}
 
       {/* Admin Routes - Sin MainLayout 
       <Route path="/adminrutas" element={<AdminDashboard />} />*/}
