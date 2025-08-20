@@ -18,6 +18,7 @@ import PasswordChange from "./pages/PasswordChange.jsx";
 import AdminRooms from "./pages/admin/AdminRooms.jsx";
 import Administrador from "./pages/admin/Administrador.jsx";
 import AdminUsers from "./pages/admin/AdminUsers.jsx";
+import ManageUsers from "./pages/admin/ManageUsers.jsx";
 import ChatbotWidget from "./components/ChatbotWidget"; 
 
 function ProtectedRoute({ children }) {
@@ -29,14 +30,12 @@ export default function App() {
   const { user, loading } = useAuth();
   const location = useLocation(); 
 
-  
   const protectedRoutes = [
     "/admin",
     "/admin/rooms",
     "/admin/users"
   ];
 
-  
   const isProtectedRoute = protectedRoutes.some(route =>
     location.pathname.startsWith(route)
   );
@@ -63,7 +62,6 @@ export default function App() {
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/password-change" element={<PasswordChange />} />
-
           <Route path="explore" element={<Explore />} />
           <Route path="rooms" element={<Rooms />} />
           <Route path="rooms/:id" element={<RoomDetail />} />
@@ -71,11 +69,7 @@ export default function App() {
           <Route path="contact" element={<Contact />} />
           <Route path="optimize" element={<ImageOptimizer />} />
           <Route path="*" element={<NotFound />} />
-          
-          {/* <Route path="/admin" element={<Administrador />} />
-          <Route path="/admin/rooms" element={<AdminRooms />} />
-          <Route path="/admin/users" element={<AdminUsers />} /> */}
-        
+
           <Route
             path="/admin"
             element={
@@ -100,10 +94,13 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/manage-users"
+            element={user ? <ManageUsers /> : <Navigate to="/login" />}
+          />
         </Route>
       </Routes>
 
-      
       {!isProtectedRoute && <ChatbotWidget />}
     </>
   );
