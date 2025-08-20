@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet, Link } from "react-router-dom";
 import { Menu } from "lucide-react";
+import { useAuth } from "../context/AuthContext.jsx";
 import { Button } from "../components/ui/Button";
 import Navigation from "../components/layout/Navigation.jsx";
 import MobileMenu from "../components/layout/MobileMenu.jsx";
 import Footer from "../components/layout/Footer.jsx";
-import { useAuth } from "../context/AuthContext.jsx";
+import UserMenu from "../components/layout/UserMenu.jsx";
 
 export default function MainLayout() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -42,7 +43,7 @@ export default function MainLayout() {
     <div className="min-h-screen bg-resort-cream flex flex-col overflow-x-hidden">
       <header
         ref={headerRef}
-        className="sticky top-0 z-30 flex flex-wrap justify-between items-center px-8 py-5 bg-white shadow-sm"
+        className="fixed top-0 left-0 right-0 z-30 flex flex-wrap justify-between items-center px-6 lg:px-8 py-4 lg:py-5 bg-white shadow-sm"
       >
         <div className="flex items-center">
           <Link
@@ -59,19 +60,22 @@ export default function MainLayout() {
           </Link>
         </div>
 
-        <div className="flex items-center space-x-6">
+        <div className="hidden lg:flex items-center space-x-6">
           <Navigation />
         </div>
 
         <div className="flex items-center justify-end gap-3">
-          <div className="hidden md:block ">
-            <Button asChild>
-              <a href="/rooms">Reservar</a>
-            </Button>
+          <div className="hidden lg:block ">
+            <Link to="/rooms">
+              <Button className="px-6 text-base">Reservar</Button>
+            </Link>
+          </div>
+          <div className="hidden lg:block">
+            <UserMenu />
           </div>
 
           <button
-            className="md:hidden inline-flex items-center justify-center p-3 rounded-md text-gray-700 hover:text-resort-olive"
+            className="lg:hidden inline-flex items-center justify-center p-3 rounded-md text-gray-700 hover:text-resort-olive"
             onClick={() => setIsMobileOpen(true)}
             aria-label="Open menu"
           >
@@ -87,7 +91,7 @@ export default function MainLayout() {
         logout={logout}
       />
 
-      <main className="flex-1">
+      <main className="flex-1" style={{ paddingTop: "var(--app-header-height, 64px)" }}>
         <Outlet />
       </main>
 

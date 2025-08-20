@@ -3,19 +3,21 @@ import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/Select';
-import { 
-  Calendar, 
-  Bed, 
-  Users, 
-  Search, 
+import {
+  Calendar,
+  Bed,
+  Users,
+  Search,
   Filter,
   CheckCircle,
   XCircle,
   Clock,
   Eye,
   Edit,
-  Plus
+  Plus,
+  Info
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 export default function AdminAvailability() {
   const [availabilityData, setAvailabilityData] = useState([]);
@@ -136,7 +138,7 @@ export default function AdminAvailability() {
         amenities: ['WiFi', 'TV', 'A/C', 'Balcony', 'Ocean View']
       }
     ];
-    
+
     setAvailabilityData(mockAvailability);
     setFilteredData(mockAvailability);
     setIsLoading(false);
@@ -235,21 +237,21 @@ export default function AdminAvailability() {
 
       if (selectedRoom.id === 'new') {
         // Crear nueva reserva sin habitación específica
-        alert('Reserva creada exitosamente (sin habitación asignada)');
+        toast.success('Reserva creada exitosamente (sin habitación asignada)');
       } else {
         // Actualizar el estado de la habitación existente
-        setAvailabilityData(prev => prev.map(room => 
-          room.id === selectedRoom.id 
+        setAvailabilityData(prev => prev.map(room =>
+          room.id === selectedRoom.id
             ? {
-                ...room,
-                status: 'reserved',
-                currentGuest: reservationForm.guestName,
-                checkIn: reservationForm.checkIn,
-                checkOut: reservationForm.checkOut
-              }
+              ...room,
+              status: 'reserved',
+              currentGuest: reservationForm.guestName,
+              checkIn: reservationForm.checkIn,
+              checkOut: reservationForm.checkOut
+            }
             : room
         ));
-        alert('Reserva creada exitosamente');
+        toast.success('Reserva creada exitosamente');
       }
 
       setIsModalOpen(false);
@@ -265,7 +267,7 @@ export default function AdminAvailability() {
       });
     } catch (error) {
       console.error('Error al crear la reserva:', error);
-      alert('Error al crear la reserva');
+      toast.error('Error al crear la reserva');
     }
   };
 
@@ -274,22 +276,31 @@ export default function AdminAvailability() {
       // Simular actualización de estado
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      setAvailabilityData(prev => prev.map(room => 
-        room.id === roomId 
+      setAvailabilityData(prev => prev.map(room =>
+        room.id === roomId
           ? {
-              ...room,
-              status: newStatus,
-              currentGuest: newStatus === 'available' ? null : room.currentGuest,
-              checkIn: newStatus === 'available' ? null : room.checkIn,
-              checkOut: newStatus === 'available' ? null : room.checkOut
-            }
+            ...room,
+            status: newStatus,
+            currentGuest: newStatus === 'available' ? null : room.currentGuest,
+            checkIn: newStatus === 'available' ? null : room.checkIn,
+            checkOut: newStatus === 'available' ? null : room.checkOut
+          }
           : room
       ));
 
-      alert(`Estado de habitación actualizado a: ${getStatusText(newStatus)}`);
+      toast.custom(
+        <div className="max-w-sm w-full bg-blue-50 border border-blue-200 text-blue-800 rounded-lg shadow p-3 flex items-start gap-3">
+          <Info className="w-5 h-5 text-blue-600 mt-0.5" />
+          <div className="text-sm">
+            <p className="font-medium">Actualización</p>
+            <p>Estado de habitación actualizado a: {getStatusText(newStatus)}</p>
+          </div>
+        </div>,
+        { duration: 3000 }
+      );
     } catch (error) {
       console.error('Error al actualizar el estado:', error);
-      alert('Error al actualizar el estado');
+      toast.error('Error al actualizar el estado');
     }
   };
 
@@ -322,7 +333,7 @@ export default function AdminAvailability() {
                 min="2025-08-20"
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium mb-2">Tipo de habitación</label>
               <Select value={roomTypeFilter} onValueChange={setRoomTypeFilter}>
@@ -470,12 +481,11 @@ export default function AdminAvailability() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredData.map((room) => (
-              <Card key={room.id} className={`border-2 ${
-                room.status === 'available' ? 'border-green-200' :
+              <Card key={room.id} className={`border-2 ${room.status === 'available' ? 'border-green-200' :
                 room.status === 'occupied' ? 'border-red-200' :
-                room.status === 'reserved' ? 'border-yellow-200' :
-                'border-gray-200'
-              }`}>
+                  room.status === 'reserved' ? 'border-yellow-200' :
+                    'border-gray-200'
+                }`}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-lg font-semibold">Habitación {room.roomNumber}</h3>
@@ -490,7 +500,7 @@ export default function AdminAvailability() {
                       <Bed className="w-4 h-4 text-gray-400" />
                       <span className="font-medium">{room.roomType}</span>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                       <Users className="w-4 h-4 text-gray-400" />
                       <span>Capacidad: {room.capacity} personas</span>
@@ -536,7 +546,7 @@ export default function AdminAvailability() {
                         Crear Reserva
                       </Button>
                     )}
-                    
+
                     {room.status !== 'available' && (
                       <Button
                         size="sm"
@@ -586,17 +596,17 @@ export default function AdminAvailability() {
                   <label className="block text-sm font-medium mb-2">Nombre del huésped *</label>
                   <Input
                     value={reservationForm.guestName}
-                    onChange={(e) => setReservationForm({...reservationForm, guestName: e.target.value})}
+                    onChange={(e) => setReservationForm({ ...reservationForm, guestName: e.target.value })}
                     placeholder="Nombre completo"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium mb-2">Email *</label>
                   <Input
                     type="email"
                     value={reservationForm.email}
-                    onChange={(e) => setReservationForm({...reservationForm, email: e.target.value})}
+                    onChange={(e) => setReservationForm({ ...reservationForm, email: e.target.value })}
                     placeholder="email@ejemplo.com"
                   />
                 </div>
@@ -605,14 +615,14 @@ export default function AdminAvailability() {
                   <label className="block text-sm font-medium mb-2">Teléfono *</label>
                   <Input
                     value={reservationForm.phone}
-                    onChange={(e) => setReservationForm({...reservationForm, phone: e.target.value})}
+                    onChange={(e) => setReservationForm({ ...reservationForm, phone: e.target.value })}
                     placeholder="+34 123 456 789"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-2">Número de huéspedes</label>
-                  <Select value={reservationForm.guests} onValueChange={(value) => setReservationForm({...reservationForm, guests: value})}>
+                  <Select value={reservationForm.guests} onValueChange={(value) => setReservationForm({ ...reservationForm, guests: value })}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -630,7 +640,7 @@ export default function AdminAvailability() {
                   <Input
                     type="date"
                     value={reservationForm.checkIn}
-                    onChange={(e) => setReservationForm({...reservationForm, checkIn: e.target.value})}
+                    onChange={(e) => setReservationForm({ ...reservationForm, checkIn: e.target.value })}
                     min="2025-08-20"
                   />
                 </div>
@@ -640,7 +650,7 @@ export default function AdminAvailability() {
                   <Input
                     type="date"
                     value={reservationForm.checkOut}
-                    onChange={(e) => setReservationForm({...reservationForm, checkOut: e.target.value})}
+                    onChange={(e) => setReservationForm({ ...reservationForm, checkOut: e.target.value })}
                     min="2025-08-21"
                   />
                 </div>
@@ -650,7 +660,7 @@ export default function AdminAvailability() {
                 <label className="block text-sm font-medium mb-2">Solicitudes especiales</label>
                 <textarea
                   value={reservationForm.specialRequests}
-                  onChange={(e) => setReservationForm({...reservationForm, specialRequests: e.target.value})}
+                  onChange={(e) => setReservationForm({ ...reservationForm, specialRequests: e.target.value })}
                   placeholder="Solicitudes especiales o comentarios..."
                   className="w-full p-3 border border-gray-300 rounded-lg resize-none"
                   rows="3"

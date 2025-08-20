@@ -27,13 +27,12 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     setUser(null);
     setProfileImage(null);
-    await fetch("http://localhost:4002/api/v1/logout"),
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      };
+    await fetch("/api/v1/logout", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
   };
 
   const getProfile = async () => {
@@ -47,7 +46,8 @@ export const AuthProvider = ({ children }) => {
     setUser(data);
 
     if (data.profileImage) {
-      setProfileImage(`http://localhost:4002${data.profileImage}`);
+      const base = import.meta.env.VITE_PUBLIC_API_BASE || '';
+      setProfileImage(`${base}${data.profileImage}`);
     }
   };
 

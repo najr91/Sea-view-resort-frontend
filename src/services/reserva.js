@@ -19,15 +19,15 @@
 export const createReservation = async (reservationData) => {
   try {
     // Buscar la habitación para obtener el roomId
-    const roomsResponse = await fetch('http://localhost:4002/api/rooms');
+    const roomsResponse = await fetch('/api/rooms');
     const rooms = await roomsResponse.json();
     const room = rooms.find(r => r.name === reservationData.habitacion);
-    
+
     if (!room) {
       throw new Error('Habitación no encontrada');
     }
 
-    const response = await fetch('http://localhost:4002/api/reserva', { //  Cambiar de 'reservas' a 'reserva'
+    const response = await fetch('/api/reserva', { //  Cambiar de 'reservas' a 'reserva'
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ export const createReservation = async (reservationData) => {
  */
 export const getReservations = async () => {
   try {
-    const response = await fetch('http://localhost:4002/api/reservas'); //  Esta URL está bien
+    const response = await fetch('/api/reservas'); //  Esta URL está bien
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -80,7 +80,7 @@ export const getReservations = async () => {
  */
 export const checkAvailability = async (roomId, checkIn, checkOut) => {
   try {
-    const response = await fetch(`http://localhost:4002/api/rooms/${roomId}/disponibilidad?checkIn=${checkIn}&checkOut=${checkOut}`);
+    const response = await fetch(`/api/rooms/${roomId}/disponibilidad?checkIn=${checkIn}&checkOut=${checkOut}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -99,7 +99,7 @@ export const checkAvailability = async (roomId, checkIn, checkOut) => {
  */
 export const updateReservation = async (reservationId, updateData) => {
   try {
-    const response = await fetch(`http://localhost:4002/api/reservas/${reservationId}`, {
+    const response = await fetch(`/api/reservas/${reservationId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ export const updateReservation = async (reservationId, updateData) => {
  */
 export const deleteReservation = async (reservationId) => {
   try {
-    const response = await fetch(`http://localhost:4002/api/reservas/${reservationId}`, {
+    const response = await fetch(`/api/reservas/${reservationId}`, {
       method: 'DELETE'
     });
 

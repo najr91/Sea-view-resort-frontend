@@ -66,7 +66,12 @@ function useItemsPerView() {
 
   useEffect(() => {
     const update = () => {
-      setItemsPerView(window.innerWidth >= 768 ? 3 : 1);
+      const width = window.innerWidth;
+      if (width >= 768) {
+        setItemsPerView(4);
+      } else {
+        setItemsPerView(1);
+      }
     };
     update();
     window.addEventListener('resize', update);
@@ -120,18 +125,18 @@ export default function Testimonials() {
               style={{ transform: `translateX(-${currentPage * 100}%)` }}
             >
               {pages.map((group, pageIdx) => (
-                <div key={pageIdx} className="grid grid-cols-1 md:grid-cols-3 gap-8 min-w-full">
+                <div key={pageIdx} className="grid grid-cols-1 md:grid-cols-4 gap-5 min-w-full">
                   {group.map((testimonial, index) => (
-                    <Card key={`${pageIdx}-${index}`} className="h-full flex flex-col text-center p-8 md:p-10 hover:shadow-lg transition-shadow">
+                    <Card key={`${pageIdx}-${index}`} className="h-full flex flex-col text-center p-6 md:p-8 hover:shadow-lg transition-shadow">
                       <div className="mb-4">
-                        <p className="text-sm md:text-base text-resort-slate mb-3">{testimonial.date}</p>
+                        <p className="text-xs md:text-sm text-resort-slate mb-3">{testimonial.date}</p>
                         <div className="flex justify-center mb-5">
                           {[...Array(5)].map((_, i) => (
                             <Star key={i} className="w-5 h-5 fill-resort-gold text-resort-gold" />
                           ))}
                         </div>
                       </div>
-                      <blockquote className="text-base md:text-lg text-resort-slate mb-6 leading-relaxed">“{testimonial.text}”</blockquote>
+                      <blockquote className="text-sm md:text-base text-resort-slate mb-6 leading-relaxed">“{testimonial.text}”</blockquote>
                       <div className="mt-auto flex items-center justify-center gap-4">
                         <img
                           src={testimonial.avatar || 'https://i.pravatar.cc/80?u=default'}
@@ -139,7 +144,7 @@ export default function Testimonials() {
                           className="w-12 h-12 rounded-full object-cover"
                         />
                         <div>
-                          <p className="font-medium text-resort-olive text-base md:text-lg">{testimonial.name}</p>
+                          <p className="font-medium text-resort-olive text-sm md:text-base">{testimonial.name}</p>
                         </div>
                       </div>
                     </Card>

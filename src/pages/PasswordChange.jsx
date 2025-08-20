@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { Button } from "../components/ui/Button";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
-const API = "http://localhost:4002/api/v1";
+const API = "/api/v1";
 
 function PasswordChange() {
   const [params] = useSearchParams();
@@ -51,9 +52,7 @@ function PasswordChange() {
           required
         />
 
-        <button className="w-full bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white py-2 rounded">
-          Cambiar contraseña
-        </button>
+        <Button className="w-full">Cambiar contraseña</Button>
 
         {message && <p className="text-[rgb(150,130,96)]  mt-3">{message}</p>}
         {error && <p className="text-red-500 mt-3">{error}</p>}

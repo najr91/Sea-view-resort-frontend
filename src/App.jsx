@@ -18,7 +18,7 @@ import PasswordChange from "./pages/PasswordChange.jsx";
 import AdminRooms from "./pages/admin/AdminRooms.jsx";
 import Administrador from "./pages/admin/Administrador.jsx";
 import ManageUsers from "./pages/admin/ManageUsers.jsx";
-import ChatbotWidget from "./components/ChatbotWidget"; // <- de tu rama chatbot
+import ChatbotWidget from "./components/chatbot/ChatbotWidget.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 
 function ProtectedRoute({ children }) {
@@ -30,14 +30,16 @@ export default function App() {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  const protectedRoutes = [
+  const chatbotHiddenRoutes = [
     "/admin",
     "/admin/rooms",
     "/admin/users",
     "/admin/manage-users",
+    "/login",
+    "/register",
   ];
 
-  const isProtectedRoute = protectedRoutes.some((route) =>
+  const isChatbotHidden = chatbotHiddenRoutes.some(route =>
     location.pathname.startsWith(route)
   );
 
@@ -52,14 +54,15 @@ export default function App() {
   return (
     <>
       <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/password-change" element={<PasswordChange />} />
+        
+        {/* Protected Routes */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
-
-          <Route
-            path="/profile"
-            element={user ? <Profile /> : <Navigate to="/login" />}
-          />
-
           <Route path="explore" element={<Explore />} />
           <Route path="rooms" element={<Rooms />} />
           <Route path="rooms/:id" element={<RoomDetail />} />
@@ -84,7 +87,6 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/admin/manage-users"
             element={user ? <ManageUsers /> : <Navigate to="/login" />}
@@ -98,17 +100,9 @@ export default function App() {
             }
           />
         </Route>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/password-change" element={<PasswordChange />} />
       </Routes>
 
-      {!isProtectedRoute && <ChatbotWidget />}
-
-      {/* Admin Routes - Sin MainLayout 
-      <Route path="/adminrutas" element={<AdminDashboard />} />*/}
+      {!isChatbotHidden && <ChatbotWidget />}
     </>
   );
 }

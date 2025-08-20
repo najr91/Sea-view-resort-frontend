@@ -98,7 +98,7 @@ export function RoomsProvider({ children }) {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const { data } = await axios.get("http://localhost:4002/api/rooms");
+        const { data } = await axios.get("/api/rooms");
         if (Array.isArray(data) && data.length > 0) {
           setRooms(data);
         }

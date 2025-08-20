@@ -13,22 +13,21 @@ const facilities = [
 
 export default function Facilities() {
   return (
-    <section className="section-standard bg-white flex items-start pt-16 md:pt-20 pb-12">
+    <section className="section-standard bg-white flex items-start pt-16 md:pt-20 pb-24 md:pb-28">
       <div className="container">
-        <div className="text-center mb-16 md:mb-20">
-          <h2 className="text-3xl font-serif text-resort-olive mb-4">Nuestras instalaciones</h2>
-          <p className="text-resort-slate">Comodidades modernas de categoría para una estadía excepcional.</p>
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-4xl font-serif text-gray-900 mb-3">Nuestras instalaciones</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">Comodidades modernas de categoría para una estadía excepcional.</p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-16 justify-items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {facilities.map((facility, index) => (
-            <div key={index} className="text-center group cursor-pointer">
-              <div className="w-16 h-16 bg-resort-gold/30 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-resort-gold/50 transition-colors">
-                <facility.icon className="w-8 h-8 text-resort-olive" />
-              </div>
-              <h3 className="font-medium text-resort-olive group-hover:text-resort-olive/80 transition-colors">
-                {facility.label}
-              </h3>
+            <div
+              key={index}
+              className="bg-gray-50 rounded-xl p-10 md:p-12 flex flex-col items-center text-center shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
+            >
+              <facility.icon className="w-10 h-10 text-resort-olive" />
+              <h3 className="mt-6 text-lg font-medium text-resort-olive">{facility.label}</h3>
             </div>
           ))}
         </div>

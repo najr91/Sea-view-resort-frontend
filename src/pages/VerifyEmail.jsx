@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { Button } from "../components/ui/Button";
 
 function VerifyEmail() {
   const [searchParams] = useSearchParams();
@@ -22,7 +23,7 @@ function VerifyEmail() {
 
       try {
         const res = await axios.get(
-          `http://localhost:4002/api/v1/verify-email?token=${token}`
+          `/api/v1/verify-email?token=${token}`
         );
 
         if (isMounted && res.data.success) {
@@ -55,21 +56,15 @@ function VerifyEmail() {
           <p>{status}</p>
 
           {verified && (
-            <button
-              onClick={() => navigate("/login")}
-              className="mt-4 bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white px-4 py-2 rounded"
-            >
+            <Button onClick={() => navigate("/login")} className="mt-4">
               Iniciar Sesión
-            </button>
+            </Button>
           )}
 
           {error && (
-            <button
-              onClick={() => navigate("/")}
-              className="mt-4 bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white px-4 py-2 rounded"
-            >
+            <Button onClick={() => navigate("/")} className="mt-4">
               Volver al inicio
-            </button>
+            </Button>
           )}
         </div>
       </div>
