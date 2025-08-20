@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
-import { Outlet, Link } from 'react-router-dom';
-import { Menu } from 'lucide-react';
-import { Button } from '../components/ui/Button';
-import Navigation from '../components/layout/Navigation.jsx';
-import MobileMenu from '../components/layout/MobileMenu.jsx';
-import Footer from '../components/layout/Footer.jsx';
+import { useState, useEffect, useRef } from "react";
+import { Outlet, Link } from "react-router-dom";
+import { Menu } from "lucide-react";
+import { Button } from "../components/ui/Button";
+import Navigation from "../components/layout/Navigation.jsx";
+import MobileMenu from "../components/layout/MobileMenu.jsx";
+import Footer from "../components/layout/Footer.jsx";
 
 export default function MainLayout() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -12,32 +12,48 @@ export default function MainLayout() {
 
   useEffect(() => {
     const updateHeaderHeightVar = () => {
-      const height = headerRef.current ? Math.ceil(headerRef.current.getBoundingClientRect().height) : 0;
-      document.documentElement.style.setProperty('--app-header-height', `${height}px`);
+      const height = headerRef.current
+        ? Math.ceil(headerRef.current.getBoundingClientRect().height)
+        : 0;
+      document.documentElement.style.setProperty(
+        "--app-header-height",
+        `${height}px`
+      );
     };
 
     updateHeaderHeightVar();
 
     let resizeObserver;
-    if (headerRef.current && 'ResizeObserver' in window) {
+    if (headerRef.current && "ResizeObserver" in window) {
       resizeObserver = new ResizeObserver(updateHeaderHeightVar);
       resizeObserver.observe(headerRef.current);
     } else {
-      window.addEventListener('resize', updateHeaderHeightVar);
+      window.addEventListener("resize", updateHeaderHeightVar);
     }
 
     return () => {
       if (resizeObserver && headerRef.current) resizeObserver.disconnect();
-      window.removeEventListener('resize', updateHeaderHeightVar);
+      window.removeEventListener("resize", updateHeaderHeightVar);
     };
   }, []);
   return (
     <div className="min-h-screen bg-resort-cream flex flex-col">
-      <header ref={headerRef} className="sticky top-0 z-30 grid grid-cols-[1fr_auto_1fr] items-center px-8 py-5 bg-white shadow-sm">
+      <header
+        ref={headerRef}
+        className="sticky top-0 z-30 grid grid-cols-[1fr_auto_1fr] items-center px-8 py-5 bg-white shadow-sm"
+      >
         <div className="flex items-center">
-          <Link to="/" className="inline-flex items-baseline leading-none select-none" aria-label="Sea View Resort">
-            <span className="font-display text-resort-olive text-2xl md:text-3xl tracking-wide">Sea View</span>
-            <span className="font-display text-resort-olive/90 text-sm md:text-base tracking-[0.35em] ml-3 uppercase">Resort</span>
+          <Link
+            to="/"
+            className="inline-flex items-baseline leading-none select-none"
+            aria-label="Sea View Resort"
+          >
+            <span className="font-display text-resort-olive text-2xl md:text-3xl tracking-wide">
+              Sea View
+            </span>
+            <span className="font-display text-resort-olive/90 text-sm md:text-base tracking-[0.35em] ml-3 uppercase">
+              Resort
+            </span>
           </Link>
         </div>
 
@@ -60,7 +76,10 @@ export default function MainLayout() {
         </div>
       </header>
 
-      <MobileMenu isOpen={isMobileOpen} onClose={() => setIsMobileOpen(false)} />
+      <MobileMenu
+        isOpen={isMobileOpen}
+        onClose={() => setIsMobileOpen(false)}
+      />
 
       <main className="flex-1">
         <Outlet />
@@ -70,5 +89,3 @@ export default function MainLayout() {
     </div>
   );
 }
-
-
