@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom"; 
 import MainLayout from "./layouts/MainLayout.jsx";
 import Home from "./pages/Home.jsx";
 import Explore from "./pages/Explore.jsx";
@@ -18,7 +18,7 @@ import PasswordChange from "./pages/PasswordChange.jsx";
 import AdminRooms from "./pages/admin/AdminRooms.jsx";
 import Administrador from "./pages/admin/Administrador.jsx";
 import AdminUsers from "./pages/admin/AdminUsers.jsx";
-
+import ChatbotWidget from "./components/ChatbotWidget"; 
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
@@ -27,6 +27,19 @@ function ProtectedRoute({ children }) {
 
 export default function App() {
   const { user, loading } = useAuth();
+  const location = useLocation(); 
+
+  
+  const protectedRoutes = [
+    "/admin",
+    "/admin/rooms",
+    "/admin/users"
+  ];
+
+  
+  const isProtectedRoute = protectedRoutes.some(route =>
+    location.pathname.startsWith(route)
+  );
 
   if (loading) {
     return (
@@ -37,59 +50,61 @@ export default function App() {
   }
 
   return (
-    <Routes>
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/profile"
-          element={user ? <Profile /> : <Navigate to="/login" />}
-        />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/password-change" element={<PasswordChange />} />
+    <>
+      <Routes>
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/profile"
+            element={user ? <Profile /> : <Navigate to="/login" />}
+          />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/password-change" element={<PasswordChange />} />
 
-        <Route path="explore" element={<Explore />} />
-        <Route path="rooms" element={<Rooms />} />
-        <Route path="rooms/:id" element={<RoomDetail />} />
-        <Route path="about" element={<About />} />
-        <Route path="contact" element={<Contact />} />
-        <Route path="optimize" element={<ImageOptimizer />} />
-        <Route path="*" element={<NotFound />} />
+          <Route path="explore" element={<Explore />} />
+          <Route path="rooms" element={<Rooms />} />
+          <Route path="rooms/:id" element={<RoomDetail />} />
+          <Route path="about" element={<About />} />
+          <Route path="contact" element={<Contact />} />
+          <Route path="optimize" element={<ImageOptimizer />} />
+          <Route path="*" element={<NotFound />} />
+          
+          {/* <Route path="/admin" element={<Administrador />} />
+          <Route path="/admin/rooms" element={<AdminRooms />} />
+          <Route path="/admin/users" element={<AdminUsers />} /> */}
         
-        {/* <Route path="/admin" element={<Administrador />} />
-        <Route path="/admin/rooms" element={<AdminRooms />} />
-        <Route path="/admin/users" element={<AdminUsers />} /> */}
-       
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <Administrador />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/rooms"
-          element={
-            <ProtectedRoute>
-              <AdminRooms />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/users"
-          element={
-            <ProtectedRoute>
-              <AdminUsers />
-            </ProtectedRoute>
-          }
-        />
-        
-      </Route>
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <Administrador />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/rooms"
+            element={
+              <ProtectedRoute>
+                <AdminRooms />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute>
+                <AdminUsers />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+      </Routes>
 
       
-    </Routes>
+      {!isProtectedRoute && <ChatbotWidget />}
+    </>
   );
 }
