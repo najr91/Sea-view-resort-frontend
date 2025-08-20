@@ -9,7 +9,6 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:4002",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
         secure: false,
       },
       "/chat": {

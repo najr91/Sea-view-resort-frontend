@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "../components/ui/Button";
 
-const API = "http://localhost:4002/api/v1";
+const API = "/api/v1";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");

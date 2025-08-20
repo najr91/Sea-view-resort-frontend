@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "../components/ui/Button";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
-const API = "http://localhost:4002/api/v1";
+const API = "/api/v1";
 
 function PasswordChange() {
   const [params] = useSearchParams();

@@ -1,43 +1,48 @@
-import React, { useState } from 'react';
-import { Button } from '../../components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
-import { 
-  Calendar, 
-  Bed, 
-  Users, 
+import React, { useState } from "react";
+import { Button } from "../../components/ui/Button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/Card";
+import {
+  Calendar,
+  Bed,
+  Users,
   BarChart3,
   Settings,
   LogOut,
   Menu,
-  X
-} from 'lucide-react';
-import AdminReservations from './AdminReservations';
-import AdminAvailability from './AdminAvailability';
+  X,
+} from "lucide-react";
+import AdminReservations from "./AdminReservations";
+import AdminAvailability from "./AdminAvailability";
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState('reservations');
+  const [activeTab, setActiveTab] = useState("reservations");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const menuItems = [
     {
-      id: 'reservations',
-      label: 'Reservas',
+      id: "reservations",
+      label: "Reservas",
       icon: Calendar,
-      description: 'Gestionar reservas'
+      description: "Gestionar reservas",
     },
     {
-      id: 'availability',
-      label: 'Disponibilidad',
+      id: "availability",
+      label: "Disponibilidad",
       icon: Bed,
-      description: 'Estado de habitaciones'
-    }
+      description: "Estado de habitaciones",
+    },
   ];
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'reservations':
+      case "reservations":
         return <AdminReservations />;
-      case 'availability':
+      case "availability":
         return <AdminAvailability />;
       default:
         return <AdminReservations />;
@@ -56,40 +61,32 @@ export default function AdminDashboard() {
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="md:hidden"
             >
-              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {sidebarOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
             </Button>
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">Panel de Administración</h1>
+              <h1 className="text-xl font-semibold text-gray-900">
+                Panel de Administración
+              </h1>
               <p className="text-sm text-gray-600">Sea View Resort</p>
             </div>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-2 text-sm text-gray-600">
-              <Users className="w-4 h-4" />
-              <span>Admin</span>
-            </div>
-            <Button variant="ghost" size="sm">
-              <LogOut className="w-4 h-4" />
-            </Button>
           </div>
         </div>
       </header>
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className={`
+        <aside
+          className={`
           fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-200 ease-in-out
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           md:relative md:translate-x-0 md:shadow-none
-        `}>
+        `}
+        >
           <div className="flex flex-col h-full">
-            {/* Logo/Brand */}
-            <div className="p-6 border-b">
-              <h2 className="text-lg font-semibold text-gray-900">Admin Panel</h2>
-              <p className="text-sm text-gray-600">Gestión Hotelera</p>
-            </div>
-
             {/* Navigation */}
             <nav className="flex-1 p-4">
               <ul className="space-y-2">
@@ -98,7 +95,7 @@ export default function AdminDashboard() {
                   return (
                     <li key={item.id}>
                       <Button
-                        variant={activeTab === item.id ? 'default' : 'ghost'}
+                        variant={activeTab === item.id ? "default" : "ghost"}
                         className="w-full justify-start gap-3"
                         onClick={() => {
                           setActiveTab(item.id);
@@ -108,7 +105,9 @@ export default function AdminDashboard() {
                         <Icon className="w-5 h-5" />
                         <div className="text-left">
                           <div className="font-medium">{item.label}</div>
-                          <div className="text-xs opacity-70">{item.description}</div>
+                          <div className="text-xs opacity-70">
+                            {item.description}
+                          </div>
                         </div>
                       </Button>
                     </li>
@@ -131,16 +130,14 @@ export default function AdminDashboard() {
         <main className="flex-1">
           {/* Mobile overlay */}
           {sidebarOpen && (
-            <div 
+            <div
               className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
               onClick={() => setSidebarOpen(false)}
             />
           )}
 
           {/* Content */}
-          <div className="min-h-screen">
-            {renderContent()}
-          </div>
+          <div className="min-h-screen">{renderContent()}</div>
         </main>
       </div>
     </div>

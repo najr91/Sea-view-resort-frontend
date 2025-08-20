@@ -3,9 +3,9 @@ import { Card, CardContent } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/Select";
-import { Calendar, Users, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { toast } from "react-hot-toast";
 import AvailabilityModal from "../booking/AvailabilityModal";
 import SuccessModal from "../booking/SuccessModal";
 import LoginRequiredModal from "../auth/LoginRequiredModal";
@@ -126,6 +126,7 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
       setIsModalOpen(false);
     } catch (error) {
       console.error('Error al confirmar la reserva:', error);
+      toast.error('Error al crear la reserva: ' + error.message);
       throw error;
     }
   };
