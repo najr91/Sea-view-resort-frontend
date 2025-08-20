@@ -2,6 +2,9 @@ import { NavLink } from "react-router-dom";
 import { classNames } from "../../lib/classNames";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { FaSignInAlt } from "react-icons/fa";
+import { LogOut, User, LogIn } from "lucide-react";
+import { useState } from "react";
 
 const navItems = [
   { name: "Inicio", to: "/" },
@@ -10,12 +13,12 @@ const navItems = [
   { name: "Nosotros", to: "/about" },
   { name: "Contacto", to: "/contact" },
   { name: "Administrador", to: "/admin" },
-  
 ];
 
 export default function Navigation() {
-  const { user, profileImage, loading, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
+  const [showName, setShowName] = useState(false);
 
   if (loading) {
     return (
@@ -56,18 +59,40 @@ export default function Navigation() {
             {item.name}
           </NavLink>
         ))}
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-4 items-center ml-4 relative">
+        {!user && (
+          <>
+            <button
+              onClick={() => navigate("/login")}
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white"
+              aria-label="Iniciar sesión"
+            >
+              <LogIn size={18} />
+            </button>
+          </>
+        )}
         {user && (
           <>
-            <span className="hidden lg:inline text-gray-700 text-sm">
-              Bienvenido, <strong>{user.username}</strong>
-            </span>
+            <button
+              onClick={() => setShowName((prev) => !prev)}
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 relative"
+              aria-label="Usuario"
+            >
+              <User size={18} />
+            </button>
+
+            {showName && (
+              <div className="absolute top-12 left-0 bg-white border border-gray-200 shadow-md rounded px-4 py-2 text-sm text-gray-700 whitespace-nowrap">
+                {user.username}
+              </div>
+            )}
 
             <button
               onClick={handleLogout}
-              className="bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white px-4 py-2 text-sm"
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white transition"
+              aria-label="Cerrar sesión"
             >
-              Cerrar sesión
+              <LogOut size={18} />
             </button>
           </>
         )}

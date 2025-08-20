@@ -1,25 +1,38 @@
-import { Link } from 'react-router-dom';
-import { X } from 'lucide-react';
-import { Button } from '../../components/ui/Button';
+import { Link } from "react-router-dom";
+import { X } from "lucide-react";
+import { Button } from "../../components/ui/Button";
+import { useAuth } from "../../context/AuthContext";
 
 const navItems = [
-  { name: 'Inicio', to: '/' },
-  { name: 'Explorar', to: '/explore' },
-  { name: 'Habitaciones', to: '/rooms' },
-  { name: 'Nosotros', to: '/about' },
-  { name: 'Contacto', to: '/contact' },
+  { name: "Inicio", to: "/" },
+  { name: "Explorar", to: "/explore" },
+  { name: "Habitaciones", to: "/rooms" },
+  { name: "Nosotros", to: "/about" },
+  { name: "Contacto", to: "/contact" },
 ];
 
-export default function MobileMenu({ isOpen, onClose }) {
+export default function MobileMenu({ isOpen, onClose, user, logout }) {
   if (!isOpen) return null;
   return (
     <div className="md:hidden fixed inset-0 z-40 bg-black/40" onClick={onClose}>
-      <div className="absolute top-0 right-0 bottom-0 w-72 bg-white shadow-xl p-6" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="absolute top-0 right-0 bottom-0 w-72 bg-white shadow-xl p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
-            <Link to="/" onClick={onClose} aria-label="Sea View Resort" className="inline-flex items-baseline leading-none select-none">
-              <span className="font-display text-resort-olive text-xl tracking-wide">Sea View</span>
-              <span className="font-display text-resort-olive/90 text-xs tracking-[0.35em] ml-2 uppercase">Resort</span>
+            <Link
+              to="/"
+              onClick={onClose}
+              aria-label="Sea View Resort"
+              className="inline-flex items-baseline leading-none select-none"
+            >
+              <span className="font-display text-resort-olive text-xl tracking-wide">
+                Sea View
+              </span>
+              <span className="font-display text-resort-olive/90 text-xs tracking-[0.35em] ml-2 uppercase">
+                Resort
+              </span>
             </Link>
           </div>
           <button onClick={onClose} aria-label="Close menu">
@@ -28,7 +41,12 @@ export default function MobileMenu({ isOpen, onClose }) {
         </div>
         <div className="flex flex-col space-y-5">
           {navItems.map((item) => (
-            <Link key={item.to} to={item.to} className="text-gray-700 hover:text-resort-olive font-medium" onClick={onClose}>
+            <Link
+              key={item.to}
+              to={item.to}
+              className="text-gray-700 hover:text-resort-olive font-medium"
+              onClick={onClose}
+            >
               {item.name}
             </Link>
           ))}
@@ -36,9 +54,33 @@ export default function MobileMenu({ isOpen, onClose }) {
             <Button className="mt-5">Reservar</Button>
           </Link>
         </div>
+        <div className="mt-6 border-t pt-4 flex flex-col gap-3">
+          {user ? (
+            <>
+              <span className="text-gray-700 font-medium">
+                Hola, {user.username}
+              </span>
+              <button
+                onClick={() => {
+                  logout();
+                  onClose();
+                }}
+                className="w-full bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] px-4 py-2 rounded text-white"
+              >
+                Cerrar sesión
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              onClick={onClose}
+              className="w-full bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white px-4 py-2 rounded text-center"
+            >
+              Ingresar
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );
 }
-
-
