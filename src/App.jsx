@@ -18,14 +18,13 @@ import PasswordChange from "./pages/PasswordChange.jsx";
 import AdminRooms from "./pages/admin/AdminRooms.jsx";
 import Administrador from "./pages/admin/Administrador.jsx";
 import AdminUsers from "./pages/admin/AdminUsers.jsx";
+import ManageUsers from "./pages/admin/ManageUsers.jsx";
+// import { use } from "react"; // Comenta o borra si no lo usás
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" />;
 }
-import AdminRooms from "./pages/admin/AdminRooms";
-import { use } from "react";
-import ManageUsers from "./pages/admin/ManageUsers.jsx";
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -60,10 +59,6 @@ export default function App() {
         <Route path="optimize" element={<ImageOptimizer />} />
         <Route path="*" element={<NotFound />} />
 
-        {/* <Route path="/admin" element={<Administrador />} />
-        <Route path="/admin/rooms" element={<AdminRooms />} />
-        <Route path="/admin/users" element={<AdminUsers />} /> */}
-
         <Route
           path="/admin"
           element={
@@ -88,7 +83,6 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/admin/users"
           element={user ? <ManageUsers /> : <Navigate to="/login" />}
