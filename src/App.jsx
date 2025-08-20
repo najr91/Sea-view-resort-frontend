@@ -17,6 +17,7 @@ import ForgotPassword from "./pages/ForgotPassword.jsx";
 import PasswordChange from "./pages/PasswordChange.jsx";
 import AdminRooms from "./pages/admin/AdminRooms";
 import { use } from "react";
+import ManageUsers from "./pages/admin/ManageUsers.jsx";
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -52,6 +53,10 @@ export default function App() {
         <Route
           path="/admin/rooms"
           element={user ? <AdminRooms /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/admin/users"
+          element={user ? <ManageUsers /> : <Navigate to="/login" />}
         />
       </Route>
     </Routes>
