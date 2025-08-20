@@ -16,7 +16,7 @@ export default function RoomsGrid() {
                 key={room.id}
                 id={room.id}
                 title={room.name}
-                imageUrl={room.images[0] || "https://via.placeholder.com/400"} // <-- Cambiado a room.images[0]
+                imageUrl={room.images && room.images.length > 0 ? room.images[0] : "https://via.placeholder.com/400"}
                 price={room.price}
                 description={room.description}
               />

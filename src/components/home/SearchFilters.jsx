@@ -222,7 +222,8 @@ export default function SearchFilters() {
           border: 1px solid #d1d5db !important;
           border-radius: 0.5rem !important;
           box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
-          z-index: 50 !important;
+          z-index: 9999 !important;
+          position: relative !important;
         }
         .select-item {
           background: white !important;
@@ -237,10 +238,10 @@ export default function SearchFilters() {
           background: #e5e7eb !important;
         }
       `}</style>
-      <Card className="max-w-6xl mx-auto shadow-2xl bg-white border-0 overflow-hidden">
-         <CardContent className="p-4 md:p-6">
-           <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 lg:gap-5 items-end">
-            <div className="md:col-span-2">
+      <Card className="max-w-7xl mx-auto shadow-2xl bg-white border-0 overflow-hidden">
+         <CardContent className="p-4 md:p-6 lg:p-8">
+           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 lg:gap-8 items-end">
+            <div className="md:col-span-2 lg:col-span-2">
               <div className="flex flex-col items-start gap-2">
                                  <div className="flex items-center gap-2 text-xs md:text-sm font-medium text-gray-700 md:shrink-0">
                    <MapPin className="w-3 h-3 md:w-4 md:h-4" />
@@ -261,7 +262,7 @@ export default function SearchFilters() {
               </div>
             </div>
 
-            <div className="md:col-span-2">
+            <div className="md:col-span-2 lg:col-span-2">
               <div className="flex flex-col items-start gap-2">
                                  <div className="flex items-center gap-2 text-xs md:text-sm font-medium text-gray-700 md:shrink-0">
                    <Bed className="w-3 h-3 md:w-4 md:h-4" />
@@ -291,7 +292,7 @@ export default function SearchFilters() {
               </div>
             </div>
 
-            <div className="md:col-span-2">
+            <div className="md:col-span-2 lg:col-span-2">
               <div className="flex flex-col items-start gap-2">
                                  <div className="flex items-center gap-2 text-xs md:text-sm font-medium text-gray-700 md:shrink-0">
                    <Users className="w-3 h-3 md:w-4 md:h-4" />
@@ -313,7 +314,7 @@ export default function SearchFilters() {
               </div>
             </div>
 
-            <div className="md:col-span-2">
+            <div className="md:col-span-2 lg:col-span-2">
               <div className="flex flex-col items-start gap-2">
                                  <div className="flex items-center gap-2 text-xs md:text-sm font-medium text-gray-700 md:shrink-0">
                    <Calendar className="w-3 h-3 md:w-4 md:h-4" />
@@ -331,7 +332,7 @@ export default function SearchFilters() {
               </div>
             </div>
 
-            <div className="md:col-span-2">
+            <div className="md:col-span-2 lg:col-span-2">
               <div className="flex flex-col items-start gap-2">
                                  <div className="flex items-center gap-2 text-xs md:text-sm font-medium text-gray-700 md:shrink-0">
                    <CalendarDays className="w-3 h-3 md:w-4 md:h-4" />
@@ -349,7 +350,7 @@ export default function SearchFilters() {
               </div>
             </div>
 
-                         <div className="mt-2 md:mt-0 flex md:col-span-2 md:justify-start self-end">
+                         <div className="mt-2 md:mt-0 flex md:col-span-2 lg:col-span-2 md:justify-start self-end">
                <Button 
                  size="md" 
                  className={`w-full md:w-full font-semibold text-sm shadow-md ${!filters.habitacion ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
