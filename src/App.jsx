@@ -19,7 +19,7 @@ import AdminRooms from "./pages/admin/AdminRooms.jsx";
 import Administrador from "./pages/admin/Administrador.jsx";
 import AdminUsers from "./pages/admin/AdminUsers.jsx";
 import ManageUsers from "./pages/admin/ManageUsers.jsx";
-import ChatbotWidget from "./components/ChatbotWidget"; 
+import ChatbotWidget from "./components/ChatbotWidget"; // <- de tu rama chatbot
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
@@ -33,7 +33,8 @@ export default function App() {
   const protectedRoutes = [
     "/admin",
     "/admin/rooms",
-    "/admin/users"
+    "/admin/users",
+    "/admin/manage-users",
   ];
 
   const isProtectedRoute = protectedRoutes.some(route =>
