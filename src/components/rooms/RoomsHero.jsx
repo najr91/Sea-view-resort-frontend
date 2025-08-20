@@ -13,7 +13,7 @@ export default function RoomsHero() {
   };
   return (
     <Hero
-      backgroundImage="https://images.unsplash.com/photo-1578898887932-47e3c74f2f6b?q=80&w=2000&auto=format&fit=crop"
+      backgroundVideo="https://res.cloudinary.com/dokpk3c2l/video/upload/v1755707266/20250820_125556_0002_usdnsf.mp4"
       overlay="bg-black/40"
       title="Habitaciones y Suites"
       subtitle="Habitaciones elegantes con diseño cuidado y todo lo necesario para una estadía perfecta."
@@ -22,11 +22,11 @@ export default function RoomsHero() {
         <Button
           aria-label="Desplazarse hacia abajo"
           onClick={handleScrollDown}
-          variant="ghost"
-          className="w-10 h-10 p-0 border border-white/80 hover:bg-white/10 focus:ring-white/60"
+          variant="outlineWhite"
+          className="w-16 h-28 p-0 border-1 hover:bg-transparent focus:ring-white/60"
           radius="full"
         >
-          <ChevronDown className="w-5 h-5 text-white" />
+          <ChevronDown className="w-6 h-6 text-white" />
         </Button>
       </div>
     </Hero>

@@ -3,9 +3,10 @@ import Hero from '../hero/Hero';
 export default function ExploreHero() {
   return (
     <Hero
-      backgroundImage="https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
+      backgroundVideo="https://res.cloudinary.com/dokpk3c2l/video/upload/v1755707222/20250820_131545_0001_jibjcw.mp4"
       title="Descubrí espacios que inspiran"
       subtitle="Relax, lujo y experiencias frente al mar"
+      titleClassName="font-serif"
     />
   );
 }

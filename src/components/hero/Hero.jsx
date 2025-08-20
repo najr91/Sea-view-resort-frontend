@@ -5,7 +5,8 @@ export default function Hero({
     title,
     subtitle,
     children,
-    className = ''
+    className = '',
+    titleClassName = 'font-serif'
 }) {
     return (
         <section className={`relative hero-standard w-full h-[80vh] flex items-center justify-center overflow-hidden ${className}`}>
@@ -29,7 +30,7 @@ export default function Hero({
 
             <div className="relative z-10 text-center px-4">
                 {title && (
-                    <h1 className="text-white text-4xl md:text-5xl font-serif mb-4">{title}</h1>
+                    <h1 className={`text-white text-4xl md:text-5xl mb-4 ${titleClassName}`}>{title}</h1>
                 )}
                 {subtitle && (
                     <p className="max-w-2xl mx-auto text-resort-cream/90 text-sm md:text-base leading-relaxed">{subtitle}</p>

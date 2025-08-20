@@ -43,7 +43,7 @@ export default function MainLayout() {
     <div className="min-h-screen bg-resort-cream flex flex-col overflow-x-hidden">
       <header
         ref={headerRef}
-        className="sticky top-0 z-30 flex flex-wrap justify-between items-center px-6 lg:px-8 py-4 lg:py-5 bg-white shadow-sm"
+        className="fixed top-0 left-0 right-0 z-30 flex flex-wrap justify-between items-center px-6 lg:px-8 py-4 lg:py-5 bg-white shadow-sm"
       >
         <div className="flex items-center">
           <Link
@@ -91,7 +91,7 @@ export default function MainLayout() {
         logout={logout}
       />
 
-      <main className="flex-1">
+      <main className="flex-1" style={{ paddingTop: "var(--app-header-height, 64px)" }}>
         <Outlet />
       </main>
 

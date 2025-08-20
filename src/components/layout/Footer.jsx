@@ -62,7 +62,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-resort-taupe mt-8 pt-8 text-center text-sm">
-          <p>Sea View Resort - 2024</p>
+          <p>Sea View Resort - 2025</p>
         </div>
       </div>
     </footer>

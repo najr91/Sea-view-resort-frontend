@@ -58,7 +58,7 @@ export default function RoomsShowcase() {
 
         <div className="mt-10 flex justify-center">
           <Link to="/rooms">
-            <Button size="lg" variant="outline">Ver todas las habitaciones</Button>
+            <Button size="lg" variant="outlineWhite">Ver todas las habitaciones</Button>
           </Link>
         </div>
       </div>
