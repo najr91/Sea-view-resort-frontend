@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { apiUrl } from "../../services/http";
 import toast from "react-hot-toast";
 
 export default function ManageUsers() {
@@ -18,7 +19,7 @@ export default function ManageUsers() {
   const getUsers = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("/api/v1/users", {
+      const res = await axios.get(apiUrl("/api/v1/users"), {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
       setUsers(res.data);
@@ -36,7 +37,7 @@ export default function ManageUsers() {
 
   const deleteUser = async (id) => {
     try {
-      await axios.delete(`/api/v1/users/${id}`, {
+      await axios.delete(apiUrl(`/api/v1/users/${id}`), {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
       setUsers(users.filter((e) => e._id !== id));
@@ -92,7 +93,7 @@ export default function ManageUsers() {
     e.preventDefault();
     try {
       const res = await axios.put(
-        `/api/v1/users/${editingUser._id}`,
+        apiUrl(`/api/v1/users/${editingUser._id}`),
         formData,
         {
           headers: { Authorization: `Bearer ${getToken()}` },

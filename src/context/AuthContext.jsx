@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
 import * as authService from "../services/authService";
+import { apiUrl } from "../services/http";
 
 const AuthContext = createContext();
 
@@ -27,7 +28,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     setUser(null);
     setProfileImage(null);
-    await fetch("/api/v1/logout", {
+    await fetch(apiUrl("/api/v1/logout"), {
       method: "POST",
       headers: {
         Authorization: `Bearer ${getToken()}`,
