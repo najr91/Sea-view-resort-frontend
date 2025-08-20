@@ -71,10 +71,9 @@ export default function Footer() {
 
             <div className="flex gap-4">
               {[Facebook, Twitter, Instagram, Youtube].map((Icon, index) => (
-                <Icon
-                  key={index}
-                  className="w-5 h-5 hover:text-resort-cyan cursor-pointer transition-colors"
-                />
+                <Link key={index} to="/404" aria-label={`Ir a ${Icon.name}`} className="hover:text-resort-cyan transition-colors">
+                  <Icon className="w-5 h-5" />
+                </Link>
               ))}
             </div>
           </div>

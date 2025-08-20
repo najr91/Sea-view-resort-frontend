@@ -6,7 +6,12 @@ export const formatDate = (dateString, locale = 'es-ES', options) => {
 
 export const formatPrice = (price, currency = 'USD', locale = 'es-ES') => {
     if (price == null || Number.isNaN(Number(price))) return '';
-    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(price);
+    const formatted = new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency,
+        currencyDisplay: 'narrowSymbol'
+    }).format(price);
+    return formatted.replace('US$', '$').replace('USD', '$');
 };
 
 

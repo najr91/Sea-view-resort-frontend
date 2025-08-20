@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { Button } from "../components/ui/Button";
@@ -12,6 +12,7 @@ export default function MainLayout() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const headerRef = useRef(null);
   const { user, logout } = useAuth();
+  const location = useLocation();
 
   useEffect(() => {
     const updateHeaderHeightVar = () => {
@@ -95,7 +96,7 @@ export default function MainLayout() {
         <Outlet />
       </main>
 
-      <Footer />
+      {location.pathname !== "/404" && <Footer />}
     </div>
   );
 }
