@@ -19,11 +19,13 @@ import AdminRooms from "./pages/admin/AdminRooms.jsx";
 import Administrador from "./pages/admin/Administrador.jsx";
 import ManageUsers from "./pages/admin/ManageUsers.jsx";
 import ChatbotWidget from "./components/ChatbotWidget"; // <- de tu rama chatbot
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" />;
 }
+
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -92,9 +94,20 @@ export default function App() {
             element={user ? <ManageUsers /> : <Navigate to="/login" />}
           />
         </Route>
+         <Route
+          path="/admin/reservations"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
 
       {!isProtectedRoute && <ChatbotWidget />}
+    
+      {/* Admin Routes - Sin MainLayout 
+      <Route path="/adminrutas" element={<AdminDashboard />} />*/}
     </>
   );
 }
