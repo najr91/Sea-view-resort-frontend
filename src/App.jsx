@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useLocation } from "react-router-dom"; 
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout.jsx";
 import Home from "./pages/Home.jsx";
 import Explore from "./pages/Explore.jsx";
@@ -26,10 +26,9 @@ function ProtectedRoute({ children }) {
   return user ? children : <Navigate to="/login" />;
 }
 
-
 export default function App() {
   const { user, loading } = useAuth();
-  const location = useLocation(); 
+  const location = useLocation();
 
   const protectedRoutes = [
     "/admin",
@@ -38,7 +37,7 @@ export default function App() {
     "/admin/manage-users",
   ];
 
-  const isProtectedRoute = protectedRoutes.some(route =>
+  const isProtectedRoute = protectedRoutes.some((route) =>
     location.pathname.startsWith(route)
   );
 
@@ -55,15 +54,12 @@ export default function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+
           <Route
             path="/profile"
             element={user ? <Profile /> : <Navigate to="/login" />}
           />
-          <Route path="/verify-email" element={<VerifyEmail />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/password-change" element={<PasswordChange />} />
+
           <Route path="explore" element={<Explore />} />
           <Route path="rooms" element={<Rooms />} />
           <Route path="rooms/:id" element={<RoomDetail />} />
@@ -88,13 +84,18 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          
+
           <Route
             path="/admin/manage-users"
             element={user ? <ManageUsers /> : <Navigate to="/login" />}
           />
         </Route>
-         <Route
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/password-change" element={<PasswordChange />} />
+        <Route
           path="/admin/reservations"
           element={
             <ProtectedRoute>
@@ -105,7 +106,7 @@ export default function App() {
       </Routes>
 
       {!isProtectedRoute && <ChatbotWidget />}
-    
+
       {/* Admin Routes - Sin MainLayout 
       <Route path="/adminrutas" element={<AdminDashboard />} />*/}
     </>

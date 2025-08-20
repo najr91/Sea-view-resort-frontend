@@ -14,7 +14,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-      <h1 className="text-3xl font-bold mb-12 text-gray-800">Panel de Administración</h1>
+      <h1 className="text-3xl font-bold mb-12 text-gray-800">
+        Panel de Administración
+      </h1>
 
       <div className="grid gap-6 md:grid-cols-3 w-full max-w-5xl">
         {/* Administración de Habitaciones */}
@@ -39,7 +41,7 @@ export default function AdminDashboard() {
 
         {/* Gestión de Usuarios */}
         <button
-          onClick={() => handleNavigate("/admin/users")}
+          onClick={() => handleNavigate("/admin/manage-users")}
           style={{ backgroundColor: "#968260" }}
           className={buttonClasses}
         >
