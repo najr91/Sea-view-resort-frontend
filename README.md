@@ -131,6 +131,26 @@ Autenticación
 
 - Componentes reutilizables con estilos consistentes.
 
+📡 Documentación de la API - Sea View Resort
+| Recurso          | Método | Ruta                            | Descripción                                 | Autenticación |
+| ---------------- | ------ | ------------------------------- | ------------------------------------------- | ------------- |
+| **Auth**         | POST   | `/api/auth/register`            | Registro de un nuevo usuario                | ❌ No          |
+| **Auth**         | POST   | `/api/auth/login`               | Inicio de sesión y obtención de token JWT   | ❌ No          |
+| **Auth**         | GET    | `/api/auth/verify-email/:token` | Verificación de correo electrónico          | ❌ No          |
+| **Auth**         | POST   | `/api/auth/forgot-password`     | Enviar link para recuperación de contraseña | ❌ No          |
+| **Auth**         | POST   | `/api/auth/password-change`     | Cambiar contraseña con token válido         | ✅ Sí (token)  |
+| **Usuarios**     | GET    | `/api/users/:id`                | Obtener perfil del usuario                  | ✅ Sí          |
+| **Usuarios**     | PUT    | `/api/users/:id`                | Editar datos del perfil                     | ✅ Sí          |
+| **Habitaciones** | GET    | `/api/rooms`                    | Listar todas las habitaciones disponibles   | ❌ No          |
+| **Habitaciones** | GET    | `/api/rooms/:id`                | Obtener detalle de una habitación           | ❌ No          |
+| **Habitaciones** | POST   | `/api/rooms`                    | Crear una nueva habitación                  | ✅ Sí (admin)  |
+| **Habitaciones** | PUT    | `/api/rooms/:id`                | Editar datos de una habitación              | ✅ Sí (admin)  |
+| **Habitaciones** | DELETE | `/api/rooms/:id`                | Eliminar una habitación                     | ✅ Sí (admin)  |
+| **Reservas**     | POST   | `/api/reservations`             | Crear una reserva                           | ✅ Sí          |
+| **Reservas**     | GET    | `/api/reservations/:userId`     | Listar reservas de un usuario específico    | ✅ Sí          |
+| **Reservas**     | DELETE | `/api/reservations/:id`         | Cancelar una reserva                        | ✅ Sí          |
+
+
 🚀 Deploy
 
 El frontend está desplegado en Vercel:
