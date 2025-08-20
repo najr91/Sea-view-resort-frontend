@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --radius: 0.5rem;
+  /* 8px, radio suave por defecto para rounded-lg */
+}
+
 @layer base {
   body {
     @apply bg-white text-gray-900 font-sans;

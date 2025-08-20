@@ -35,9 +35,9 @@ export default function MobileMenu({ isOpen, onClose, user, logout }) {
               </span>
             </Link>
           </div>
-          <button onClick={onClose} aria-label="Close menu">
-            <X className="w-6 h-6 text-gray-700" />
-          </button>
+          <Button variant="ghost" size="sm" onClick={onClose} aria-label="Close menu" className="h-8 w-8 p-0">
+            <X className="w-5 h-5 text-gray-700" />
+          </Button>
         </div>
         <div className="flex flex-col space-y-5">
           {navItems.map((item) => (
@@ -51,7 +51,7 @@ export default function MobileMenu({ isOpen, onClose, user, logout }) {
             </Link>
           ))}
           <Link to="/rooms" onClick={onClose}>
-            <Button className="mt-5">Reservar</Button>
+            <Button className="mt-5 rounded-full px-6">Reservar</Button>
           </Link>
         </div>
         <div className="mt-6 border-t pt-4 flex flex-col gap-3">
@@ -60,23 +60,20 @@ export default function MobileMenu({ isOpen, onClose, user, logout }) {
               <span className="text-gray-700 font-medium">
                 Hola, {user.username}
               </span>
-              <button
+              <Button
                 onClick={() => {
                   logout();
                   onClose();
                 }}
-                className="w-full bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] px-4 py-2 rounded text-white"
+                className="w-full"
+                radius="full"
               >
                 Cerrar sesión
-              </button>
+              </Button>
             </>
           ) : (
-            <Link
-              to="/login"
-              onClick={onClose}
-              className="w-full bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white px-4 py-2 rounded text-center"
-            >
-              Ingresar
+            <Link to="/login" onClick={onClose} className="w-full">
+              <Button className="w-full">Ingresar</Button>
             </Link>
           )}
         </div>

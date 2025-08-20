@@ -6,9 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Calendar, Users, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import AvailabilityModal from "../home/AvailabilityModal";
-import SuccessModal from "../home/SuccessModal";
-import LoginRequiredModal from "../home/LoginRequiredModal";
+import AvailabilityModal from "../booking/AvailabilityModal";
+import SuccessModal from "../booking/SuccessModal";
+import LoginRequiredModal from "../auth/LoginRequiredModal";
 
 /**
  * Sidebar de reserva con cálculo de costos.
@@ -23,14 +23,14 @@ import LoginRequiredModal from "../home/LoginRequiredModal";
 export default function BookingSidebar({ pricePerNight, roomName }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const [bookingData, setBookingData] = useState({
     destino: '',
     checkIn: '2025-08-20',
     checkOut: '2025-08-25',
     huespedes: '2'
   });
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [availabilityData, setAvailabilityData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,7 +60,7 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
     const dates = [];
     const startDate = new Date(checkIn);
     const minDate = new Date('2025-08-20');
-    
+
     const ranges = [
       { start: 1, end: 3 },
       { start: 7, end: 10 },
@@ -69,7 +69,7 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
       { start: 30, end: 35 },
       { start: 60, end: 65 }
     ];
-    
+
     ranges.forEach(range => {
       for (let i = range.start; i <= range.end; i++) {
         const newDate = new Date(startDate);
@@ -79,7 +79,7 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
         }
       }
     });
-    
+
     return dates;
   };
 
@@ -88,7 +88,7 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
       alert('Por favor selecciona un destino');
       return;
     }
-    
+
     setIsLoading(true);
     try {
       // Simular búsqueda de disponibilidad
@@ -101,7 +101,7 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
         precioTotal: total,
         diasDisponibles: generateAvailableDates(bookingData.checkIn, bookingData.checkOut)
       };
-      
+
       setAvailabilityData(mockData);
       setIsModalOpen(true);
     } catch (error) {
@@ -120,7 +120,7 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
     try {
       console.log('Confirmando reserva:', data);
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       setConfirmedReservation(data);
       setIsSuccessModalOpen(true);
       setIsModalOpen(false);
@@ -148,19 +148,19 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
       const originalCheckIn = new Date(bookingData.checkIn);
       const originalCheckOut = new Date(bookingData.checkOut);
       const nightsDiff = Math.ceil((originalCheckOut - originalCheckIn) / (1000 * 60 * 60 * 24));
-      
+
       const newCheckOutDate = new Date(checkInDate);
       newCheckOutDate.setDate(checkInDate.getDate() + nightsDiff);
-      
+
       const updatedBookingData = {
         ...bookingData,
         checkIn: selectedDate,
         checkOut: newCheckOutDate.toISOString().split('T')[0]
       };
-      
+
       setBookingData(updatedBookingData);
       setIsLoading(true);
-      
+
       const mockData = {
         ...updatedBookingData,
         habitacion: roomName,
@@ -170,7 +170,7 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
         precioTotal: total,
         diasDisponibles: generateAvailableDates(selectedDate, newCheckOutDate.toISOString().split('T')[0])
       };
-      
+
       setAvailabilityData(mockData);
     } catch (error) {
       console.error('Error al seleccionar fecha alternativa:', error);
@@ -283,7 +283,7 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
             </div>
           </div>
 
-          <Button 
+          <Button
             className={`w-full ${!bookingData.destino ? 'opacity-50 cursor-not-allowed' : ''}`}
             size="lg"
             onClick={handleSearch}

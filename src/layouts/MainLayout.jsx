@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet, Link } from "react-router-dom";
 import { Menu } from "lucide-react";
+import { useAuth } from "../context/AuthContext.jsx";
 import { Button } from "../components/ui/Button";
 import Navigation from "../components/layout/Navigation.jsx";
 import MobileMenu from "../components/layout/MobileMenu.jsx";
 import Footer from "../components/layout/Footer.jsx";
-import { useAuth } from "../context/AuthContext.jsx";
+import UserMenu from "../components/layout/UserMenu.jsx";
 
 export default function MainLayout() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -65,9 +66,12 @@ export default function MainLayout() {
 
         <div className="flex items-center justify-end gap-3">
           <div className="hidden md:block ">
-            <Button asChild>
-              <a href="/rooms">Reservar</a>
-            </Button>
+            <Link to="/rooms">
+              <Button className="px-6 text-base">Reservar</Button>
+            </Link>
+          </div>
+          <div className="hidden md:block">
+            <UserMenu />
           </div>
 
           <button

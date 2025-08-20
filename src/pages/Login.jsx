@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
+import { Button } from "../components/ui/Button";
 
 function Login() {
   const { login } = useAuth();
@@ -73,12 +74,7 @@ function Login() {
           required
         />
 
-        <button
-          type="submit"
-          className="w-full bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white rounded py-2 mb-4"
-        >
-          Entrar
-        </button>
+        <Button type="submit" className="w-full mb-4">Entrar</Button>
 
         <div className="text-center text-sm space-y-2">
           <p>

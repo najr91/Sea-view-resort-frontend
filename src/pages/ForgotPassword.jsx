@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Button } from "../components/ui/Button";
 
 const API = "http://localhost:4002/api/v1";
 
@@ -44,9 +45,7 @@ function ForgotPassword() {
           required
         />
 
-        <button className="w-full bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white py-2 rounded">
-          Enviar instrucciones
-        </button>
+        <Button className="w-full">Enviar instrucciones</Button>
 
         {message && <p className="text-[rgb(150,130,96)] ">{message}</p>}
         {error && <p className="text-red-500 mt-3">{error}</p>}

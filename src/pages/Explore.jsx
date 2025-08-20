@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import SearchFilters from "../components/home/SearchFilters.jsx";
+import ExploreHero from "../components/explore/ExploreHero.jsx";
 
 
 import gym1 from "../assets/AreasComunes/Gym/pexels-rdne-8611937.jpg";
@@ -29,30 +29,30 @@ import spa4 from "../assets/AreasComunes/Spa/pexels-jonathanborba-3316923.jpg";
 
 
 const sections = [
-  { 
-    title: "Playa y Pileta", 
-    images: [pool1, pool2, pool3, pool4], 
-    caption: "Disfrutá del sol y la brisa junto al mar" 
+  {
+    title: "Playa y Pileta",
+    images: [pool1, pool2, pool3, pool4],
+    caption: "Disfrutá del sol y la brisa junto al mar"
   },
-  { 
-    title: "Jardines", 
-    images: [jard1, jard2, jard3, jard4], 
-    caption: "Conectá con la naturaleza en nuestros jardines" 
+  {
+    title: "Jardines",
+    images: [jard1, jard2, jard3, jard4],
+    caption: "Conectá con la naturaleza en nuestros jardines"
   },
-  { 
-    title: "Restaurantes", 
-    images: [rest1, rest2, rest3, rest4], 
-    caption: "Sabores únicos que despiertan tus sentidos" 
+  {
+    title: "Restaurantes",
+    images: [rest1, rest2, rest3, rest4],
+    caption: "Sabores únicos que despiertan tus sentidos"
   },
-  { 
-    title: "Spa", 
-    images: [spa1, spa2, spa3, spa4], 
-    caption: "Relajate con nuestros masajes y tratamientos" 
+  {
+    title: "Spa",
+    images: [spa1, spa2, spa3, spa4],
+    caption: "Relajate con nuestros masajes y tratamientos"
   },
-  { 
-    title: "Gym", 
-    images: [gym1, gym2, gym3, gym4], 
-    caption: "Mantente en forma con instalaciones de primer nivel" 
+  {
+    title: "Gym",
+    images: [gym1, gym2, gym3, gym4],
+    caption: "Mantente en forma con instalaciones de primer nivel"
   },
 ];
 
@@ -73,9 +73,8 @@ function ImageSlider({ images, caption }) {
           key={idx}
           src={img}
           alt={caption}
-          className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${
-            idx === current ? "opacity-100" : "opacity-0"
-          }`}
+          className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${idx === current ? "opacity-100" : "opacity-0"
+            }`}
         />
       ))}
       <div className="absolute inset-0 bg-black/20 flex items-center justify-center px-4">
@@ -90,30 +89,10 @@ function ImageSlider({ images, caption }) {
 export default function Explore() {
   return (
     <div className="bg-white">
-      
-      <section className="relative h-[80vh] w-full overflow-hidden">
-        <video
-          className="absolute top-0 left-0 w-full h-full object-cover"
-          src="https://res.cloudinary.com/dokpk3c2l/video/upload/v1755464603/Dise%C3%B1o_sin_t%C3%ADtulo_tn9f4u.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 bg-black/30">
-          <h1 className="text-4xl md:text-5xl font-serif mb-4 text-white drop-shadow-md">
-            Descubrí espacios que inspiran
-          </h1>
-          <p className="text-lg md:text-2xl text-white mb-6 drop-shadow-sm">
-            Relax, lujo y experiencias frente al mar
-          </p>
-          <div className="w-full max-w-3xl">
-            <SearchFilters />
-          </div>
-        </div>
-      </section>
 
-      
+      <ExploreHero />
+
+
       <section className="py-10 space-y-16">
         <div className="container mx-auto px-4 space-y-12">
           {sections.map((sec) => (

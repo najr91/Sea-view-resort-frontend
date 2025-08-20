@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "../components/ui/Button";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
@@ -59,9 +60,7 @@ function Register() {
           className="w-full mb-4 p-2 border"
           onChange={handleChange}
         />
-        <button className="w-full bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white p-2 rounded mb-4">
-          Registrarse
-        </button>
+        <Button className="w-full mb-4">Registrarse</Button>
         <p className="text-center text-sm">
           ¿Ya tienes una cuenta?{" "}
           <Link to="/login" className="text-[rgb(150,130,96)] hover:underline">

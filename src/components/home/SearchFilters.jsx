@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent } from '../../components/ui/Card';
-import { Input } from '../../components/ui/Input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/Select';
-import { MapPin, Bed, Users, Calendar, CalendarDays } from 'lucide-react';
-import AvailabilityModal from './AvailabilityModal';
-import SuccessModal from './SuccessModal';
-import LoginRequiredModal from './LoginRequiredModal';
+import DestinationSelect from '../../components/search/DestinationSelect.jsx';
+import RoomTypeSelect from '../../components/search/RoomTypeSelect.jsx';
+import GuestsSelect from '../../components/search/GuestsSelect.jsx';
+import DateRangePicker from '../../components/search/DateRangePicker.jsx';
+import AvailabilityModal from '../booking/AvailabilityModal';
+import SuccessModal from '../booking/SuccessModal';
+import LoginRequiredModal from '../auth/LoginRequiredModal';
 import { useAuth } from '../../context/AuthContext';
 import { useRooms } from '../../context/RoomsContext';
 
@@ -16,7 +17,7 @@ export default function SearchFilters() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { rooms } = useRooms();
-  
+
   const [filters, setFilters] = useState({
     destino: '',
     habitacion: '',
@@ -56,12 +57,12 @@ export default function SearchFilters() {
       alert('Por favor selecciona una habitación antes de buscar');
       return;
     }
-    
+
     setIsLoading(true);
     try {
       // reemplaza con tu endpoint
       //const response = await axios.post('http://localhost:5173/api/reserva', filters);
-      
+
       // Procesar la respuesta y calcular información adicional
       const processedData = {
         ...filters,
@@ -69,7 +70,7 @@ export default function SearchFilters() {
         noches: calculateNights(filters.checkIn, filters.checkOut),
         precioTotal: response.data.precioPorNoche * calculateNights(filters.checkIn, filters.checkOut)
       };
-      
+
       setAvailabilityData(processedData);
       setIsModalOpen(true);
     } catch (error) {
@@ -102,10 +103,10 @@ export default function SearchFilters() {
     // Generar fechas alternativas disponibles más variadas
     const dates = [];
     const startDate = new Date(checkIn);
-    
+
     // Asegurar que las fechas sean desde el 20 de agosto de 2025 en adelante
     const minDate = new Date('2025-08-20');
-    
+
     // Generar fechas en diferentes rangos para dar más opciones
     const ranges = [
       { start: 1, end: 3 },    // Próximos días
@@ -115,19 +116,19 @@ export default function SearchFilters() {
       { start: 30, end: 35 },  // Un mes después
       { start: 60, end: 65 }   // Dos meses después
     ];
-    
+
     ranges.forEach(range => {
       for (let i = range.start; i <= range.end; i++) {
         const newDate = new Date(startDate);
         newDate.setDate(startDate.getDate() + i);
-        
+
         // Solo agregar fechas que sean después del 20 de agosto de 2025
         if (newDate >= minDate) {
           dates.push(newDate.toISOString().split('T')[0]);
         }
       }
     });
-    
+
     return dates;
   };
 
@@ -143,10 +144,10 @@ export default function SearchFilters() {
       // Aquí implementarías la lógica para confirmar la reserva
       console.log('Confirmando reserva:', data);
       // Ejemplo: await axios.post('http://localhost:5000/api/reservas', data);
-      
+
       // Simular un pequeño delay para mostrar el proceso
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // Guardar los datos de la reserva confirmada y mostrar el modal de éxito
       setConfirmedReservation(data);
       setIsSuccessModalOpen(true);
@@ -177,22 +178,22 @@ export default function SearchFilters() {
       const originalCheckIn = new Date(filters.checkIn);
       const originalCheckOut = new Date(filters.checkOut);
       const nightsDiff = Math.ceil((originalCheckOut - originalCheckIn) / (1000 * 60 * 60 * 24));
-      
+
       const newCheckOutDate = new Date(checkInDate);
       newCheckOutDate.setDate(checkInDate.getDate() + nightsDiff);
-      
+
       // Actualizar los filtros con las nuevas fechas
       const updatedFilters = {
         ...filters,
         checkIn: selectedDate,
         checkOut: newCheckOutDate.toISOString().split('T')[0]
       };
-      
+
       setFilters(updatedFilters);
-      
+
       // Hacer una nueva búsqueda con las fechas actualizadas
       setIsLoading(true);
-      
+
       // Simular llamada a la API con las nuevas fechas
       const precioPorNoche = getRoomPrice(updatedFilters.habitacion);
       const mockData = {
@@ -203,10 +204,10 @@ export default function SearchFilters() {
         precioTotal: precioPorNoche * calculateNights(selectedDate, newCheckOutDate.toISOString().split('T')[0]),
         diasDisponibles: generateAvailableDates(selectedDate, newCheckOutDate.toISOString().split('T')[0])
       };
-      
+
       setAvailabilityData(mockData);
       // El modal ya está abierto, solo actualizamos los datos
-      
+
     } catch (error) {
       console.error('Error al seleccionar fecha alternativa:', error);
     } finally {
@@ -220,121 +221,34 @@ export default function SearchFilters() {
         <CardContent className="p-4 md:p-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5 lg:gap-6 items-end">
             <div className="md:col-span-2">
-              <div className="flex flex-col items-start gap-2">
-                <div className="flex items-center gap-2 text-sm text-resort-slate md:shrink-0">
-                  <MapPin className="w-4 h-4" />
-                  <span>Destino</span>
-                </div>
-                <div className="w-full">
-                  <Select onValueChange={v => handleChange('destino', v)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccione un destino" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="maldives">Maldives</SelectItem>
-                      <SelectItem value="bali">Bali</SelectItem>
-                      <SelectItem value="hawaii">Hawaii</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+              <DestinationSelect value={filters.destino} onChange={(v) => handleChange('destino', v)} />
             </div>
 
             <div className="md:col-span-2">
-              <div className="flex flex-col items-start gap-2">
-                <div className="flex items-center gap-2 text-sm text-resort-slate md:shrink-0">
-                  <Bed className="w-4 h-4" />
-                  <span>Tipo de habitación</span>
-                </div>
-                                 <div className="w-full">
-                   <Select onValueChange={v => handleChange('habitacion', v)}>
-                     <SelectTrigger>
-                       <SelectValue placeholder="Seleccione una habitación" />
-                     </SelectTrigger>
-                     <SelectContent>
-                                               {rooms.length > 0 ? (
-                          rooms.map((room) => (
-                            <SelectItem key={room.id} value={room.name}>
-                              {room.name}
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="" disabled>
-                            No hay habitaciones disponibles
-                          </SelectItem>
-                        )}
-                     </SelectContent>
-                   </Select>
-                   
-                 </div>
-              </div>
+              <RoomTypeSelect value={filters.habitacion} onChange={(v) => handleChange('habitacion', v)} rooms={rooms} />
             </div>
 
             <div className="md:col-span-2">
-              <div className="flex flex-col items-start gap-2">
-                <div className="flex items-center gap-2 text-sm text-resort-slate md:shrink-0">
-                  <Users className="w-4 h-4" />
-                  <span>Huéspedes</span>
-                </div>
-                <div className="w-full">
-                  <Select onValueChange={v => handleChange('huespedes', v)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="2 Adultos" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 Adulto</SelectItem>
-                      <SelectItem value="2">2 Adultos</SelectItem>
-                      <SelectItem value="3">3 Adultos</SelectItem>
-                      <SelectItem value="4">4 Adultos</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+              <GuestsSelect value={filters.huespedes} onChange={(v) => handleChange('huespedes', v)} />
             </div>
 
-            <div className="md:col-span-2">
-              <div className="flex flex-col items-start gap-2">
-                <div className="flex items-center gap-2 text-sm text-resort-slate md:shrink-0">
-                  <Calendar className="w-4 h-4" />
-                  <span>Check-in</span>
-                </div>
-                                 <div className="w-full">
-                   <Input
-                     type="date"
-                     value={filters.checkIn}
-                     min="2025-08-20"
-                     onChange={e => handleChange('checkIn', e.target.value)}
-                   />
-                 </div>
-              </div>
-            </div>
-
-            <div className="md:col-span-2">
-              <div className="flex flex-col items-start gap-2">
-                <div className="flex items-center gap-2 text-sm text-resort-slate md:shrink-0">
-                  <CalendarDays className="w-4 h-4" />
-                  <span>Check-out</span>
-                </div>
-                                 <div className="w-full">
-                   <Input
-                     type="date"
-                     value={filters.checkOut}
-                     min="2025-08-21"
-                     onChange={e => handleChange('checkOut', e.target.value)}
-                   />
-                 </div>
-              </div>
+            <div className="md:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <DateRangePicker
+                checkIn={filters.checkIn}
+                checkOut={filters.checkOut}
+                onChange={handleChange}
+              />
             </div>
 
             <div className="mt-2 md:mt-0 flex md:col-span-2 md:justify-start self-end">
-                             <Button 
-                 size="md" 
-                 className={`w-full md:w-full ${!filters.habitacion ? 'opacity-50 cursor-not-allowed' : ''}`}
-                 onClick={handleSearch}
-                 disabled={isLoading || !filters.habitacion}
-               >
-                 {isLoading ? 'Buscando...' : !filters.habitacion ? 'Selecciona una habitación' : 'Buscar'}
-               </Button>
+              <Button
+                size="md"
+                className={`w-full md:w-full ${!filters.habitacion ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={handleSearch}
+                disabled={isLoading || !filters.habitacion}
+              >
+                {isLoading ? 'Buscando...' : 'Buscar'}
+              </Button>
             </div>
           </div>
         </CardContent>
