@@ -23,7 +23,7 @@ function VerifyEmail() {
 
       try {
         const res = await axios.get(
-          `http://localhost:4002/api/v1/verify-email?token=${token}`
+          `/api/v1/verify-email?token=${token}`
         );
 
         if (isMounted && res.data.success) {

@@ -1,16 +1,21 @@
-import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
+import { Link } from "react-router-dom";
+import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
+import { Button } from "../../components/ui/Button";
+import { Input } from "../../components/ui/Input";
 
 const quickLinks = [
-  { label: 'Explorar', to: '/explore' },
-  { label: 'Habitaciones', to: '/rooms' },
-  { label: 'Contacto', to: '/contact' },
-  { label: 'Nosotros', to: '/about' },
+  { label: "Explorar", to: "/explore" },
+  { label: "Habitaciones", to: "/rooms" },
+  { label: "Contacto", to: "/contact" },
+  { label: "Nosotros", to: "/about" },
 ];
 
-const companyLinks = ['Política de privacidad', 'Términos del servicio', 'Preguntas frecuentes', 'Carreras'];
+const companyLinks = [
+  "Política de privacidad",
+  "Términos del servicio",
+  "Preguntas frecuentes",
+  "Aviso legal",
+];
 
 export default function Footer() {
   return (
@@ -26,7 +31,10 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               {quickLinks.map((link) => (
                 <li key={link.to}>
-                  <Link to={link.to} className="hover:text-resort-gold transition-colors">
+                  <Link
+                    to={link.to}
+                    className="hover:text-resort-gold transition-colors"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -39,7 +47,9 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               {companyLinks.map((link) => (
                 <li key={link}>
-                  <span className="hover:text-resort-gold transition-colors cursor-pointer">{link}</span>
+                  <span className="hover:text-resort-gold transition-colors cursor-pointer">
+                    {link}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -47,9 +57,15 @@ export default function Footer() {
 
           <div>
             <h4 className="font-medium mb-4">Boletín</h4>
-            <p className="text-sm mb-4">Reciba novedades y beneficios exclusivos.</p>
+            <p className="text-sm mb-4">
+              Reciba novedades y beneficios exclusivos.
+            </p>
             <div className="flex gap-2 mb-6">
-              <Input type="email" placeholder="Ingrese su correo" className="bg-white text-gray-900 text-sm flex-1" />
+              <Input
+                type="email"
+                placeholder="Ingrese su correo"
+                className="bg-white text-gray-900 text-sm flex-1"
+              />
               <Button variant="secondary">Suscribirse</Button>
             </div>
 
@@ -70,5 +86,3 @@ export default function Footer() {
     </footer>
   );
 }
-
-

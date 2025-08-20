@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useRooms } from "../../context/RoomsContext";
 import axios from "axios";
+import { apiUrl } from "../../services/http";
 
 export default function AdminRooms() {
   const { rooms, setRooms } = useRooms();
@@ -19,7 +20,7 @@ export default function AdminRooms() {
     message: "",
   });
 
-  const API_URL = "http://localhost:3000/api/rooms";
+  const API_URL = apiUrl("/api/rooms");
 
   const openModal = (room = null) => {
     if (room) {
@@ -43,7 +44,7 @@ export default function AdminRooms() {
       formData.price !== (editingRoom?.price || "") ||
       formData.description !== (editingRoom?.description || "") ||
       JSON.stringify(formData.images) !==
-        JSON.stringify(editingRoom?.images || [])
+      JSON.stringify(editingRoom?.images || [])
     ) {
       setConfirmData({
         open: true,

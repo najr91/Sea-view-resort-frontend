@@ -2,8 +2,7 @@ import { useState } from "react";
 import { Button } from "../components/ui/Button";
 import { Link } from "react-router-dom";
 import beachImg from "../assets/AreasComunes/Pileta-Playa/pexels-gapeppy1-2373201.jpg";
-
-const API = "http://localhost:4002/api/v1";
+import { apiUrl } from "../services/http";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -15,7 +14,7 @@ function ForgotPassword() {
     setMessage(null);
     setError(null);
 
-    const res = await fetch(`${API}/password-reset-request`, {
+    const res = await fetch(apiUrl(`/api/v1/password-reset-request`), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),

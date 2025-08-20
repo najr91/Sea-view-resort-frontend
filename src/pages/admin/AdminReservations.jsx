@@ -18,7 +18,7 @@ import {
   Clock
 } from 'lucide-react';
 import { useRooms } from '../../context/RoomsContext';
-import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 export default function AdminReservations() {
   const { rooms } = useRooms();
@@ -134,10 +134,10 @@ export default function AdminReservations() {
         await new Promise(resolve => setTimeout(resolve, 1000));
         
         setReservations(prev => prev.filter(r => r.id !== reservationId));
-        alert('Reserva eliminada exitosamente');
+        toast.success('Reserva eliminada exitosamente');
       } catch (error) {
         console.error('Error al eliminar la reserva:', error);
-        alert('Error al eliminar la reserva');
+        toast.error('Error al eliminar la reserva');
       }
     }
   };
@@ -168,7 +168,7 @@ export default function AdminReservations() {
             ? { ...r, ...formData, guests: parseInt(formData.guests), totalPrice }
             : r
         ));
-        alert('Reserva actualizada exitosamente');
+        toast.success('Reserva actualizada exitosamente');
       } else {
         // Simular creación
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -184,7 +184,7 @@ export default function AdminReservations() {
         };
         
         setReservations(prev => [...prev, newReservation]);
-        alert('Reserva creada exitosamente');
+        toast.success('Reserva creada exitosamente');
       }
       
       setIsModalOpen(false);
@@ -202,7 +202,7 @@ export default function AdminReservations() {
       });
     } catch (error) {
       console.error('Error al guardar la reserva:', error);
-      alert('Error al guardar la reserva');
+      toast.error('Error al guardar la reserva');
     }
   };
 

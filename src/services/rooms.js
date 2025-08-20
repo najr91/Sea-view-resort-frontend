@@ -46,5 +46,3 @@ export function getRoomById(id) {
     // Fallback simple mientras no hay otras habitaciones
     return getRoomById('demo-room');
 }
-
-
