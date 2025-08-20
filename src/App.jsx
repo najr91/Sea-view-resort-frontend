@@ -92,8 +92,8 @@ export default function App() {
 
       
       
-      {/* Admin Routes - Sin MainLayout */}
-      <Route path="adminrutas" element={<AdminDashboard />} />
+      {/* Admin Routes */}
+      <Route path="/adminrutas" element={<AdminDashboard />} />
     </Routes>
   );
 }
