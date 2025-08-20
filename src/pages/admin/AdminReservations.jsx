@@ -229,10 +229,12 @@ export default function AdminReservations() {
   };
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-ES', {
+    const formatted = new Intl.NumberFormat('es-ES', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'USD',
+      currencyDisplay: 'narrowSymbol'
     }).format(price);
+    return formatted.replace('US$', '$').replace('USD', '$');
   };
 
   // Función para obtener el precio de la habitación seleccionada
