@@ -24,6 +24,10 @@ import oceanviewDeluxe1 from '../assets/Habitaciones/OceanviewDeluxe/pexels-asad
 import oceanviewDeluxe2 from '../assets/Habitaciones/OceanviewDeluxe/pexels-asadphoto-28843941.jpg';
 import oceanviewDeluxe3 from '../assets/Habitaciones/OceanviewDeluxe/pexels-asadphoto-28843958.jpg';
 import oceanviewDeluxe4 from '../assets/Habitaciones/OceanviewDeluxe/pexels-asadphoto-28843952.jpg';
+import glamping1 from '../assets/Habitaciones/Glamping/pexels-bertellifotografia-13870172.jpg';
+import glamping2 from '../assets/Habitaciones/Glamping/pexels-rachel-claire-4825701.jpg';
+import glamping3 from '../assets/Habitaciones/Glamping/pexels-bertellifotografia-13869956.jpg';
+import glamping4 from '../assets/Habitaciones/Glamping/pexels-bertellifotografia-13869946.jpg';
 
 const RoomsContext = createContext();
 
@@ -69,9 +73,17 @@ export function RoomsProvider({ children }) {
         "Romance, privacidad y lujo con vista al mar\nDiseñada especialmente para parejas, esta suite ofrece jacuzzi privado, cama King y una terraza íntima con vista al mar. Ideal para lunas de miel, aniversarios o escapadas románticas.\nVista al mar y piscina\nHasta 2 adultos\nJacuzzi en la habitación\nTerraza con camastros\nDecoración especial y vino de cortesía",
       images: [honeymoon1, honeymoon2, honeymoon3, honeymoon4, honeymoon5],
     },
+    {
+  id: 6,
+  name: "Tienda de Campaña en el Mar",
+  price: 300000, 
+  description:
+    "Vive la experiencia única de dormir junto al mar en nuestra tienda de campaña de lujo, con todas las comodidades de un hotel cinco estrellas. Incluye todas las comidas servidas directamente en tu carpa.\nVista al mar\nHasta 2 adultos\nCama King\nDeck privado\nServicio de comidas incluido, decoración de lujo, Wifi",
+  images: [glamping1, glamping2, glamping3, glamping4]
+}
   ]);
 
-  // 👉 Intentar traer habitaciones del backend
+  
   useEffect(() => {
     const fetchRooms = async () => {
       try {

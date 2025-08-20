@@ -17,8 +17,7 @@ import ForgotPassword from "./pages/ForgotPassword.jsx";
 import PasswordChange from "./pages/PasswordChange.jsx";
 import AdminRooms from "./pages/admin/AdminRooms.jsx";
 import Administrador from "./pages/admin/Administrador.jsx";
-import AdminUsers from "./pages/admin/AdminUsers.jsx";
-
+import ManageUsers from "./pages/admin/ManageUsers.jsx";
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
@@ -57,11 +56,7 @@ export default function App() {
         <Route path="contact" element={<Contact />} />
         <Route path="optimize" element={<ImageOptimizer />} />
         <Route path="*" element={<NotFound />} />
-        
-        {/* <Route path="/admin" element={<Administrador />} />
-        <Route path="/admin/rooms" element={<AdminRooms />} />
-        <Route path="/admin/users" element={<AdminUsers />} /> */}
-       
+
         <Route
           path="/admin"
           element={
@@ -82,14 +77,11 @@ export default function App() {
           path="/admin/users"
           element={
             <ProtectedRoute>
-              <AdminUsers />
+              <ManageUsers />
             </ProtectedRoute>
           }
         />
-        
       </Route>
-
-      
     </Routes>
   );
 }
