@@ -120,7 +120,7 @@ export default function AdminDashboard() {
             {/* Footer */}
             <div className="p-4 border-t">
               <div className="text-xs text-gray-500">
-                <p>© 2024 Sea View Resort</p>
+                <p>© 2025 Sea View Resort</p>
                 <p>Panel de Administración</p>
               </div>
             </div>

@@ -30,7 +30,7 @@ export default function SearchFilters() {
     setIsLoading(true);
     try {
       // reemplaza con tu endpoint
-      const response = await axios.post('http://localhost:5000/api/busqueda', filters);
+      const response = await axios.post('http://localhost:4002/api/reserva', filters);
       
       // Procesar la respuesta y calcular información adicional
       const processedData = {
