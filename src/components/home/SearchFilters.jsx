@@ -201,9 +201,11 @@ export default function SearchFilters() {
                       <SelectValue placeholder="Estándar" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="standard">Estándar</SelectItem>
-                      <SelectItem value="deluxe">Deluxe</SelectItem>
-                      <SelectItem value="suite">Suite</SelectItem>
+                      <SelectItem value="standard">Standard Room</SelectItem>
+                      <SelectItem value="Superior Room">Deluxe</SelectItem>
+                      <SelectItem value="Ocean View Room">Super Deluxe</SelectItem>
+                      <SelectItem value="Ocean View Deluxe">Deluxe</SelectItem>
+                      <SelectItem value="Honeymoon Suite">Suite</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
