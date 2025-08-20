@@ -89,20 +89,20 @@ export default function App() {
             path="/admin/manage-users"
             element={user ? <ManageUsers /> : <Navigate to="/login" />}
           />
+          <Route
+            path="/admin/reservations"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/password-change" element={<PasswordChange />} />
-        <Route
-          path="/admin/reservations"
-          element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
       </Routes>
 
       {!isProtectedRoute && <ChatbotWidget />}
