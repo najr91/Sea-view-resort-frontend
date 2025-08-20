@@ -22,7 +22,7 @@ export default function AvailabilityModal({ isOpen, onClose, availabilityData, o
 
 
     return (
-        <Modal open={isOpen} onClose={onClose} size="md">
+        <Modal open={isOpen} onClose={onClose} size="md" lockScroll trapFocus>
             <Card className="w-full max-h-[90vh] overflow-y-auto">
                 {externalLoading && (
                     <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-xl">

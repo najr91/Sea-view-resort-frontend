@@ -6,7 +6,7 @@ import { formatDate, formatPrice } from '../../lib/formatters';
 
 export default function SuccessModal({ isOpen, onClose, reservationData }) {
     return (
-        <Modal open={isOpen} onClose={onClose} size="sm">
+        <Modal open={isOpen} onClose={onClose} size="sm" lockScroll trapFocus>
             <Card className="w-full">
                 <CardHeader className="text-center pb-4">
                     <div className="flex justify-center mb-4">

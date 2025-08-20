@@ -43,7 +43,7 @@ export default function MainLayout() {
     <div className="min-h-screen bg-resort-cream flex flex-col overflow-x-hidden">
       <header
         ref={headerRef}
-        className="sticky top-0 z-30 flex flex-wrap justify-between items-center px-8 py-5 bg-white shadow-sm"
+        className="sticky top-0 z-30 flex flex-wrap justify-between items-center px-6 lg:px-8 py-4 lg:py-5 bg-white shadow-sm"
       >
         <div className="flex items-center">
           <Link
@@ -60,22 +60,22 @@ export default function MainLayout() {
           </Link>
         </div>
 
-        <div className="flex items-center space-x-6">
+        <div className="hidden lg:flex items-center space-x-6">
           <Navigation />
         </div>
 
         <div className="flex items-center justify-end gap-3">
-          <div className="hidden md:block ">
+          <div className="hidden lg:block ">
             <Link to="/rooms">
               <Button className="px-6 text-base">Reservar</Button>
             </Link>
           </div>
-          <div className="hidden md:block">
+          <div className="hidden lg:block">
             <UserMenu />
           </div>
 
           <button
-            className="md:hidden inline-flex items-center justify-center p-3 rounded-md text-gray-700 hover:text-resort-olive"
+            className="lg:hidden inline-flex items-center justify-center p-3 rounded-md text-gray-700 hover:text-resort-olive"
             onClick={() => setIsMobileOpen(true)}
             aria-label="Open menu"
           >

@@ -5,7 +5,7 @@ import { X, LogIn, UserPlus } from 'lucide-react';
 
 export default function LoginRequiredModal({ isOpen, onClose, onNavigateToLogin, onNavigateToRegister }) {
     return (
-        <Modal open={isOpen} onClose={onClose} size="sm">
+        <Modal open={isOpen} onClose={onClose} size="sm" lockScroll trapFocus>
             <Card className="w-full">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                     <CardTitle className="text-xl font-semibold text-center w-full">
