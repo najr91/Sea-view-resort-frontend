@@ -9,6 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 import AvailabilityModal from "../home/AvailabilityModal";
 import SuccessModal from "../home/SuccessModal";
 import LoginRequiredModal from "../home/LoginRequiredModal";
+import { createReservation } from "../../services/reserva"; // 👈 Importar el servicio
 
 /**
  * Sidebar de reserva con cálculo de costos.
@@ -119,13 +120,29 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
 
     try {
       console.log('Confirmando reserva:', data);
-      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      setConfirmedReservation(data);
+      // Usar el servicio de reservas para crear la reserva real
+      const reservationData = {
+        habitacion: data.habitacion,
+        destino: data.destino,
+        huespedes: data.huespedes,
+        checkIn: data.checkIn,
+        checkOut: data.checkOut,
+        precioPorNoche: data.precioPorNoche
+      };
+      
+      const createdReservation = await createReservation(reservationData);
+      
+      setConfirmedReservation({
+        ...data,
+        id: createdReservation._id,
+        estado: createdReservation.estado
+      });
       setIsSuccessModalOpen(true);
       setIsModalOpen(false);
     } catch (error) {
       console.error('Error al confirmar la reserva:', error);
+      alert('Error al crear la reserva: ' + error.message);
       throw error;
     }
   };

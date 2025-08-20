@@ -11,6 +11,7 @@ import SuccessModal from './SuccessModal';
 import LoginRequiredModal from './LoginRequiredModal';
 import { useAuth } from '../../context/AuthContext';
 import { useRooms } from '../../context/RoomsContext';
+import { createReservation } from '../../services/reserva'; // 👈 Importar el servicio
 
 export default function SearchFilters() {
   const navigate = useNavigate();
@@ -59,22 +60,7 @@ export default function SearchFilters() {
     
     setIsLoading(true);
     try {
-      // reemplaza con tu endpoint
-      //const response = await axios.post('http://localhost:5173/api/reserva', filters);
-      
-      // Procesar la respuesta y calcular información adicional
-      const processedData = {
-        ...filters,
-        ...response.data,
-        noches: calculateNights(filters.checkIn, filters.checkOut),
-        precioTotal: response.data.precioPorNoche * calculateNights(filters.checkIn, filters.checkOut)
-      };
-      
-      setAvailabilityData(processedData);
-      setIsModalOpen(true);
-    } catch (error) {
-      console.error('Error en la búsqueda:', error);
-      // En caso de error, mostrar datos de ejemplo para demostración
+      // Simular búsqueda de disponibilidad
       const precioPorNoche = getRoomPrice(filters.habitacion);
       const mockData = {
         ...filters,
@@ -86,6 +72,8 @@ export default function SearchFilters() {
       };
       setAvailabilityData(mockData);
       setIsModalOpen(true);
+    } catch (error) {
+      console.error('Error en la búsqueda:', error);
     } finally {
       setIsLoading(false);
     }
@@ -140,20 +128,32 @@ export default function SearchFilters() {
     }
 
     try {
-      // Aquí implementarías la lógica para confirmar la reserva
       console.log('Confirmando reserva:', data);
-      // Ejemplo: await axios.post('http://localhost:5000/api/reservas', data);
       
-      // Simular un pequeño delay para mostrar el proceso
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Usar el servicio de reservas para crear la reserva real
+      const reservationData = {
+        habitacion: data.habitacion,
+        destino: data.destino,
+        huespedes: data.huespedes,
+        checkIn: data.checkIn,
+        checkOut: data.checkOut,
+        precioPorNoche: data.precioPorNoche
+      };
+      
+      const createdReservation = await createReservation(reservationData);
       
       // Guardar los datos de la reserva confirmada y mostrar el modal de éxito
-      setConfirmedReservation(data);
+      setConfirmedReservation({
+        ...data,
+        id: createdReservation._id,
+        estado: createdReservation.estado
+      });
       setIsSuccessModalOpen(true);
       // Cerrar el modal de disponibilidad
       setIsModalOpen(false);
     } catch (error) {
       console.error('Error al confirmar la reserva:', error);
+      alert('Error al crear la reserva: ' + error.message);
       throw error;
     }
   };
