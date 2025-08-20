@@ -214,27 +214,48 @@ export default function SearchFilters() {
     }
   };
 
-  return (
+    return (
     <>
-      <Card className="max-w-6xl mx-auto shadow-lg">
-        <CardContent className="p-4 md:p-6">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5 lg:gap-6 items-end">
+      <style jsx>{`
+        .select-content {
+          background: white !important;
+          border: 1px solid #d1d5db !important;
+          border-radius: 0.5rem !important;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+          z-index: 50 !important;
+        }
+        .select-item {
+          background: white !important;
+          color: #374151 !important;
+          padding: 0.5rem 0.75rem !important;
+          cursor: pointer !important;
+        }
+        .select-item:hover {
+          background: #f3f4f6 !important;
+        }
+        .select-item.selected {
+          background: #e5e7eb !important;
+        }
+      `}</style>
+      <Card className="max-w-6xl mx-auto shadow-2xl bg-white border-0 overflow-hidden">
+         <CardContent className="p-4 md:p-6">
+           <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 lg:gap-5 items-end">
             <div className="md:col-span-2">
               <div className="flex flex-col items-start gap-2">
-                <div className="flex items-center gap-2 text-sm text-resort-slate md:shrink-0">
-                  <MapPin className="w-4 h-4" />
-                  <span>Destino</span>
-                </div>
+                                 <div className="flex items-center gap-2 text-xs md:text-sm font-medium text-gray-700 md:shrink-0">
+                   <MapPin className="w-3 h-3 md:w-4 md:h-4" />
+                   <span className="truncate">Destino</span>
+                 </div>
                 <div className="w-full">
                   <Select onValueChange={v => handleChange('destino', v)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccione un destino" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="maldives">Maldives</SelectItem>
-                      <SelectItem value="bali">Bali</SelectItem>
-                      <SelectItem value="hawaii">Hawaii</SelectItem>
-                    </SelectContent>
+                                         <SelectTrigger className="text-sm !bg-white !border-gray-300 hover:!border-gray-400 focus:!border-blue-500 !text-gray-900">
+                       <SelectValue placeholder="Destino" />
+                     </SelectTrigger>
+                                         <SelectContent className="select-content">
+                       <SelectItem value="maldives" className="select-item">Maldives</SelectItem>
+                       <SelectItem value="bali" className="select-item">Bali</SelectItem>
+                       <SelectItem value="hawaii" className="select-item">Hawaii</SelectItem>
+                     </SelectContent>
                   </Select>
                 </div>
               </div>
@@ -242,28 +263,28 @@ export default function SearchFilters() {
 
             <div className="md:col-span-2">
               <div className="flex flex-col items-start gap-2">
-                <div className="flex items-center gap-2 text-sm text-resort-slate md:shrink-0">
-                  <Bed className="w-4 h-4" />
-                  <span>Tipo de habitación</span>
-                </div>
+                                 <div className="flex items-center gap-2 text-xs md:text-sm font-medium text-gray-700 md:shrink-0">
+                   <Bed className="w-3 h-3 md:w-4 md:h-4" />
+                   <span className="truncate">Tipo de habitación</span>
+                 </div>
                                  <div className="w-full">
                    <Select onValueChange={v => handleChange('habitacion', v)}>
-                     <SelectTrigger>
-                       <SelectValue placeholder="Seleccione una habitación" />
-                     </SelectTrigger>
-                     <SelectContent>
-                                               {rooms.length > 0 ? (
+                                           <SelectTrigger className="text-sm !bg-white !border-gray-300 hover:!border-gray-400 focus:!border-blue-500 !text-gray-900">
+                        <SelectValue placeholder="Habitación" />
+                      </SelectTrigger>
+                                           <SelectContent className="select-content">
+                        {rooms.length > 0 ? (
                           rooms.map((room) => (
-                            <SelectItem key={room.id} value={room.name}>
+                            <SelectItem key={room.id} value={room.name} className="select-item">
                               {room.name}
                             </SelectItem>
                           ))
                         ) : (
-                          <SelectItem value="" disabled>
+                          <SelectItem value="" disabled className="select-item">
                             No hay habitaciones disponibles
                           </SelectItem>
                         )}
-                     </SelectContent>
+                      </SelectContent>
                    </Select>
                    
                  </div>
@@ -272,21 +293,21 @@ export default function SearchFilters() {
 
             <div className="md:col-span-2">
               <div className="flex flex-col items-start gap-2">
-                <div className="flex items-center gap-2 text-sm text-resort-slate md:shrink-0">
-                  <Users className="w-4 h-4" />
-                  <span>Huéspedes</span>
-                </div>
+                                 <div className="flex items-center gap-2 text-xs md:text-sm font-medium text-gray-700 md:shrink-0">
+                   <Users className="w-3 h-3 md:w-4 md:h-4" />
+                   <span className="truncate">Huéspedes</span>
+                 </div>
                 <div className="w-full">
                   <Select onValueChange={v => handleChange('huespedes', v)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="2 Adultos" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 Adulto</SelectItem>
-                      <SelectItem value="2">2 Adultos</SelectItem>
-                      <SelectItem value="3">3 Adultos</SelectItem>
-                      <SelectItem value="4">4 Adultos</SelectItem>
-                    </SelectContent>
+                                         <SelectTrigger className="text-sm !bg-white !border-gray-300 hover:!border-gray-400 focus:!border-blue-500 !text-gray-900">
+                       <SelectValue placeholder="Huéspedes" />
+                     </SelectTrigger>
+                                         <SelectContent className="select-content">
+                       <SelectItem value="1" className="select-item">1 Adulto</SelectItem>
+                       <SelectItem value="2" className="select-item">2 Adultos</SelectItem>
+                       <SelectItem value="3" className="select-item">3 Adultos</SelectItem>
+                       <SelectItem value="4" className="select-item">4 Adultos</SelectItem>
+                     </SelectContent>
                   </Select>
                 </div>
               </div>
@@ -294,48 +315,50 @@ export default function SearchFilters() {
 
             <div className="md:col-span-2">
               <div className="flex flex-col items-start gap-2">
-                <div className="flex items-center gap-2 text-sm text-resort-slate md:shrink-0">
-                  <Calendar className="w-4 h-4" />
-                  <span>Check-in</span>
-                </div>
+                                 <div className="flex items-center gap-2 text-xs md:text-sm font-medium text-gray-700 md:shrink-0">
+                   <Calendar className="w-3 h-3 md:w-4 md:h-4" />
+                   <span className="truncate">Check-in</span>
+                 </div>
                                  <div className="w-full">
-                   <Input
-                     type="date"
-                     value={filters.checkIn}
-                     min="2025-08-20"
-                     onChange={e => handleChange('checkIn', e.target.value)}
-                   />
+                                       <Input
+                      type="date"
+                      value={filters.checkIn}
+                      min="2025-08-20"
+                      onChange={e => handleChange('checkIn', e.target.value)}
+                      className="!bg-white !border-gray-300 hover:!border-gray-400 focus:!border-blue-500 !text-gray-900"
+                    />
                  </div>
               </div>
             </div>
 
             <div className="md:col-span-2">
               <div className="flex flex-col items-start gap-2">
-                <div className="flex items-center gap-2 text-sm text-resort-slate md:shrink-0">
-                  <CalendarDays className="w-4 h-4" />
-                  <span>Check-out</span>
-                </div>
+                                 <div className="flex items-center gap-2 text-xs md:text-sm font-medium text-gray-700 md:shrink-0">
+                   <CalendarDays className="w-3 h-3 md:w-4 md:h-4" />
+                   <span className="truncate">Check-out</span>
+                 </div>
                                  <div className="w-full">
-                   <Input
-                     type="date"
-                     value={filters.checkOut}
-                     min="2025-08-21"
-                     onChange={e => handleChange('checkOut', e.target.value)}
-                   />
+                                       <Input
+                      type="date"
+                      value={filters.checkOut}
+                      min="2025-08-21"
+                      onChange={e => handleChange('checkOut', e.target.value)}
+                      className="!bg-white !border-gray-300 hover:!border-gray-400 focus:!border-blue-500 !text-gray-900"
+                    />
                  </div>
               </div>
             </div>
 
-            <div className="mt-2 md:mt-0 flex md:col-span-2 md:justify-start self-end">
-                             <Button 
+                         <div className="mt-2 md:mt-0 flex md:col-span-2 md:justify-start self-end">
+               <Button 
                  size="md" 
-                 className={`w-full md:w-full ${!filters.habitacion ? 'opacity-50 cursor-not-allowed' : ''}`}
+                 className={`w-full md:w-full font-semibold text-sm shadow-md ${!filters.habitacion ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
                  onClick={handleSearch}
                  disabled={isLoading || !filters.habitacion}
                >
-                 {isLoading ? 'Buscando...' : !filters.habitacion ? 'Selecciona una habitación' : 'Buscar'}
+                 {isLoading ? 'Buscando...' : !filters.habitacion ? 'Selecciona habitación' : 'Buscar'}
                </Button>
-            </div>
+             </div>
           </div>
         </CardContent>
       </Card>
