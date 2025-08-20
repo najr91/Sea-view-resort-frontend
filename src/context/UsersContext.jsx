@@ -1,17 +1,18 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
+import { apiUrl } from "../services/http";
 
 const UsersContext = createContext();
 
 export function UsersProvider({ children }) {
-  const [users, setUsers] = useState([]); 
+  const [users, setUsers] = useState([]);
 
-  
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const { data } = await axios.get("http://localhost:3000/api/admin/users", {
-          withCredentials: true, 
+        const { data } = await axios.get(apiUrl("/api/admin/users"), {
+          withCredentials: true,
         });
         if (Array.isArray(data)) setUsers(data);
       } catch (error) {

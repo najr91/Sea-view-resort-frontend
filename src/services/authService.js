@@ -1,15 +1,16 @@
-const API = "/api/v1";
-const getToken = () => localStorage.getItem("token");
 import axios from "axios";
+import { apiUrl } from "./http";
+const API_PREFIX = "/api/v1";
+const getToken = () => localStorage.getItem("token");
 
 export const register = async (userData) => {
-  const res = await axios.post(`${API}/register`, userData);
+  const res = await axios.post(apiUrl(`${API_PREFIX}/register`), userData);
   return res.data;
 };
 
 export const login = async (data) => {
   try {
-    const res = await axios.post(`${API}/login`, data);
+    const res = await axios.post(apiUrl(`${API_PREFIX}/login`), data);
 
     return {
       token: res.data.token,
@@ -26,7 +27,7 @@ export const login = async (data) => {
 };
 
 export const verifyToken = async () => {
-  const res = await fetch(`${API}/verify-token`, {
+  const res = await fetch(apiUrl(`${API_PREFIX}/verify-token`), {
     headers: {
       Authorization: `Bearer ${getToken()}`,
     },
@@ -36,7 +37,7 @@ export const verifyToken = async () => {
 };
 
 export const profile = async () => {
-  const res = await fetch(`${API}/profile`, {
+  const res = await fetch(apiUrl(`${API_PREFIX}/profile`), {
     headers: {
       Authorization: `Bearer ${getToken()}`,
     },
