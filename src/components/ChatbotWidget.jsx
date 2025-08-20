@@ -6,10 +6,9 @@ export default function ChatbotWidget() {
 
   return (
     <div className="fixed bottom-5 right-5 z-50">
-      
       {open && (
         <div className="w-80 h-96 bg-white border rounded-2xl shadow-lg mb-3 flex flex-col overflow-hidden">
-          <div className="flex justify-between items-center p-2 bg-green-600 text-white rounded-t-2xl">
+          <div className="flex justify-between items-center p-2 bg-[#968260] text-white rounded-t-2xl">
             <h2 className="text-sm font-semibold">Chat del Hotel</h2>
             <button
               onClick={() => setOpen(false)}
