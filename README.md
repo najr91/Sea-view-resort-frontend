@@ -89,47 +89,47 @@ El frontend consume el backend mediante Axios, utilizando los siguientes endpoin
 
 Autenticación
 
-POST /api/auth/register → Registro de usuario
+- POST /api/auth/register → Registro de usuario
 
-POST /api/auth/login → Inicio de sesión
+- POST /api/auth/login → Inicio de sesión
 
-Habitaciones
+- Habitaciones
 
-GET /api/rooms → Listar habitaciones
+- GET /api/rooms → Listar habitaciones
 
-POST /api/rooms → Crear habitación (admin)
+- POST /api/rooms → Crear habitación (admin)
 
-PUT /api/rooms/:id → Editar habitación (admin)
+- PUT /api/rooms/:id → Editar habitación (admin)
 
-DELETE /api/rooms/:id → Eliminar habitación (admin)
+- DELETE /api/rooms/:id → Eliminar habitación (admin)
 
-Reservas
+- Reservas
 
-POST /api/reservations → Crear reserva
+- POST /api/reservations → Crear reserva
 
-GET /api/reservations/:userId → Ver reservas de un usuario
+- GET /api/reservations/:userId → Ver reservas de un usuario
 
-DELETE /api/reservations/:id → Cancelar reserva
+- DELETE /api/reservations/:id → Cancelar reserva
 
 🧪 Validaciones
 
-Validación de formularios (correo electrónico, contraseñas, fechas).
+- Validación de formularios (correo electrónico, contraseñas, fechas).
 
-Protección de rutas privadas (ej. /profile, /admin/rooms).
+- Protección de rutas privadas (ej. /profile, /admin/rooms).
 
-Manejo de errores con mensajes claros utilizando react-hot-toast.
+- Manejo de errores con mensajes claros utilizando react-hot-toast.
 
-Redirección según rol y autenticación.
+- Redirección según rol y autenticación.
 
-Página personalizada para errores 404.
+- Página personalizada para errores 404.
 
 📱 Responsive Design
 
-Diseño adaptable a desktop, tablet y mobile.
+- Diseño adaptable a desktop, tablet y mobile.
 
-Uso de TailwindCSS para un diseño rápido y eficiente.
+- Uso de TailwindCSS para un diseño rápido y eficiente.
 
-Componentes reutilizables con estilos consistentes.
+- Componentes reutilizables con estilos consistentes.
 
 🚀 Deploy
 
@@ -141,12 +141,12 @@ El frontend está desplegado en Vercel:
 
 Proyecto desarrollado por el equipo de RollingCode School:
 
-Nelson Juarez Rivas
+- Nelson Juarez Rivas
 
-Natividad Rodriguez
+- Natividad Rodriguez
 
-Lucia Gallardo
+- Lucia Gallardo
 
-Santiago Nieva
+- Santiago Nieva
 
-José Perez
+- José Perez
