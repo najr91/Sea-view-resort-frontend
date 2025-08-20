@@ -17,7 +17,6 @@ import ForgotPassword from "./pages/ForgotPassword.jsx";
 import PasswordChange from "./pages/PasswordChange.jsx";
 import AdminRooms from "./pages/admin/AdminRooms.jsx";
 import Administrador from "./pages/admin/Administrador.jsx";
-import AdminUsers from "./pages/admin/AdminUsers.jsx";
 import ManageUsers from "./pages/admin/ManageUsers.jsx";
 import ChatbotWidget from "./components/ChatbotWidget"; // <- de tu rama chatbot
 
@@ -87,14 +86,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/admin/users"
-            element={
-              <ProtectedRoute>
-                <AdminUsers />
-              </ProtectedRoute>
-            }
-          />
+          
           <Route
             path="/admin/manage-users"
             element={user ? <ManageUsers /> : <Navigate to="/login" />}
