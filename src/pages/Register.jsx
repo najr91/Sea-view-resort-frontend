@@ -118,7 +118,7 @@ function Register() {
             </label>
           </div>
 
-          <Button className="w-full mb-4">Registrarse</Button>
+          <Button type="submit" className="w-full mb-4">Registrarse</Button>
           <p className="text-center text-sm">
             ¿Ya tienes una cuenta? {""}
             <Link to="/login" className="text-[rgb(150,130,96)] hover:underline">
