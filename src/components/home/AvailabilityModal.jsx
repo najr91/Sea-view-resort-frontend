@@ -3,7 +3,7 @@ import { Button } from '../ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { X, Calendar, CheckCircle, XCircle, Clock } from 'lucide-react';
 
-export default function AvailabilityModal({ isOpen, onClose, availabilityData, onConfirmReservation, onSelectAlternativeDate, isLoading: externalLoading }) {
+export default function AvailabilityModal({ isOpen, onClose, availabilityData, onConfirmReservation, onSelectAlternativeDate, isLoading: externalLoading, user }) {
   const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
@@ -115,6 +115,19 @@ export default function AvailabilityModal({ isOpen, onClose, availabilityData, o
                 </div>
               </div>
 
+              {/* Información de autenticación */}
+              {!user && (
+                <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Clock className="w-4 h-4 text-yellow-600" />
+                    <span className="font-medium text-yellow-800">Inicia sesión para confirmar</span>
+                  </div>
+                  <p className="text-yellow-700 text-sm">
+                    Necesitas estar logueado para confirmar tu reserva. Al hacer clic en "Confirmar Reserva" serás redirigido a la página de login.
+                  </p>
+                </div>
+              )}
+
               {/* Botón de confirmar */}
               <div className="flex gap-3 pt-4">
                 <Button
@@ -122,7 +135,7 @@ export default function AvailabilityModal({ isOpen, onClose, availabilityData, o
                   disabled={isLoading}
                   className="flex-1 bg-green-600 hover:bg-green-700"
                 >
-                  {isLoading ? 'Confirmando...' : 'Confirmar Reserva'}
+                  {isLoading ? 'Confirmando...' : user ? 'Confirmar Reserva' : 'Iniciar Sesión y Confirmar'}
                 </Button>
                 <Button
                   variant="outline"

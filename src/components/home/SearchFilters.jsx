@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent } from '../../components/ui/Card';
@@ -7,8 +8,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { MapPin, Bed, Users, Calendar, CalendarDays } from 'lucide-react';
 import AvailabilityModal from './AvailabilityModal';
 import SuccessModal from './SuccessModal';
+import LoginRequiredModal from './LoginRequiredModal';
+import { useAuth } from '../../context/AuthContext';
+import { useRooms } from '../../context/RoomsContext';
 
 export default function SearchFilters() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { rooms } = useRooms();
+  
   const [filters, setFilters] = useState({
     destino: '',
     habitacion: '',
@@ -21,12 +29,34 @@ export default function SearchFilters() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [confirmedReservation, setConfirmedReservation] = useState(null);
+  const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] = useState(false);
+  const [selectedRoomPrice, setSelectedRoomPrice] = useState(0);
 
   const handleChange = (field, value) => {
     setFilters(prev => ({ ...prev, [field]: value }));
   };
 
+  // Función para obtener el precio de la habitación seleccionada
+  const getRoomPrice = (roomName) => {
+    const room = rooms.find(r => r.name === roomName);
+    return room ? room.price : 150; // Precio por defecto si no se encuentra
+  };
+
+  // Actualizar el precio cuando cambie la habitación seleccionada
+  useEffect(() => {
+    if (filters.habitacion) {
+      const price = getRoomPrice(filters.habitacion);
+      setSelectedRoomPrice(price);
+    }
+  }, [filters.habitacion, rooms]);
+
   const handleSearch = async () => {
+    // Validar que se haya seleccionado una habitación
+    if (!filters.habitacion) {
+      alert('Por favor selecciona una habitación antes de buscar');
+      return;
+    }
+    
     setIsLoading(true);
     try {
       // reemplaza con tu endpoint
@@ -45,12 +75,13 @@ export default function SearchFilters() {
     } catch (error) {
       console.error('Error en la búsqueda:', error);
       // En caso de error, mostrar datos de ejemplo para demostración
+      const precioPorNoche = getRoomPrice(filters.habitacion);
       const mockData = {
         ...filters,
         disponible: Math.random() > 0.5, // Simular disponibilidad aleatoria
-        precioPorNoche: 150,
+        precioPorNoche: precioPorNoche,
         noches: calculateNights(filters.checkIn, filters.checkOut),
-        precioTotal: 150 * calculateNights(filters.checkIn, filters.checkOut),
+        precioTotal: precioPorNoche * calculateNights(filters.checkIn, filters.checkOut),
         diasDisponibles: generateAvailableDates(filters.checkIn, filters.checkOut)
       };
       setAvailabilityData(mockData);
@@ -101,6 +132,13 @@ export default function SearchFilters() {
   };
 
   const handleConfirmReservation = async (data) => {
+    // Verificar si el usuario está logueado
+    if (!user) {
+      // Si no está logueado, mostrar el modal de login requerido
+      setIsLoginRequiredModalOpen(true);
+      return;
+    }
+
     try {
       // Aquí implementarías la lógica para confirmar la reserva
       console.log('Confirmando reserva:', data);
@@ -118,6 +156,18 @@ export default function SearchFilters() {
       console.error('Error al confirmar la reserva:', error);
       throw error;
     }
+  };
+
+  const handleNavigateToLogin = () => {
+    setIsLoginRequiredModalOpen(false);
+    setIsModalOpen(false);
+    navigate('/login');
+  };
+
+  const handleNavigateToRegister = () => {
+    setIsLoginRequiredModalOpen(false);
+    setIsModalOpen(false);
+    navigate('/register');
   };
 
   const handleSelectAlternativeDate = async (selectedDate) => {
@@ -144,12 +194,13 @@ export default function SearchFilters() {
       setIsLoading(true);
       
       // Simular llamada a la API con las nuevas fechas
+      const precioPorNoche = getRoomPrice(updatedFilters.habitacion);
       const mockData = {
         ...updatedFilters,
         disponible: Math.random() > 0.3, // Mayor probabilidad de disponibilidad
-        precioPorNoche: 150,
+        precioPorNoche: precioPorNoche,
         noches: calculateNights(selectedDate, newCheckOutDate.toISOString().split('T')[0]),
-        precioTotal: 150 * calculateNights(selectedDate, newCheckOutDate.toISOString().split('T')[0]),
+        precioTotal: precioPorNoche * calculateNights(selectedDate, newCheckOutDate.toISOString().split('T')[0]),
         diasDisponibles: generateAvailableDates(selectedDate, newCheckOutDate.toISOString().split('T')[0])
       };
       
@@ -195,20 +246,27 @@ export default function SearchFilters() {
                   <Bed className="w-4 h-4" />
                   <span>Tipo de habitación</span>
                 </div>
-                <div className="w-full">
-                  <Select onValueChange={v => handleChange('habitacion', v)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Estándar" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="standard">Standard Room</SelectItem>
-                      <SelectItem value="Superior Room">Deluxe</SelectItem>
-                      <SelectItem value="Ocean View Room">Super Deluxe</SelectItem>
-                      <SelectItem value="Ocean View Deluxe">Deluxe</SelectItem>
-                      <SelectItem value="Honeymoon Suite">Suite</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                                 <div className="w-full">
+                   <Select onValueChange={v => handleChange('habitacion', v)}>
+                     <SelectTrigger>
+                       <SelectValue placeholder="Seleccione una habitación" />
+                     </SelectTrigger>
+                     <SelectContent>
+                                               {rooms.length > 0 ? (
+                          rooms.map((room) => (
+                            <SelectItem key={room.id} value={room.name}>
+                              {room.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="" disabled>
+                            No hay habitaciones disponibles
+                          </SelectItem>
+                        )}
+                     </SelectContent>
+                   </Select>
+                   
+                 </div>
               </div>
             </div>
 
@@ -269,14 +327,14 @@ export default function SearchFilters() {
             </div>
 
             <div className="mt-2 md:mt-0 flex md:col-span-2 md:justify-start self-end">
-              <Button 
-                size="md" 
-                className="w-full md:w-full" 
-                onClick={handleSearch}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Buscando...' : 'Buscar'}
-              </Button>
+                             <Button 
+                 size="md" 
+                 className={`w-full md:w-full ${!filters.habitacion ? 'opacity-50 cursor-not-allowed' : ''}`}
+                 onClick={handleSearch}
+                 disabled={isLoading || !filters.habitacion}
+               >
+                 {isLoading ? 'Buscando...' : !filters.habitacion ? 'Selecciona una habitación' : 'Buscar'}
+               </Button>
             </div>
           </div>
         </CardContent>
@@ -290,6 +348,7 @@ export default function SearchFilters() {
         onConfirmReservation={handleConfirmReservation}
         onSelectAlternativeDate={handleSelectAlternativeDate}
         isLoading={isLoading}
+        user={user}
       />
 
       {/* Modal de confirmación exitosa */}
@@ -297,6 +356,14 @@ export default function SearchFilters() {
         isOpen={isSuccessModalOpen}
         onClose={() => setIsSuccessModalOpen(false)}
         reservationData={confirmedReservation}
+      />
+
+      {/* Modal de login requerido */}
+      <LoginRequiredModal
+        isOpen={isLoginRequiredModalOpen}
+        onClose={() => setIsLoginRequiredModalOpen(false)}
+        onNavigateToLogin={handleNavigateToLogin}
+        onNavigateToRegister={handleNavigateToRegister}
       />
     </>
   );

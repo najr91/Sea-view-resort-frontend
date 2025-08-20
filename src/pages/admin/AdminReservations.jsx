@@ -17,9 +17,11 @@ import {
   XCircle,
   Clock
 } from 'lucide-react';
+import { useRooms } from '../../context/RoomsContext';
 import axios from 'axios';
 
 export default function AdminReservations() {
+  const { rooms } = useRooms();
   const [reservations, setReservations] = useState([]);
   const [filteredReservations, setFilteredReservations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,71 +41,54 @@ export default function AdminReservations() {
     specialRequests: ''
   });
 
-  // Simular datos de reservas para demostración
+  // Simular datos de reservas para demostración usando habitaciones del contexto
   useEffect(() => {
-    const mockReservations = [
-      {
-        id: 1,
-        guestName: 'María González',
-        email: 'maria@email.com',
-        phone: '+34 123 456 789',
-        checkIn: '2025-08-20',
-        checkOut: '2025-08-25',
-        roomType: 'Deluxe',
-        guests: 2,
-        status: 'confirmed',
-        specialRequests: 'Vista al mar preferida',
-        totalPrice: 750,
-        createdAt: '2024-12-15'
-      },
-      {
-        id: 2,
-        guestName: 'Carlos Rodríguez',
-        email: 'carlos@email.com',
-        phone: '+34 987 654 321',
-        checkIn: '2025-08-22',
-        checkOut: '2025-08-24',
-        roomType: 'Standard',
-        guests: 1,
-        status: 'pending',
-        specialRequests: '',
-        totalPrice: 300,
-        createdAt: '2024-12-16'
-      },
-      {
-        id: 3,
-        guestName: 'Ana Martínez',
-        email: 'ana@email.com',
-        phone: '+34 555 123 456',
-        checkIn: '2025-08-28',
-        checkOut: '2025-09-02',
-        roomType: 'Suite',
-        guests: 3,
-        status: 'cancelled',
-        specialRequests: 'Cama extra necesaria',
-        totalPrice: 1200,
-        createdAt: '2024-12-14'
-      },
-      {
-        id: 4,
-        guestName: 'Luis Fernández',
-        email: 'luis@email.com',
-        phone: '+34 777 888 999',
-        checkIn: '2025-08-30',
-        checkOut: '2025-09-05',
-        roomType: 'Deluxe',
-        guests: 2,
-        status: 'confirmed',
-        specialRequests: 'Check-in temprano si es posible',
-        totalPrice: 900,
-        createdAt: '2024-12-17'
-      }
+    if (rooms.length === 0) return; // Esperar a que las habitaciones se carguen
+    
+    const mockGuests = [
+      { name: 'María González', email: 'maria@email.com', phone: '+34 123 456 789' },
+      { name: 'Carlos Rodríguez', email: 'carlos@email.com', phone: '+34 987 654 321' },
+      { name: 'Ana Martínez', email: 'ana@email.com', phone: '+34 555 123 456' },
+      { name: 'Luis Fernández', email: 'luis@email.com', phone: '+34 777 888 999' },
+      { name: 'Sofia García', email: 'sofia@email.com', phone: '+34 111 222 333' },
+      { name: 'Miguel López', email: 'miguel@email.com', phone: '+34 444 555 666' }
     ];
+    
+    const mockReservations = [];
+    
+    // Crear reservas para cada habitación disponible
+    rooms.forEach((room, index) => {
+      if (index < mockGuests.length) {
+        const guest = mockGuests[index];
+        const checkIn = new Date('2025-08-20');
+        checkIn.setDate(checkIn.getDate() + (index * 2)); // Fechas escalonadas
+        const checkOut = new Date(checkIn);
+        checkOut.setDate(checkOut.getDate() + (index % 3 + 2)); // 2-4 noches
+        
+        const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+        const totalPrice = room.price * nights;
+        
+        mockReservations.push({
+          id: index + 1,
+          guestName: guest.name,
+          email: guest.email,
+          phone: guest.phone,
+          checkIn: checkIn.toISOString().split('T')[0],
+          checkOut: checkOut.toISOString().split('T')[0],
+          roomType: room.name,
+          guests: (index % 3) + 1, // 1-3 huéspedes
+          status: ['confirmed', 'pending', 'cancelled'][index % 3],
+          specialRequests: index % 2 === 0 ? 'Vista al mar preferida' : '',
+          totalPrice,
+          createdAt: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toISOString().split('T')[0]
+        });
+      }
+    });
     
     setReservations(mockReservations);
     setFilteredReservations(mockReservations);
     setIsLoading(false);
-  }, []);
+  }, [rooms]); // Dependencia en rooms para que se actualice cuando cambien las habitaciones
 
   // Filtrar reservas
   useEffect(() => {
@@ -159,13 +144,28 @@ export default function AdminReservations() {
 
   const handleSave = async () => {
     try {
+      // Validar campos obligatorios
+      if (!formData.guestName || !formData.email || !formData.phone || !formData.roomType) {
+        alert('Por favor completa todos los campos obligatorios');
+        return;
+      }
+
+      // Validar que la habitación seleccionada existe en el contexto
+      const selectedRoom = rooms.find(r => r.name === formData.roomType);
+      if (!selectedRoom) {
+        alert('La habitación seleccionada no existe en el sistema');
+        return;
+      }
+
       if (editingReservation) {
         // Simular actualización
         await new Promise(resolve => setTimeout(resolve, 1000));
         
+        const totalPrice = calculateTotalPrice(formData.roomType, formData.checkIn, formData.checkOut);
+        
         setReservations(prev => prev.map(r => 
           r.id === editingReservation.id 
-            ? { ...r, ...formData, guests: parseInt(formData.guests) }
+            ? { ...r, ...formData, guests: parseInt(formData.guests), totalPrice }
             : r
         ));
         alert('Reserva actualizada exitosamente');
@@ -173,11 +173,13 @@ export default function AdminReservations() {
         // Simular creación
         await new Promise(resolve => setTimeout(resolve, 1000));
         
+        const totalPrice = calculateTotalPrice(formData.roomType, formData.checkIn, formData.checkOut);
+        
         const newReservation = {
           id: Date.now(),
           ...formData,
           guests: parseInt(formData.guests),
-          totalPrice: 0, // Calcular según el tipo de habitación
+          totalPrice,
           createdAt: new Date().toISOString().split('T')[0]
         };
         
@@ -233,10 +235,34 @@ export default function AdminReservations() {
     }).format(price);
   };
 
-  if (isLoading) {
+  // Función para obtener el precio de la habitación seleccionada
+  const getRoomPrice = (roomName) => {
+    const room = rooms.find(r => r.name === roomName);
+    return room ? room.price : 0;
+  };
+
+  // Función para calcular el precio total de la reserva
+  const calculateTotalPrice = (roomType, checkIn, checkOut) => {
+    if (!roomType || !checkIn || !checkOut) return 0;
+    
+    const pricePerNight = getRoomPrice(roomType);
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    const diffTime = Math.abs(end - start);
+    const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return pricePerNight * nights;
+  };
+
+  if (isLoading || rooms.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">
+            {rooms.length === 0 ? 'Cargando habitaciones...' : 'Cargando reservas...'}
+          </p>
+        </div>
       </div>
     );
   }
@@ -246,7 +272,9 @@ export default function AdminReservations() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Panel de Administración - Reservas</h1>
-        <p className="text-gray-600">Gestiona todas las reservas del hotel</p>
+        <p className="text-gray-600">
+          Gestiona todas las reservas del hotel • {rooms.length} habitación{rooms.length !== 1 ? 'es' : ''} disponible{rooms.length !== 1 ? 's' : ''} en el sistema
+        </p>
       </div>
 
       {/* Filtros y búsqueda */}
@@ -522,9 +550,17 @@ export default function AdminReservations() {
                       <SelectValue placeholder="Seleccionar tipo" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Standard">Standard</SelectItem>
-                      <SelectItem value="Deluxe">Deluxe</SelectItem>
-                      <SelectItem value="Suite">Suite</SelectItem>
+                      {rooms.length > 0 ? (
+                        rooms.map((room) => (
+                          <SelectItem key={room.id} value={room.name}>
+                            {room.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="" disabled>
+                          No hay habitaciones disponibles
+                        </SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
@@ -555,6 +591,35 @@ export default function AdminReservations() {
                   rows="3"
                 />
               </div>
+
+              {/* Mostrar precio calculado */}
+              {formData.roomType && formData.checkIn && formData.checkOut && (
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-medium mb-2">Resumen de Precios:</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Precio por noche:</span>
+                      <span className="font-medium">{formatPrice(getRoomPrice(formData.roomType))}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Noches:</span>
+                      <span className="font-medium">
+                        {(() => {
+                          const start = new Date(formData.checkIn);
+                          const end = new Date(formData.checkOut);
+                          const diffTime = Math.abs(end - start);
+                          return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        })()}
+                      </span>
+                    </div>
+                    <hr className="border-gray-200" />
+                    <div className="flex justify-between font-semibold">
+                      <span>Total:</span>
+                      <span className="text-green-600">{formatPrice(calculateTotalPrice(formData.roomType, formData.checkIn, formData.checkOut))}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="flex gap-3 pt-4">
                 <Button

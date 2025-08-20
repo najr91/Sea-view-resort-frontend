@@ -62,7 +62,7 @@ export default function RoomDetail() {
           </div>
 
           <div className="lg:col-span-1">
-            <BookingSidebar pricePerNight={room.price} />
+            <BookingSidebar pricePerNight={room.price} roomName={room.name} />
           </div>
         </div>
       </main>

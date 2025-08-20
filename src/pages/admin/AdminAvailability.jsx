@@ -12,7 +12,9 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  Eye
+  Eye,
+  Edit,
+  Plus
 } from 'lucide-react';
 
 export default function AdminAvailability() {
@@ -22,6 +24,17 @@ export default function AdminAvailability() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [roomTypeFilter, setRoomTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [reservationForm, setReservationForm] = useState({
+    guestName: '',
+    email: '',
+    phone: '',
+    checkIn: '',
+    checkOut: '',
+    guests: '2',
+    specialRequests: ''
+  });
 
   // Simular datos de disponibilidad
   useEffect(() => {
@@ -195,6 +208,91 @@ export default function AdminAvailability() {
 
   const stats = getStatistics();
 
+  const handleCreateReservation = (room) => {
+    setSelectedRoom(room);
+    setReservationForm({
+      guestName: '',
+      email: '',
+      phone: '',
+      checkIn: '2025-08-20',
+      checkOut: '2025-08-25',
+      guests: '2',
+      specialRequests: ''
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleSaveReservation = async () => {
+    try {
+      // Validar campos obligatorios
+      if (!reservationForm.guestName || !reservationForm.email || !reservationForm.phone) {
+        alert('Por favor completa todos los campos obligatorios');
+        return;
+      }
+
+      // Simular creación de reserva
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      if (selectedRoom.id === 'new') {
+        // Crear nueva reserva sin habitación específica
+        alert('Reserva creada exitosamente (sin habitación asignada)');
+      } else {
+        // Actualizar el estado de la habitación existente
+        setAvailabilityData(prev => prev.map(room => 
+          room.id === selectedRoom.id 
+            ? {
+                ...room,
+                status: 'reserved',
+                currentGuest: reservationForm.guestName,
+                checkIn: reservationForm.checkIn,
+                checkOut: reservationForm.checkOut
+              }
+            : room
+        ));
+        alert('Reserva creada exitosamente');
+      }
+
+      setIsModalOpen(false);
+      setSelectedRoom(null);
+      setReservationForm({
+        guestName: '',
+        email: '',
+        phone: '',
+        checkIn: '2025-08-20',
+        checkOut: '2025-08-25',
+        guests: '2',
+        specialRequests: ''
+      });
+    } catch (error) {
+      console.error('Error al crear la reserva:', error);
+      alert('Error al crear la reserva');
+    }
+  };
+
+  const handleChangeStatus = async (roomId, newStatus) => {
+    try {
+      // Simular actualización de estado
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      setAvailabilityData(prev => prev.map(room => 
+        room.id === roomId 
+          ? {
+              ...room,
+              status: newStatus,
+              currentGuest: newStatus === 'available' ? null : room.currentGuest,
+              checkIn: newStatus === 'available' ? null : room.checkIn,
+              checkOut: newStatus === 'available' ? null : room.checkOut
+            }
+          : room
+      ));
+
+      alert(`Estado de habitación actualizado a: ${getStatusText(newStatus)}`);
+    } catch (error) {
+      console.error('Error al actualizar el estado:', error);
+      alert('Error al actualizar el estado');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -214,7 +312,7 @@ export default function AdminAvailability() {
       {/* Filtros */}
       <Card className="mb-6">
         <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div>
               <label className="block text-sm font-medium mb-2">Fecha</label>
               <Input
@@ -266,6 +364,35 @@ export default function AdminAvailability() {
                 className="w-full"
               >
                 Limpiar filtros
+              </Button>
+            </div>
+
+            <div className="flex items-end">
+              <Button
+                onClick={() => {
+                  setSelectedRoom({
+                    id: 'new',
+                    roomNumber: 'Nueva',
+                    roomType: 'Standard',
+                    capacity: 2,
+                    price: 150,
+                    amenities: ['WiFi', 'TV', 'A/C']
+                  });
+                  setReservationForm({
+                    guestName: '',
+                    email: '',
+                    phone: '',
+                    checkIn: '2025-08-20',
+                    checkOut: '2025-08-25',
+                    guests: '2',
+                    specialRequests: ''
+                  });
+                  setIsModalOpen(true);
+                }}
+                className="w-full bg-green-600 hover:bg-green-700"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Nueva Reserva
               </Button>
             </div>
           </div>
@@ -399,18 +526,43 @@ export default function AdminAvailability() {
                   </div>
 
                   <div className="mt-4 flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => {
-                        // Aquí podrías abrir un modal con detalles completos
-                        console.log('Ver detalles de habitación:', room);
-                      }}
+                    {room.status === 'available' && (
+                      <Button
+                        size="sm"
+                        className="flex-1 bg-green-600 hover:bg-green-700"
+                        onClick={() => handleCreateReservation(room)}
+                      >
+                        <Plus className="w-4 h-4" />
+                        Crear Reserva
+                      </Button>
+                    )}
+                    
+                    {room.status !== 'available' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => handleChangeStatus(room.id, 'available')}
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        Marcar Disponible
+                      </Button>
+                    )}
+
+                    <Select
+                      value={room.status}
+                      onValueChange={(value) => handleChangeStatus(room.id, value)}
                     >
-                      <Eye className="w-4 h-4" />
-                      Ver detalles
-                    </Button>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="available">Disponible</SelectItem>
+                        <SelectItem value="reserved">Reservada</SelectItem>
+                        <SelectItem value="occupied">Ocupada</SelectItem>
+                        <SelectItem value="maintenance">Mantenimiento</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </CardContent>
               </Card>
@@ -418,6 +570,136 @@ export default function AdminAvailability() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Modal para crear reserva */}
+      {isModalOpen && selectedRoom && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <CardHeader>
+              <CardTitle>
+                {selectedRoom.id === 'new' ? 'Nueva Reserva' : `Crear Reserva - Habitación ${selectedRoom.roomNumber}`}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Nombre del huésped *</label>
+                  <Input
+                    value={reservationForm.guestName}
+                    onChange={(e) => setReservationForm({...reservationForm, guestName: e.target.value})}
+                    placeholder="Nombre completo"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">Email *</label>
+                  <Input
+                    type="email"
+                    value={reservationForm.email}
+                    onChange={(e) => setReservationForm({...reservationForm, email: e.target.value})}
+                    placeholder="email@ejemplo.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Teléfono *</label>
+                  <Input
+                    value={reservationForm.phone}
+                    onChange={(e) => setReservationForm({...reservationForm, phone: e.target.value})}
+                    placeholder="+34 123 456 789"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Número de huéspedes</label>
+                  <Select value={reservationForm.guests} onValueChange={(value) => setReservationForm({...reservationForm, guests: value})}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1</SelectItem>
+                      <SelectItem value="2">2</SelectItem>
+                      <SelectItem value="3">3</SelectItem>
+                      <SelectItem value="4">4</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Check-in</label>
+                  <Input
+                    type="date"
+                    value={reservationForm.checkIn}
+                    onChange={(e) => setReservationForm({...reservationForm, checkIn: e.target.value})}
+                    min="2025-08-20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Check-out</label>
+                  <Input
+                    type="date"
+                    value={reservationForm.checkOut}
+                    onChange={(e) => setReservationForm({...reservationForm, checkOut: e.target.value})}
+                    min="2025-08-21"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Solicitudes especiales</label>
+                <textarea
+                  value={reservationForm.specialRequests}
+                  onChange={(e) => setReservationForm({...reservationForm, specialRequests: e.target.value})}
+                  placeholder="Solicitudes especiales o comentarios..."
+                  className="w-full p-3 border border-gray-300 rounded-lg resize-none"
+                  rows="3"
+                />
+              </div>
+
+              {selectedRoom.id !== 'new' && (
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-medium mb-2">Detalles de la habitación:</h4>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-600">Habitación:</span>
+                      <p className="font-medium">{selectedRoom.roomNumber} - {selectedRoom.roomType}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Precio por noche:</span>
+                      <p className="font-medium">{formatPrice(selectedRoom.price)}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Capacidad:</span>
+                      <p className="font-medium">{selectedRoom.capacity} personas</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Amenities:</span>
+                      <p className="font-medium">{selectedRoom.amenities.join(', ')}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-4">
+                <Button
+                  onClick={handleSaveReservation}
+                  className="flex-1"
+                >
+                  Crear Reserva
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

@@ -18,6 +18,7 @@ import PasswordChange from "./pages/PasswordChange.jsx";
 import AdminRooms from "./pages/admin/AdminRooms.jsx";
 import Administrador from "./pages/admin/Administrador.jsx";
 import ManageUsers from "./pages/admin/ManageUsers.jsx";
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
@@ -82,12 +83,20 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin/reservations"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
       </Route>
 
       
       
-      {/* Admin Routes */}
-      <Route path="/adminrutas" element={<AdminDashboard />} />
+      {/* Admin Routes - Sin MainLayout 
+      <Route path="/adminrutas" element={<AdminDashboard />} />*/}
     </Routes>
   );
 }

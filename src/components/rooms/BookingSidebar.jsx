@@ -1,7 +1,14 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "../ui/Card";
 import { Button } from "../ui/Button";
-import { Calendar, Users } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Input } from "../ui/Input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/Select";
+import { Calendar, Users, MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import AvailabilityModal from "../home/AvailabilityModal";
+import SuccessModal from "../home/SuccessModal";
+import LoginRequiredModal from "../home/LoginRequiredModal";
 
 /**
  * Sidebar de reserva con cálculo de costos.
@@ -13,12 +20,164 @@ import { Link } from "react-router-dom";
  * @param {number} props.pricePerNight - Precio por noche de la habitación.
  * @returns {JSX.Element}
  */
-export default function BookingSidebar({ pricePerNight }) {
-  const nights = 3;
+export default function BookingSidebar({ pricePerNight, roomName }) {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  const [bookingData, setBookingData] = useState({
+    destino: '',
+    checkIn: '2025-08-20',
+    checkOut: '2025-08-25',
+    huespedes: '2'
+  });
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [availabilityData, setAvailabilityData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [confirmedReservation, setConfirmedReservation] = useState(null);
+  const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] = useState(false);
+
+  // Calcular noches
+  const calculateNights = (checkIn, checkOut) => {
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    const diffTime = Math.abs(end - start);
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  const nights = calculateNights(bookingData.checkIn, bookingData.checkOut);
   const serviceFee = 25000;
   const taxes = 30000;
   const subtotal = pricePerNight * nights;
   const total = subtotal + serviceFee + taxes;
+
+  const handleChange = (field, value) => {
+    setBookingData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const generateAvailableDates = (checkIn, checkOut) => {
+    const dates = [];
+    const startDate = new Date(checkIn);
+    const minDate = new Date('2025-08-20');
+    
+    const ranges = [
+      { start: 1, end: 3 },
+      { start: 7, end: 10 },
+      { start: 14, end: 17 },
+      { start: 21, end: 24 },
+      { start: 30, end: 35 },
+      { start: 60, end: 65 }
+    ];
+    
+    ranges.forEach(range => {
+      for (let i = range.start; i <= range.end; i++) {
+        const newDate = new Date(startDate);
+        newDate.setDate(startDate.getDate() + i);
+        if (newDate >= minDate) {
+          dates.push(newDate.toISOString().split('T')[0]);
+        }
+      }
+    });
+    
+    return dates;
+  };
+
+  const handleSearch = async () => {
+    if (!bookingData.destino) {
+      alert('Por favor selecciona un destino');
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      // Simular búsqueda de disponibilidad
+      const mockData = {
+        ...bookingData,
+        habitacion: roomName,
+        disponible: Math.random() > 0.5,
+        precioPorNoche: pricePerNight,
+        noches: nights,
+        precioTotal: total,
+        diasDisponibles: generateAvailableDates(bookingData.checkIn, bookingData.checkOut)
+      };
+      
+      setAvailabilityData(mockData);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error('Error en la búsqueda:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleConfirmReservation = async (data) => {
+    if (!user) {
+      setIsLoginRequiredModalOpen(true);
+      return;
+    }
+
+    try {
+      console.log('Confirmando reserva:', data);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setConfirmedReservation(data);
+      setIsSuccessModalOpen(true);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Error al confirmar la reserva:', error);
+      throw error;
+    }
+  };
+
+  const handleNavigateToLogin = () => {
+    setIsLoginRequiredModalOpen(false);
+    setIsModalOpen(false);
+    navigate('/login');
+  };
+
+  const handleNavigateToRegister = () => {
+    setIsLoginRequiredModalOpen(false);
+    setIsModalOpen(false);
+    navigate('/register');
+  };
+
+  const handleSelectAlternativeDate = async (selectedDate) => {
+    try {
+      const checkInDate = new Date(selectedDate);
+      const originalCheckIn = new Date(bookingData.checkIn);
+      const originalCheckOut = new Date(bookingData.checkOut);
+      const nightsDiff = Math.ceil((originalCheckOut - originalCheckIn) / (1000 * 60 * 60 * 24));
+      
+      const newCheckOutDate = new Date(checkInDate);
+      newCheckOutDate.setDate(checkInDate.getDate() + nightsDiff);
+      
+      const updatedBookingData = {
+        ...bookingData,
+        checkIn: selectedDate,
+        checkOut: newCheckOutDate.toISOString().split('T')[0]
+      };
+      
+      setBookingData(updatedBookingData);
+      setIsLoading(true);
+      
+      const mockData = {
+        ...updatedBookingData,
+        habitacion: roomName,
+        disponible: Math.random() > 0.3,
+        precioPorNoche: pricePerNight,
+        noches: calculateNights(selectedDate, newCheckOutDate.toISOString().split('T')[0]),
+        precioTotal: total,
+        diasDisponibles: generateAvailableDates(selectedDate, newCheckOutDate.toISOString().split('T')[0])
+      };
+      
+      setAvailabilityData(mockData);
+    } catch (error) {
+      console.error('Error al seleccionar fecha alternativa:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div
@@ -40,35 +199,65 @@ export default function BookingSidebar({ pricePerNight }) {
           </div>
 
           <div className="space-y-4 mb-6">
+            {/* Campo de Destino */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-900">
+                Destino
+              </label>
+              <Select onValueChange={v => handleChange('destino', v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione un destino" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="maldives">Maldives</SelectItem>
+                  <SelectItem value="bali">Bali</SelectItem>
+                  <SelectItem value="hawaii">Hawaii</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Fechas de Check-in y Check-out */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-900">
                   Check-in
                 </label>
-                <div className="flex items-center gap-2 p-3 border rounded-lg">
-                  <Calendar className="h-4 w-4 text-resort-slate" />
-                  <span className="text-sm text-resort-slate">15 Dic</span>
-                </div>
+                <Input
+                  type="date"
+                  value={bookingData.checkIn}
+                  min="2025-08-20"
+                  onChange={e => handleChange('checkIn', e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-900">
                   Check-out
                 </label>
-                <div className="flex items-center gap-2 p-3 border rounded-lg">
-                  <Calendar className="h-4 w-4 text-resort-slate" />
-                  <span className="text-sm text-resort-slate">18 Dic</span>
-                </div>
+                <Input
+                  type="date"
+                  value={bookingData.checkOut}
+                  min="2025-08-21"
+                  onChange={e => handleChange('checkOut', e.target.value)}
+                />
               </div>
             </div>
 
+            {/* Campo de Huéspedes */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-900">
                 Huéspedes
               </label>
-              <div className="flex items-center gap-2 p-3 border rounded-lg">
-                <Users className="h-4 w-4 text-resort-slate" />
-                <span className="text-sm text-resort-slate">2 Adultos</span>
-              </div>
+              <Select onValueChange={v => handleChange('huespedes', v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="2 Adultos" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1 Adulto</SelectItem>
+                  <SelectItem value="2">2 Adultos</SelectItem>
+                  <SelectItem value="3">3 Adultos</SelectItem>
+                  <SelectItem value="4">4 Adultos</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -94,9 +283,13 @@ export default function BookingSidebar({ pricePerNight }) {
             </div>
           </div>
 
-          <Button asChild className="w-full" size="lg">
-            {" "}
-            <Link to="/login">Reservar ahora</Link>{" "}
+          <Button 
+            className={`w-full ${!bookingData.destino ? 'opacity-50 cursor-not-allowed' : ''}`}
+            size="lg"
+            onClick={handleSearch}
+            disabled={isLoading || !bookingData.destino}
+          >
+            {isLoading ? 'Buscando...' : !bookingData.destino ? 'Selecciona un destino' : 'Verificar disponibilidad'}
           </Button>
           <p className="text-xs text-resort-slate text-center mt-4">
             Aún no se realizará ningún cargo
@@ -118,6 +311,32 @@ export default function BookingSidebar({ pricePerNight }) {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Modal de disponibilidad */}
+      <AvailabilityModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        availabilityData={availabilityData}
+        onConfirmReservation={handleConfirmReservation}
+        onSelectAlternativeDate={handleSelectAlternativeDate}
+        isLoading={isLoading}
+        user={user}
+      />
+
+      {/* Modal de confirmación exitosa */}
+      <SuccessModal
+        isOpen={isSuccessModalOpen}
+        onClose={() => setIsSuccessModalOpen(false)}
+        reservationData={confirmedReservation}
+      />
+
+      {/* Modal de login requerido */}
+      <LoginRequiredModal
+        isOpen={isLoginRequiredModalOpen}
+        onClose={() => setIsLoginRequiredModalOpen(false)}
+        onNavigateToLogin={handleNavigateToLogin}
+        onNavigateToRegister={handleNavigateToRegister}
+      />
     </div>
   );
 }
