@@ -1,14 +1,14 @@
 import { Waves, Wifi, Coffee, Dumbbell, Gamepad2, Lightbulb, Shirt, Car } from 'lucide-react';
 
 const facilities = [
-  { icon: Waves, label: 'Swimming Pool' },
-  { icon: Wifi, label: 'WiFi' },
-  { icon: Coffee, label: 'Breakfast' },
-  { icon: Dumbbell, label: 'Gym' },
-  { icon: Gamepad2, label: 'Game center' },
-  { icon: Lightbulb, label: '24/7 Light' },
-  { icon: Shirt, label: 'Laundry' },
-  { icon: Car, label: 'Parking space' },
+  { icon: Waves, label: 'Piscina' },
+  { icon: Wifi, label: 'Wi‑Fi de cortesía' },
+  { icon: Coffee, label: 'Desayuno incluido' },
+  { icon: Dumbbell, label: 'Gimnasio' },
+  { icon: Gamepad2, label: 'Sala de juegos' },
+  { icon: Lightbulb, label: 'Energía 24/7' },
+  { icon: Shirt, label: 'Lavandería' },
+  { icon: Car, label: 'Estacionamiento' },
 ];
 
 export default function Facilities() {
@@ -16,8 +16,8 @@ export default function Facilities() {
     <section className="section-standard bg-white flex items-start pt-16 md:pt-20 pb-12">
       <div className="container">
         <div className="text-center mb-16 md:mb-20">
-          <h2 className="text-3xl font-serif text-resort-olive mb-4">Our Facilities</h2>
-          <p className="text-resort-slate">We offer modern (5 star) hotel facilities for your comfort.</p>
+          <h2 className="text-3xl font-serif text-resort-olive mb-4">Nuestras instalaciones</h2>
+          <p className="text-resort-slate">Comodidades modernas de categoría para una estadía excepcional.</p>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-16 justify-items-center">

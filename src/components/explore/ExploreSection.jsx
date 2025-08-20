@@ -2,9 +2,9 @@ import { Card, CardContent } from '../../components/ui/Card';
 
 export default function ExploreSection({ imageUrl, title, description }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
       <div className="relative">
-        <img src={imageUrl} alt={title} className="w-full h-[340px] object-cover rounded-2xl" />
+        <img src={imageUrl} alt={title} className="w-full h-[340px] object-cover rounded-xl" />
       </div>
       <div className="-mt-12 px-6 pb-6">
         <Card className="mx-auto max-w-3xl">

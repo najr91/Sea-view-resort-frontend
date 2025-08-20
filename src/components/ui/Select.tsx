@@ -80,7 +80,7 @@ export function SelectTrigger({ children, className }: SelectTriggerProps) {
     <button
       type="button"
       className={clsx(
-        'flex h-10 w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-resort-olive focus:border-resort-olive disabled:cursor-not-allowed disabled:opacity-50',
+        'flex h-10 w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-resort-olive focus:border-resort-olive disabled:cursor-not-allowed disabled:opacity-50',
         className
       )}
       onClick={onToggle}
@@ -97,7 +97,7 @@ export function SelectContent({ children }: SelectContentProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="absolute top-full left-0 z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
+    <div className="absolute top-full left-0 z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
       {children}
     </div>
   );

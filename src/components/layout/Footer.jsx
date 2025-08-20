@@ -4,13 +4,13 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 
 const quickLinks = [
-  { label: 'Explore', to: '/explore' },
-  { label: 'Rooms', to: '/rooms' },
-  { label: 'Contact', to: '/contact' },
-  { label: 'About', to: '/about' },
+  { label: 'Explorar', to: '/explore' },
+  { label: 'Habitaciones', to: '/rooms' },
+  { label: 'Contacto', to: '/contact' },
+  { label: 'Nosotros', to: '/about' },
 ];
 
-const companyLinks = ['Privacy policy', 'Terms of service', 'FAQ', 'Careers'];
+const companyLinks = ['Política de privacidad', 'Términos del servicio', 'Preguntas frecuentes', 'Carreras'];
 
 export default function Footer() {
   return (
@@ -22,7 +22,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-medium mb-4">Quick Links</h4>
+            <h4 className="font-medium mb-4">Accesos rápidos</h4>
             <ul className="space-y-2 text-sm">
               {quickLinks.map((link) => (
                 <li key={link.to}>
@@ -35,7 +35,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-medium mb-4">Company</h4>
+            <h4 className="font-medium mb-4">Compañía</h4>
             <ul className="space-y-2 text-sm">
               {companyLinks.map((link) => (
                 <li key={link}>
@@ -46,11 +46,11 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-medium mb-4">Newsletter</h4>
-            <p className="text-sm mb-4">Get the latest news and updates to get amazing discounts</p>
+            <h4 className="font-medium mb-4">Boletín</h4>
+            <p className="text-sm mb-4">Reciba novedades y beneficios exclusivos.</p>
             <div className="flex gap-2 mb-6">
-              <Input type="email" placeholder="Enter your email" className="bg-white text-gray-900 text-sm flex-1" />
-              <Button variant="secondary">Subscribe</Button>
+              <Input type="email" placeholder="Ingrese su correo" className="bg-white text-gray-900 text-sm flex-1" />
+              <Button variant="secondary">Suscribirse</Button>
             </div>
 
             <div className="flex gap-4">

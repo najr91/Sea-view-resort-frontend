@@ -58,6 +58,7 @@ module.exports = {
       },
       fontFamily: {
         serif: ["Georgia", "serif"],
+        display: ["Playfair Display", "serif"],
       },
       keyframes: {
         "fade-in": {

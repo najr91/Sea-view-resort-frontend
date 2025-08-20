@@ -1,4 +1,6 @@
 import { Card, CardContent } from '../../components/ui/Card';
+import { Link } from 'react-router-dom';
+import { Button } from '../../components/ui/Button';
 
 const rooms = [
   {
@@ -34,8 +36,8 @@ export default function RoomsShowcase() {
       <div className="absolute inset-0 bg-resort-slate/70"></div>
       <div className="container mx-auto relative z-10">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-serif text-white mb-4">Luxurious Rooms</h2>
-          <p className="text-resort-cream">All room are design for your comfort</p>
+          <h2 className="text-3xl font-serif text-white mb-4">Habitaciones de lujo</h2>
+          <p className="text-resort-cream">Cada espacio está diseñado para su confort</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -52,6 +54,12 @@ export default function RoomsShowcase() {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        <div className="mt-10 flex justify-center">
+          <Link to="/rooms">
+            <Button size="lg" variant="outline">Ver todas las habitaciones</Button>
+          </Link>
         </div>
       </div>
     </section>
