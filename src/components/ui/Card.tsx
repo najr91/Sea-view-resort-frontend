@@ -26,3 +26,29 @@ export function CardContent({ children, className }: CardContentProps) {
     </div>
   );
 }
+
+interface CardHeaderProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export function CardHeader({ children, className }: CardHeaderProps) {
+  return (
+    <div className={clsx('flex flex-col space-y-1.5 p-6', className)}>
+      {children}
+    </div>
+  );
+}
+
+interface CardTitleProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export function CardTitle({ children, className }: CardTitleProps) {
+  return (
+    <h3 className={clsx('text-2xl font-semibold leading-none tracking-tight', className)}>
+      {children}
+    </h3>
+  );
+}
