@@ -5,10 +5,12 @@ import { Button } from "../components/ui/Button";
 import Navigation from "../components/layout/Navigation.jsx";
 import MobileMenu from "../components/layout/MobileMenu.jsx";
 import Footer from "../components/layout/Footer.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function MainLayout() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const headerRef = useRef(null);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const updateHeaderHeightVar = () => {
@@ -37,10 +39,10 @@ export default function MainLayout() {
     };
   }, []);
   return (
-    <div className="min-h-screen bg-resort-cream flex flex-col">
+    <div className="min-h-screen bg-resort-cream flex flex-col overflow-x-hidden">
       <header
         ref={headerRef}
-        className="sticky top-0 z-30 grid grid-cols-[1fr_auto_1fr] items-center px-8 py-5 bg-white shadow-sm"
+        className="sticky top-0 z-30 flex flex-wrap justify-between items-center px-8 py-5 bg-white shadow-sm"
       >
         <div className="flex items-center">
           <Link
@@ -51,16 +53,18 @@ export default function MainLayout() {
             <span className="font-display text-resort-olive text-2xl md:text-3xl tracking-wide">
               Sea View
             </span>
-            <span className="font-display text-resort-olive/90 text-sm md:text-base tracking-[0.35em] ml-3 uppercase">
+            <span className="font-display text-resort-olive/90 text-sm md:text-base tracking-[0.35em] ml-3 uppercase mr-6">
               Resort
             </span>
           </Link>
         </div>
 
-        <Navigation />
+        <div className="flex items-center space-x-6">
+          <Navigation />
+        </div>
 
         <div className="flex items-center justify-end gap-3">
-          <div className="hidden md:block">
+          <div className="hidden md:block ">
             <Button asChild>
               <a href="/rooms">Reservar</a>
             </Button>
@@ -79,6 +83,8 @@ export default function MainLayout() {
       <MobileMenu
         isOpen={isMobileOpen}
         onClose={() => setIsMobileOpen(false)}
+        user={user}
+        logout={logout}
       />
 
       <main className="flex-1">

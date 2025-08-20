@@ -7,8 +7,17 @@ export default function AdminRooms() {
   const { rooms, setRooms } = useRooms();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
-  const [formData, setFormData] = useState({ name: "", price: "", description: "", images: [] });
-  const [confirmData, setConfirmData] = useState({ open: false, action: null, message: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    price: "",
+    description: "",
+    images: [],
+  });
+  const [confirmData, setConfirmData] = useState({
+    open: false,
+    action: null,
+    message: "",
+  });
 
   const API_URL = "http://localhost:3000/api/rooms";
 
@@ -33,7 +42,8 @@ export default function AdminRooms() {
       formData.name !== (editingRoom?.name || "") ||
       formData.price !== (editingRoom?.price || "") ||
       formData.description !== (editingRoom?.description || "") ||
-      JSON.stringify(formData.images) !== JSON.stringify(editingRoom?.images || [])
+      JSON.stringify(formData.images) !==
+        JSON.stringify(editingRoom?.images || [])
     ) {
       setConfirmData({
         open: true,
@@ -71,7 +81,10 @@ export default function AdminRooms() {
         .catch(() => toast.error("Error al subir la imagen"));
     } else {
       // aún no existe en DB, solo vista previa
-      setFormData({ ...formData, images: [...formData.images, URL.createObjectURL(file)] });
+      setFormData({
+        ...formData,
+        images: [...formData.images, URL.createObjectURL(file)],
+      });
     }
   };
 
@@ -94,7 +107,11 @@ export default function AdminRooms() {
   };
 
   const handleSave = () => {
-    if (!formData.name.trim() || !formData.price || !formData.description.trim()) {
+    if (
+      !formData.name.trim() ||
+      !formData.price ||
+      !formData.description.trim()
+    ) {
       toast.error("Por favor completa todos los campos obligatorios");
       return;
     }
@@ -113,7 +130,10 @@ export default function AdminRooms() {
       action: async () => {
         try {
           if (editingRoom) {
-            const { data } = await axios.put(`${API_URL}/${editingRoom.id}`, formData);
+            const { data } = await axios.put(
+              `${API_URL}/${editingRoom.id}`,
+              formData
+            );
             setRooms(rooms.map((r) => (r.id === editingRoom.id ? data : r)));
             toast.success("Habitación actualizada");
           } else {
@@ -154,7 +174,7 @@ export default function AdminRooms() {
 
       <button
         onClick={() => openModal()}
-        className="mb-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        className="mb-6 bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white px-4 py-2 rounded "
       >
         + Agregar Habitación
       </button>
@@ -179,7 +199,11 @@ export default function AdminRooms() {
                 <td className="py-3 px-4">{room.description}</td>
                 <td className="py-3 px-4">
                   {room.images?.length > 0 ? (
-                    <img src={room.images[0]} alt="preview" className="w-16 h-16 object-cover rounded" />
+                    <img
+                      src={room.images[0]}
+                      alt="preview"
+                      className="w-16 h-16 object-cover rounded"
+                    />
                   ) : (
                     <span className="text-gray-400">Sin imagen</span>
                   )}
@@ -217,7 +241,11 @@ export default function AdminRooms() {
             <p className="text-gray-500">{room.description}</p>
             {room.images?.length > 0 && (
               <div className="flex gap-2">
-                <img src={room.images[0]} alt="preview" className="w-16 h-16 object-cover rounded" />
+                <img
+                  src={room.images[0]}
+                  alt="preview"
+                  className="w-16 h-16 object-cover rounded"
+                />
               </div>
             )}
             <div className="mt-3 flex space-x-2">
@@ -274,13 +302,24 @@ export default function AdminRooms() {
             />
 
             <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-2">Imagen</label>
-              <input type="file" accept="image/*" onChange={handleImageChange} className="w-full border p-2 rounded" />
+              <label className="block text-gray-700 font-medium mb-2">
+                Imagen
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="w-full border p-2 rounded"
+              />
               {formData.images?.length > 0 && (
                 <div className="flex gap-2 overflow-x-auto py-2">
                   {formData.images.map((img, idx) => (
                     <div key={idx} className="relative">
-                      <img src={img} alt={`image-${idx}`} className="w-16 h-16 object-cover rounded" />
+                      <img
+                        src={img}
+                        alt={`image-${idx}`}
+                        className="w-16 h-16 object-cover rounded"
+                      />
                       <button
                         type="button"
                         onClick={() => removeImage(idx)}
@@ -295,10 +334,16 @@ export default function AdminRooms() {
             </div>
 
             <div className="flex justify-end gap-2">
-              <button onClick={closeModal} className="bg-gray-500 text-white px-4 py-2 rounded">
+              <button
+                onClick={closeModal}
+                className="bg-gray-500 text-white px-4 py-2 rounded"
+              >
                 Cancelar
               </button>
-              <button onClick={handleSave} className="bg-blue-600 text-white px-4 py-2 rounded">
+              <button
+                onClick={handleSave}
+                className="bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white px-4 py-2 rounded"
+              >
                 Guardar
               </button>
             </div>
@@ -313,7 +358,9 @@ export default function AdminRooms() {
             <h3 className="text-lg">{confirmData.message}</h3>
             <div className="flex justify-end gap-2 mt-4">
               <button
-                onClick={() => setConfirmData({ open: false, action: null, message: "" })}
+                onClick={() =>
+                  setConfirmData({ open: false, action: null, message: "" })
+                }
                 className="bg-gray-500 text-white px-4 py-2 rounded"
               >
                 Cancelar
@@ -323,7 +370,7 @@ export default function AdminRooms() {
                   confirmData.action();
                   setConfirmData({ open: false, action: null, message: "" });
                 }}
-                className="bg-red-600 text-white px-4 py-2 rounded"
+                className="bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white px-4 py-2 rounded"
               >
                 Confirmar
               </button>
