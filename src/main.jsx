@@ -14,8 +14,8 @@ createRoot(document.getElementById("root")).render(
         <RoomsProvider>
           <App />
         </RoomsProvider>
-        <Toaster position="top-center" reverseOrder={false} />
       </AuthProvider>
+      <Toaster position="top-center" reverseOrder={false} />
     </BrowserRouter>
   </StrictMode>
 );

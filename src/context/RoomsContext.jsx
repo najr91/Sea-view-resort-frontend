@@ -1,4 +1,6 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
+
 import standard1 from '../assets/Habitaciones/StandardRoom/pexels-siddanth-sawant-178759136-28464712.webp'
 import standard2 from '../assets/Habitaciones/StandardRoom/pexels-siddanth-sawant-178759136-28464713.webp'
 import standard3 from '../assets/Habitaciones/StandardRoom/pexels-siddanth-sawant-178759136-28464714.webp'
@@ -22,7 +24,6 @@ import oceanviewDeluxe1 from '../assets/Habitaciones/OceanviewDeluxe/pexels-asad
 import oceanviewDeluxe2 from '../assets/Habitaciones/OceanviewDeluxe/pexels-asadphoto-28843941.jpg';
 import oceanviewDeluxe3 from '../assets/Habitaciones/OceanviewDeluxe/pexels-asadphoto-28843958.jpg';
 import oceanviewDeluxe4 from '../assets/Habitaciones/OceanviewDeluxe/pexels-asadphoto-28843952.jpg';
-
 
 const RoomsContext = createContext();
 
@@ -69,6 +70,22 @@ export function RoomsProvider({ children }) {
       images: [honeymoon1, honeymoon2, honeymoon3, honeymoon4, honeymoon5],
     },
   ]);
+
+  // 👉 Intentar traer habitaciones del backend
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const { data } = await axios.get("http://localhost:4000/api/rooms");
+        if (Array.isArray(data) && data.length > 0) {
+          setRooms(data);
+        }
+      } catch (error) {
+        console.warn("No se pudo conectar al backend, se muestran las habitaciones locales.");
+      }
+    };
+
+    fetchRooms();
+  }, []);
 
   return (
     <RoomsContext.Provider value={{ rooms, setRooms }}>
