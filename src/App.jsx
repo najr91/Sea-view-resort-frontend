@@ -36,6 +36,7 @@ export default function App() {
     "/admin/rooms",
     "/admin/users",
     "/admin/manage-users",
+    "/admin/reservations",
   ];
 
   const isProtectedRoute = protectedRoutes.some(route =>
