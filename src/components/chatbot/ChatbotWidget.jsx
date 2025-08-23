@@ -9,7 +9,7 @@ export default function ChatbotWidget() {
             {open && (
                 <div className="w-80 h-96 bg-white border rounded-2xl shadow-lg mb-3 flex flex-col overflow-hidden">
                     <div className="flex justify-between items-center p-2 bg-[#968260] text-white rounded-t-2xl">
-                        <h2 className="text-sm font-semibold">Chat del Hotel</h2>
+                        <h2 className="text-sm font-semibold">SeaViewResort Chat</h2>
                         <button
                             onClick={() => setOpen(false)}
                             className="text-white hover:text-gray-200"
@@ -34,5 +34,3 @@ export default function ChatbotWidget() {
         </div>
     );
 }
-
-
