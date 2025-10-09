@@ -1,13 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useRooms } from "../../context/RoomsContext";
 import axios from "axios";
 import { apiUrl } from "../../services/http";
+import { Button } from "../../components/ui/Button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+} from "../../components/ui/Card";
+import { Input } from "../../components/ui/Input";
+import PageHeader from "../../components/admin/PageHeader";
+import StatsGrid from "../../components/admin/StatsGrid";
+import StatsCard from "../../components/admin/StatsCard";
+import ImageGalleryModal from "../../components/admin/ImageGalleryModal";
+import { Bed, Users, Edit, Trash2, Eye, CheckCircle, AlertCircle, Search, Plus, DollarSign } from "lucide-react";
 
 export default function AdminRooms() {
   const { rooms, setRooms } = useRooms();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -19,6 +32,26 @@ export default function AdminRooms() {
     action: null,
     message: "",
   });
+
+  const [gallery, setGallery] = useState({
+    open: false,
+    images: [],
+    index: 0,
+    title: "",
+  });
+
+  // Estadísticas calculadas
+  const totalRooms = rooms.length;
+  const availableRooms = rooms.filter(r => !r.isOccupied).length; // Asumiendo que existe esta propiedad
+  const occupiedRooms = totalRooms - availableRooms;
+  const totalCapacity = rooms.reduce((sum, r) => sum + (parseInt(r.capacity) || 0), 0);
+
+  // Filtrar habitaciones por búsqueda
+  const filteredRooms = rooms.filter(room =>
+    room.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    room.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    room.bedType?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const API_URL = apiUrl("/api/rooms");
 
@@ -64,28 +97,30 @@ export default function AdminRooms() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const data = new FormData();
-    data.append("image", file);
+  const handleImagesChange = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
     if (editingRoom) {
-      axios
-        .post(`${API_URL}/${editingRoom.id}/images`, data)
-        .then((res) => {
-          setRooms(rooms.map((r) => (r.id === editingRoom.id ? res.data : r)));
-          setFormData({ ...formData, images: res.data.images });
-          toast.success("Imagen subida");
-        })
-        .catch(() => toast.error("Error al subir la imagen"));
+      try {
+        let latestRoom = null;
+        for (const file of files) {
+          const data = new FormData();
+          data.append("image", file);
+          const res = await axios.post(`${API_URL}/${editingRoom.id}/images`, data);
+          latestRoom = res.data;
+        }
+        if (latestRoom) {
+          setRooms(rooms.map((r) => (r.id === editingRoom.id ? latestRoom : r)));
+          setFormData({ ...formData, images: latestRoom.images });
+        }
+        toast.success("Imágenes subidas");
+      } catch (err) {
+        toast.error("Error al subir imágenes");
+      }
     } else {
-      // aún no existe en DB, solo vista previa
-      setFormData({
-        ...formData,
-        images: [...formData.images, URL.createObjectURL(file)],
-      });
+      const previews = files.map((f) => URL.createObjectURL(f));
+      setFormData({ ...formData, images: [...formData.images, ...previews] });
     }
   };
 
@@ -105,6 +140,14 @@ export default function AdminRooms() {
       newImages.splice(index, 1);
       setFormData({ ...formData, images: newImages });
     }
+  };
+
+  const setCoverImage = (index) => {
+    if (index === 0) return;
+    const newImages = [...formData.images];
+    const [selected] = newImages.splice(index, 1);
+    newImages.unshift(selected);
+    setFormData({ ...formData, images: newImages });
   };
 
   const handleSave = () => {
@@ -168,185 +211,280 @@ export default function AdminRooms() {
     });
   };
 
+  const openGallery = (images = [], startIndex = 0, title = "") => {
+    if (!images || images.length === 0) return;
+    setGallery({ open: true, images, index: startIndex, title });
+  };
+
+  const closeGallery = () =>
+    setGallery({ open: false, images: [], index: 0, title: "" });
+
+  const formatAmenityName = (amenity) => {
+    if (typeof amenity === 'string') {
+      const withSpaces = amenity.replace(/_/g, ' ');
+      return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1);
+    }
+    if (amenity && typeof amenity === 'object') {
+      const raw = amenity.name || amenity.label || '';
+      return raw.charAt(0).toUpperCase() + raw.slice(1);
+    }
+    return String(amenity);
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: 'ARS'
+    }).format(price);
+  };
+
   return (
-    <div className="container py-8">
+    <div className="w-full min-h-screen bg-gray-50">
       <Toaster position="top-right" />
-      <h1 className="text-2xl font-bold mb-6">Gestión de Habitaciones</h1>
 
-      <button
-        onClick={() => openModal()}
-        className="mb-6 bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white px-4 py-2 rounded "
-      >
-        + Agregar Habitación
-      </button>
+      {/* Header */}
+      <PageHeader
+        title="Panel de Administración - Habitaciones"
+        subtitle={`Gestiona todas las habitaciones del hotel • ${totalRooms} habitación${totalRooms !== 1 ? 'es' : ''} en el sistema`}
+      />
 
-      {/* Tabla */}
-      <div className="overflow-x-auto hidden md:block">
-        <table className="min-w-full bg-white rounded-lg shadow">
-          <thead>
-            <tr className="bg-gray-100 text-left">
-              <th className="py-3 px-4">Nombre</th>
-              <th className="py-3 px-4">Precio</th>
-              <th className="py-3 px-4">Descripción</th>
-              <th className="py-3 px-4">Imagen</th>
-              <th className="py-3 px-4">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rooms.map((room) => (
-              <tr key={room.id} className="border-t">
-                <td className="py-3 px-4">{room.name}</td>
-                <td className="py-3 px-4">${room.price}</td>
-                <td className="py-3 px-4">{room.description}</td>
-                <td className="py-3 px-4">
-                  {room.images?.length > 0 ? (
-                    <img
-                      src={room.images[0]}
-                      alt="preview"
-                      className="w-16 h-16 object-cover rounded"
-                    />
-                  ) : (
-                    <span className="text-gray-400">Sin imagen</span>
-                  )}
-                </td>
-                <td className="py-3 px-4 align-top">
-                  <div className="flex flex-col gap-2 w-max">
-                    <button
-                      onClick={() => openModal(room)}
-                      style={{ backgroundColor: "#968260" }}
-                      className="text-white px-3 py-1 rounded hover:opacity-90"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => handleDelete(room.id)}
-                      style={{ backgroundColor: "#ceb996" }}
-                      className="text-white px-3 py-1 rounded hover:opacity-90"
-                    >
-                      Borrar
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Estadísticas */}
+      <StatsGrid>
+        <StatsCard
+          label="Total Habitaciones"
+          value={totalRooms}
+          icon={Bed}
+          iconColor="text-green-600"
+        />
+        <StatsCard
+          label="Disponibles"
+          value={availableRooms}
+          icon={CheckCircle}
+          iconColor="text-green-600"
+          valueColor="text-green-600"
+        />
+        <StatsCard
+          label="Ocupadas"
+          value={occupiedRooms}
+          icon={AlertCircle}
+          iconColor="text-yellow-600"
+          valueColor="text-yellow-600"
+        />
+        <StatsCard
+          label="Capacidad Total"
+          value={totalCapacity}
+          icon={Users}
+          iconColor="text-blue-600"
+          valueColor="text-blue-600"
+        />
+      </StatsGrid>
 
-      {/* Mobile */}
-      <div className="grid gap-4 md:hidden">
-        {rooms.map((room) => (
-          <div key={room.id} className="bg-white rounded-lg shadow p-4">
-            <h3 className="text-lg font-bold">{room.name}</h3>
-            <p className="text-gray-600">Precio: ${room.price}</p>
-            <p className="text-gray-500">{room.description}</p>
-            {room.images?.length > 0 && (
-              <div className="flex gap-2">
-                <img
-                  src={room.images[0]}
-                  alt="preview"
-                  className="w-16 h-16 object-cover rounded"
-                />
-              </div>
-            )}
-            <div className="mt-3 flex space-x-2">
-              <button
-                onClick={() => openModal(room)}
-                style={{ backgroundColor: "#968260" }}
-                className="flex-1 text-white px-3 py-2 rounded hover:opacity-90 text-sm"
+      {/* Tabla de habitaciones */}
+      <Card className="w-full mb-8">
+        <div className="flex flex-col space-y-1.5 px-6 pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="relative md:col-span-2">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="Buscar por nombre, descripción o tipo de cama..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                onClick={() => openModal()}
+                className="flex items-center gap-2"
               >
-                Editar
-              </button>
-              <button
-                onClick={() => handleDelete(room.id)}
-                style={{ backgroundColor: "#ceb996" }}
-                className="flex-1 text-white px-3 py-2 rounded hover:opacity-90 text-sm"
-              >
-                Borrar
-              </button>
+                <Plus className="w-4 h-4" />
+                Nueva Habitación
+              </Button>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+        <CardContent className="pt-4">
+          <div style={{ maxHeight: '47vh' }} className="overflow-y-auto">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left px-6 py-4 font-medium">Habitación</th>
+                    <th className="text-left px-6 py-4 font-medium">Detalles</th>
+                    <th className="text-left px-6 py-4 font-medium">Precio</th>
+                    <th className="text-left px-6 py-4 font-medium">Amenidades</th>
+                    <th className="text-left px-6 py-4 font-medium">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredRooms.map((room) => (
+                    <tr key={room.id} className="border-b hover:bg-gray-50">
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div>
+                            <p className="font-medium">{room.name}</p>
+                            <p className="text-sm text-gray-600 line-clamp-1">{room.description}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 text-sm">
+                            <Users className="w-4 h-4 text-gray-400" />
+                            <span>{room.capacity} personas</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <Bed className="w-4 h-4 text-gray-400" />
+                            <span>{room.bedType}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <p className="font-medium text-green-600">{formatPrice(room.price)}</p>
+                        <p className="text-xs text-gray-500">por noche</p>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex flex-wrap gap-1 max-w-[200px]">
+                          {(room.amenities || []).slice(0, 2).map((amenity, index) => (
+                            <span key={index} className="inline-block px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                              {formatAmenityName(amenity)}
+                            </span>
+                          ))}
+                          {(room.amenities || []).length > 2 && (
+                            <span className="inline-block px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                              +{room.amenities.length - 2}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openGallery(room.images, 0, room.name)}
+                            title="Ver imágenes"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openModal(room)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDelete(room.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
-          <div className="bg-white p-6 rounded-lg shadow w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">
-              {editingRoom ? "Editar Habitación" : "Agregar Habitación"}
-            </h2>
-            <input
-              type="text"
-              name="name"
-              placeholder="Nombre"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full border p-2 rounded mb-3"
-              maxLength={25}
-            />
-            <input
-              type="number"
-              name="price"
-              placeholder="Precio"
-              value={formData.price}
-              onChange={handleChange}
-              className="w-full border p-2 rounded mb-3"
-            />
-            <textarea
-              name="description"
-              placeholder="Descripción"
-              value={formData.description}
-              onChange={handleChange}
-              className="w-full border p-2 rounded mb-3"
-              maxLength={440}
-            />
-
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-2">
-                Imagen
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="w-full border p-2 rounded"
-              />
-              {formData.images?.length > 0 && (
-                <div className="flex gap-2 overflow-x-auto py-2">
-                  {formData.images.map((img, idx) => (
-                    <div key={idx} className="relative">
-                      <img
-                        src={img}
-                        alt={`image-${idx}`}
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeImage(idx)}
-                        className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full p-1"
-                      >
-                        X
-                      </button>
-                    </div>
-                  ))}
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow w-full max-w-4xl max-h-[85vh] flex flex-col">
+            <div className="p-4 md:p-6 overflow-auto">
+              <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">
+                {editingRoom ? "Editar Habitación" : "Agregar Habitación"}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Nombre"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded mb-3 text-sm md:text-base"
+                    maxLength={25}
+                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Precio</label>
+                  <input
+                    type="number"
+                    name="price"
+                    placeholder="Precio"
+                    value={formData.price}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded mb-3 text-sm md:text-base"
+                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                  <textarea
+                    name="description"
+                    placeholder="Descripción"
+                    value={formData.description}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded mb-1 min-h-[140px] text-sm md:text-base"
+                    maxLength={440}
+                  />
+                  <p className="text-xs text-gray-500 mb-2">Máximo 440 caracteres.</p>
                 </div>
-              )}
-            </div>
 
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={closeModal}
-                className="bg-gray-500 text-white px-4 py-2 rounded"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleSave}
-                className="bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white px-4 py-2 rounded"
-              >
-                Guardar
-              </button>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Imágenes</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImagesChange}
+                    className="w-full border p-2 rounded text-sm md:text-base"
+                  />
+
+                  {formData.images?.length > 0 && (
+                    <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+                      {formData.images.map((img, idx) => (
+                        <div key={idx} className="relative group">
+                          {idx === 0 && (
+                            <span className="absolute -top-2 -left-2 z-10 bg-resort-olive text-white text-[10px] px-2 py-0.5 rounded-full shadow">Portada</span>
+                          )}
+                          <img
+                            src={img}
+                            alt={`image-${idx}`}
+                            onClick={() => openGallery(formData.images, idx, formData.name || "Imágenes")}
+                            className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 object-cover rounded-md ring-1 ring-gray-200 cursor-zoom-in"
+                          />
+                          <div className="absolute inset-0 flex items-start justify-end gap-1 p-1 opacity-0 group-hover:opacity-100 transition">
+                            <button
+                              type="button"
+                              onClick={() => setCoverImage(idx)}
+                              className="bg-white/90 hover:bg-white text-gray-800 text-[10px] px-2 py-0.5 rounded shadow"
+                            >
+                              Portada
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeImage(idx)}
+                              className="bg-red-500 hover:bg-red-600 text-white text-[10px] w-6 h-6 rounded-full grid place-items-center shadow"
+                              aria-label="Eliminar"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t flex justify-end gap-2">
+              <Button variant="ghost" onClick={closeModal}>Cancelar</Button>
+              <Button onClick={handleSave}>Guardar</Button>
             </div>
           </div>
         </div>
@@ -354,31 +492,40 @@ export default function AdminRooms() {
 
       {/* Confirm */}
       {confirmData.open && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-lg shadow w-full max-w-md">
             <h3 className="text-lg">{confirmData.message}</h3>
             <div className="flex justify-end gap-2 mt-4">
-              <button
+              <Button
+                variant="ghost"
                 onClick={() =>
                   setConfirmData({ open: false, action: null, message: "" })
                 }
-                className="bg-gray-500 text-white px-4 py-2 rounded"
               >
                 Cancelar
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => {
                   confirmData.action();
                   setConfirmData({ open: false, action: null, message: "" });
                 }}
-                className="bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white px-4 py-2 rounded"
               >
                 Confirmar
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Galería */}
+      <ImageGalleryModal
+        isOpen={gallery.open}
+        onClose={closeGallery}
+        images={gallery.images}
+        currentIndex={gallery.index}
+        onIndexChange={(newIndex) => setGallery(g => ({ ...g, index: newIndex }))}
+        title={gallery.title}
+      />
     </div>
   );
 }

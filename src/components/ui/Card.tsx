@@ -52,3 +52,12 @@ export function CardTitle({ children, className }: CardTitleProps) {
     </h3>
   );
 }
+
+// CardDescription: breve descripción/texto complementario para tarjetas
+export function CardDescription({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <p className={clsx('text-sm text-gray-600', className)}>
+      {children}
+    </p>
+  );
+}

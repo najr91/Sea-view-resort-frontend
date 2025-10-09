@@ -59,8 +59,8 @@ export default function App() {
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/password-change" element={<PasswordChange />} />
-        
-        {/* Protected Routes */}
+
+        {/* Protected Routes with MainLayout */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="explore" element={<Explore />} />
@@ -70,36 +70,42 @@ export default function App() {
           <Route path="contact" element={<Contact />} />
           <Route path="optimize" element={<ImageOptimizer />} />
           <Route path="*" element={<NotFound />} />
-
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute>
-                <Administrador />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/rooms"
-            element={
-              <ProtectedRoute>
-                <AdminRooms />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/manage-users"
-            element={user ? <ManageUsers /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/admin/reservations"
-            element={
-              <ProtectedRoute>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         </Route>
+
+        {/* Admin Routes without MainLayout */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <Administrador />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/rooms"
+          element={
+            <ProtectedRoute>
+              <AdminRooms />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-users"
+          element={
+            <ProtectedRoute>
+              <ManageUsers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/reservations"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
 
       {!isChatbotHidden && <ChatbotWidget />}

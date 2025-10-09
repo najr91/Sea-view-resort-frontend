@@ -205,14 +205,14 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
               <label className="text-sm font-medium text-gray-900">
                 Destino
               </label>
-              <Select onValueChange={v => handleChange('destino', v)}>
+              <Select value={bookingData.destino} onValueChange={v => handleChange('destino', v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccione un destino" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="maldives">Maldives</SelectItem>
+                  <SelectItem value="maldivas">Maldivas</SelectItem>
                   <SelectItem value="bali">Bali</SelectItem>
-                  <SelectItem value="hawaii">Hawaii</SelectItem>
+                  <SelectItem value="hawai">Hawái</SelectItem>
                 </SelectContent>
               </Select>
             </div>
