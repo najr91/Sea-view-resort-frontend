@@ -20,7 +20,7 @@ export default function AdminRooms() {
     description: "",
     images: [],
   });
-  const [localImages, setLocalImages] = useState([]); // previews locales
+  const [localImages, setLocalImages] = useState([]);
   const [confirmData, setConfirmData] = useState({
     open: false,
     action: null,
@@ -29,12 +29,10 @@ export default function AdminRooms() {
 
   const API_URL = "http://localhost:4002";
 
-  // --- Cargar habitaciones al iniciar ---
   useEffect(() => {
     (async () => {
       const res = await getRooms();
       if (res.ok) {
-        // Asegurar que rooms siempre sea array
         setRooms(Array.isArray(res.data) ? res.data : []);
       } else toast.error("Error al cargar habitaciones");
     })();
@@ -60,7 +58,6 @@ export default function AdminRooms() {
   };
 
   const closeModal = () => {
-    // Compara solo los campos reales, ignorando previews locales
     if (
       formData.name !== (editingRoom?.name || "") ||
       formData.price !== (editingRoom?.price || "") ||
@@ -96,7 +93,6 @@ export default function AdminRooms() {
   };
 
   const removeImage = async (img) => {
-    // Si es preview local
     const local = localImages.find((i) => i.preview === img);
     if (local) {
       setLocalImages(localImages.filter((i) => i.preview !== img));
@@ -122,9 +118,6 @@ export default function AdminRooms() {
       toast.error("Error al eliminar la imagen");
     }
   };
-
-  // --- Guardar habitación ---
-  // --- Guardar habitación ---
   const handleSave = () => {
     if (
       !formData.name.trim() ||
@@ -142,7 +135,6 @@ export default function AdminRooms() {
         try {
           let savedRoom;
 
-          // Crear o actualizar habitación
           if (editingRoom) {
             const res = await updateRoom(editingRoom._id, formData);
             if (res.ok) savedRoom = res.data?.datos || res.data;
@@ -153,7 +145,6 @@ export default function AdminRooms() {
 
           if (!savedRoom) throw new Error("No se pudo guardar la habitación");
 
-          // Subir previews locales
           for (const { file } of localImages) {
             const data = new FormData();
             data.append("images", file);
@@ -165,13 +156,11 @@ export default function AdminRooms() {
             savedRoom = uploadRes.data?.datos || uploadRes.data;
           }
 
-          // Normalizar URLs de imágenes
           savedRoom.images =
             savedRoom.images?.map((img) =>
               img.startsWith("http") ? img : `${API_URL}${img}`
             ) || [];
 
-          // Actualizar lista de habitaciones
           if (editingRoom) {
             setRooms(
               rooms.map((r) => (r._id === savedRoom._id ? savedRoom : r))

@@ -1,9 +1,6 @@
 const urlRooms =
   import.meta.env.VITE_APP_ROOMS || "http://localhost:4002/api/rooms";
 
-/**
- * Helper para parsear respuesta fetch y devolver un objeto consistente
- */
 async function parseResponse(res) {
   const text = await res.text();
   let data;
@@ -15,10 +12,6 @@ async function parseResponse(res) {
   return { ok: res.ok, status: res.status, data };
 }
 
-/* -------------------------
-   READ - obtener todas las habitaciones
-   GET /api/rooms
---------------------------*/
 export const getRooms = async () => {
   try {
     const respuesta = await fetch(`${urlRooms}`);
@@ -29,10 +22,6 @@ export const getRooms = async () => {
   }
 };
 
-/* -------------------------
-   CREATE - crear habitación
-   POST /api/rooms  (body JSON)
---------------------------*/
 export const crearRoom = async (dato) => {
   try {
     const respuesta = await fetch(`${urlRooms}`, {
@@ -49,10 +38,6 @@ export const crearRoom = async (dato) => {
   }
 };
 
-/* -------------------------
-   READ single - obtener habitación por id
-   GET /api/rooms/:id
---------------------------*/
 export const getRoomByID = async (id) => {
   try {
     const respuesta = await fetch(`${urlRooms}/${id}`);
@@ -63,10 +48,6 @@ export const getRoomByID = async (id) => {
   }
 };
 
-/* -------------------------
-   UPDATE - actualizar habitación
-   PUT /api/rooms/:id
---------------------------*/
 export const updateRoom = async (id, producto) => {
   try {
     const respuesta = await fetch(`${urlRooms}/${id}`, {
@@ -83,10 +64,6 @@ export const updateRoom = async (id, producto) => {
   }
 };
 
-/* -------------------------
-   DELETE - eliminar habitación
-   DELETE /api/rooms/:id
---------------------------*/
 export const deleteRoom = async (id) => {
   try {
     const respuesta = await fetch(`${urlRooms}/${id}`, {
@@ -99,10 +76,6 @@ export const deleteRoom = async (id) => {
   }
 };
 
-/* -------------------------
-   Añadir imágenes por nombre (solo nombres de files que ya existen en servidor)
-   POST /api/rooms/:id/images  body: { imageNames: [ "file1.jpg", ... ] }
---------------------------*/
 export const addImagesByNames = async (id, imageNames = []) => {
   try {
     const respuesta = await fetch(`${urlRooms}/${id}/images`, {
@@ -117,10 +90,6 @@ export const addImagesByNames = async (id, imageNames = []) => {
   }
 };
 
-/* -------------------------
-   Listar imágenes disponibles en src/uploads/rooms
-   GET /api/rooms/available-images
---------------------------*/
 export const listAvailableImages = async () => {
   try {
     const respuesta = await fetch(`${urlRooms}/available-images`);
@@ -131,10 +100,6 @@ export const listAvailableImages = async () => {
   }
 };
 
-/* -------------------------
-   Eliminar imagen de una habitación
-   DELETE /api/rooms/:id/images  body: { imageUrl: "..." }
---------------------------*/
 export const deleteImage = async (id, imageUrl) => {
   try {
     const respuesta = await fetch(`${urlRooms}/${id}/images`, {
