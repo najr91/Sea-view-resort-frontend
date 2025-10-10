@@ -2,59 +2,45 @@ import React, { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useRooms } from "../../context/RoomsContext";
 import axios from "axios";
-import { apiUrl } from "../../services/http";
-import { Button } from "../../components/ui/Button";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-} from "../../components/ui/Card";
-import { Input } from "../../components/ui/Input";
-import PageHeader from "../../components/admin/PageHeader";
-import StatsGrid from "../../components/admin/StatsGrid";
-import StatsCard from "../../components/admin/StatsCard";
-import ImageGalleryModal from "../../components/admin/ImageGalleryModal";
-import { Bed, Users, Edit, Trash2, Eye, CheckCircle, AlertCircle, Search, Plus, DollarSign } from "lucide-react";
+  getRooms,
+  crearRoom,
+  updateRoom,
+  deleteRoom,
+  deleteImage,
+} from "../../services/app.js";
 
 export default function AdminRooms() {
   const { rooms, setRooms } = useRooms();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
     name: "",
     price: "",
     description: "",
     images: [],
   });
+  const [localImages, setLocalImages] = useState([]); // previews locales
   const [confirmData, setConfirmData] = useState({
     open: false,
     action: null,
     message: "",
   });
 
-  const [gallery, setGallery] = useState({
-    open: false,
-    images: [],
-    index: 0,
-    title: "",
-  });
+  const API_URL = "http://localhost:4002";
 
-  // Estadísticas calculadas
-  const totalRooms = rooms.length;
-  const availableRooms = rooms.filter(r => !r.isOccupied).length; // Asumiendo que existe esta propiedad
-  const occupiedRooms = totalRooms - availableRooms;
-  const totalCapacity = rooms.reduce((sum, r) => sum + (parseInt(r.capacity) || 0), 0);
+  // --- Cargar habitaciones al iniciar ---
+  useEffect(() => {
+    (async () => {
+      const res = await getRooms();
+      if (res.ok) {
+        // Asegurar que rooms siempre sea array
+        setRooms(Array.isArray(res.data) ? res.data : []);
+      } else toast.error("Error al cargar habitaciones");
+    })();
+  }, []);
 
-  // Filtrar habitaciones por búsqueda
-  const filteredRooms = rooms.filter(room =>
-    room.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    room.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    room.bedType?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const API_URL = apiUrl("/api/rooms");
-
+  // --- Modal ---
   const openModal = (room = null) => {
     if (room) {
       setEditingRoom(room);
@@ -64,20 +50,23 @@ export default function AdminRooms() {
         description: room.description,
         images: room.images || [],
       });
+      setLocalImages([]); // limpiar previews locales
     } else {
       setEditingRoom(null);
       setFormData({ name: "", price: "", description: "", images: [] });
+      setLocalImages([]);
     }
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
+    // Compara solo los campos reales, ignorando previews locales
     if (
       formData.name !== (editingRoom?.name || "") ||
       formData.price !== (editingRoom?.price || "") ||
       formData.description !== (editingRoom?.description || "") ||
       JSON.stringify(formData.images) !==
-      JSON.stringify(editingRoom?.images || [])
+        JSON.stringify(editingRoom?.images || [])
     ) {
       setConfirmData({
         open: true,
@@ -92,64 +81,50 @@ export default function AdminRooms() {
     }
   };
 
+  // --- Form ---
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleImagesChange = async (e) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-    if (editingRoom) {
-      try {
-        let latestRoom = null;
-        for (const file of files) {
-          const data = new FormData();
-          data.append("image", file);
-          const res = await axios.post(`${API_URL}/${editingRoom.id}/images`, data);
-          latestRoom = res.data;
-        }
-        if (latestRoom) {
-          setRooms(rooms.map((r) => (r.id === editingRoom.id ? latestRoom : r)));
-          setFormData({ ...formData, images: latestRoom.images });
-        }
-        toast.success("Imágenes subidas");
-      } catch (err) {
-        toast.error("Error al subir imágenes");
-      }
-    } else {
-      const previews = files.map((f) => URL.createObjectURL(f));
-      setFormData({ ...formData, images: [...formData.images, ...previews] });
+    const previewURL = URL.createObjectURL(file);
+    setLocalImages([...localImages, { file, preview: previewURL }]);
+  };
+
+  const removeImage = async (img) => {
+    // Si es preview local
+    const local = localImages.find((i) => i.preview === img);
+    if (local) {
+      setLocalImages(localImages.filter((i) => i.preview !== img));
+      return;
+    }
+
+    // Si es imagen subida
+    try {
+      const res = await deleteImage(editingRoom._id, img);
+      const updatedRoom = res?.data;
+      if (!updatedRoom) throw new Error("Error al eliminar imagen");
+
+      updatedRoom.images = updatedRoom.images.map((i) =>
+        i.startsWith("http") ? i : `${API_URL}${i}`
+      );
+
+      setFormData({ ...formData, images: updatedRoom.images });
+      setRooms(rooms.map((r) => (r._id === editingRoom._id ? updatedRoom : r)));
+      setEditingRoom(updatedRoom);
+      toast.success("Imagen eliminada");
+    } catch (err) {
+      console.error(err);
+      toast.error("Error al eliminar la imagen");
     }
   };
 
-  const removeImage = (index) => {
-    if (editingRoom) {
-      const imageToDelete = formData.images[index];
-      axios
-        .delete(`${API_URL}/${editingRoom.id}/images/${index}`)
-        .then((res) => {
-          setRooms(rooms.map((r) => (r.id === editingRoom.id ? res.data : r)));
-          setFormData({ ...formData, images: res.data.images });
-          toast("Imagen eliminada", { icon: "🗑️" });
-        })
-        .catch(() => toast.error("Error al eliminar la imagen"));
-    } else {
-      const newImages = [...formData.images];
-      newImages.splice(index, 1);
-      setFormData({ ...formData, images: newImages });
-    }
-  };
-
-  const setCoverImage = (index) => {
-    if (index === 0) return;
-    const newImages = [...formData.images];
-    const [selected] = newImages.splice(index, 1);
-    newImages.unshift(selected);
-    setFormData({ ...formData, images: newImages });
-  };
-
+  // --- Guardar habitación ---
+  // --- Guardar habitación ---
   const handleSave = () => {
     if (
       !formData.name.trim() ||
@@ -159,33 +134,56 @@ export default function AdminRooms() {
       toast.error("Por favor completa todos los campos obligatorios");
       return;
     }
-    if (formData.name.length > 25) {
-      toast.error("El nombre no puede tener más de 25 caracteres");
-      return;
-    }
-    if (formData.description.length > 440) {
-      toast.error("La descripción no puede tener más de 440 caracteres");
-      return;
-    }
 
     setConfirmData({
       open: true,
       message: "¿Quieres guardar los cambios?",
       action: async () => {
         try {
+          let savedRoom;
+
+          // Crear o actualizar habitación
           if (editingRoom) {
-            const { data } = await axios.put(
-              `${API_URL}/${editingRoom.id}`,
-              formData
+            const res = await updateRoom(editingRoom._id, formData);
+            if (res.ok) savedRoom = res.data?.datos || res.data;
+          } else {
+            const res = await crearRoom({ ...formData, images: [] });
+            if (res.ok) savedRoom = res.data?.datos || res.data;
+          }
+
+          if (!savedRoom) throw new Error("No se pudo guardar la habitación");
+
+          // Subir previews locales
+          for (const { file } of localImages) {
+            const data = new FormData();
+            data.append("images", file);
+
+            const uploadRes = await axios.post(
+              `${API_URL}/api/rooms/${savedRoom._id}/images`,
+              data
             );
-            setRooms(rooms.map((r) => (r.id === editingRoom.id ? data : r)));
+            savedRoom = uploadRes.data?.datos || uploadRes.data;
+          }
+
+          // Normalizar URLs de imágenes
+          savedRoom.images =
+            savedRoom.images?.map((img) =>
+              img.startsWith("http") ? img : `${API_URL}${img}`
+            ) || [];
+
+          // Actualizar lista de habitaciones
+          if (editingRoom) {
+            setRooms(
+              rooms.map((r) => (r._id === savedRoom._id ? savedRoom : r))
+            );
             toast.success("Habitación actualizada");
           } else {
-            const { data } = await axios.post(API_URL, formData);
-            setRooms([...rooms, data]);
+            setRooms([...rooms, savedRoom]);
             toast.success("Habitación agregada");
           }
+
           setIsModalOpen(false);
+          setLocalImages([]);
         } catch (err) {
           console.error(err);
           toast.error("Error guardando habitación");
@@ -194,15 +192,16 @@ export default function AdminRooms() {
     });
   };
 
+  // --- Eliminar habitación ---
   const handleDelete = (id) => {
     setConfirmData({
       open: true,
       message: "¿Seguro que deseas borrar esta habitación?",
       action: async () => {
         try {
-          await axios.delete(`${API_URL}/${id}`);
-          setRooms(rooms.filter((r) => r.id !== id));
-          toast.error("Habitación eliminada");
+          const res = await deleteRoom(id);
+          if (res.ok) setRooms(rooms.filter((r) => r._id !== id));
+          toast.success("Habitación eliminada");
         } catch (err) {
           console.error(err);
           toast.error("Error eliminando habitación");
@@ -211,321 +210,237 @@ export default function AdminRooms() {
     });
   };
 
-  const openGallery = (images = [], startIndex = 0, title = "") => {
-    if (!images || images.length === 0) return;
-    setGallery({ open: true, images, index: startIndex, title });
-  };
-
-  const closeGallery = () =>
-    setGallery({ open: false, images: [], index: 0, title: "" });
-
-  const formatAmenityName = (amenity) => {
-    if (typeof amenity === 'string') {
-      const withSpaces = amenity.replace(/_/g, ' ');
-      return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1);
-    }
-    if (amenity && typeof amenity === 'object') {
-      const raw = amenity.name || amenity.label || '';
-      return raw.charAt(0).toUpperCase() + raw.slice(1);
-    }
-    return String(amenity);
-  };
-
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'ARS'
-    }).format(price);
-  };
-
   return (
-    <div className="w-full min-h-screen bg-gray-50">
+    <div className="container py-8">
       <Toaster position="top-right" />
+      <h1 className="text-2xl font-bold mb-6">Gestión de Habitaciones</h1>
 
-      {/* Header */}
-      <PageHeader
-        title="Panel de Administración - Habitaciones"
-        subtitle={`Gestiona todas las habitaciones del hotel • ${totalRooms} habitación${totalRooms !== 1 ? 'es' : ''} en el sistema`}
-      />
+      <button
+        onClick={() => openModal()}
+        className="mb-6 bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white px-4 py-2 rounded "
+      >
+        + Agregar Habitación
+      </button>
 
-      {/* Estadísticas */}
-      <StatsGrid>
-        <StatsCard
-          label="Total Habitaciones"
-          value={totalRooms}
-          icon={Bed}
-          iconColor="text-green-600"
-        />
-        <StatsCard
-          label="Disponibles"
-          value={availableRooms}
-          icon={CheckCircle}
-          iconColor="text-green-600"
-          valueColor="text-green-600"
-        />
-        <StatsCard
-          label="Ocupadas"
-          value={occupiedRooms}
-          icon={AlertCircle}
-          iconColor="text-yellow-600"
-          valueColor="text-yellow-600"
-        />
-        <StatsCard
-          label="Capacidad Total"
-          value={totalCapacity}
-          icon={Users}
-          iconColor="text-blue-600"
-          valueColor="text-blue-600"
-        />
-      </StatsGrid>
+      {/* Tabla Desktop */}
+      <div className="overflow-x-auto hidden md:block">
+        <table className="min-w-full bg-white rounded-lg shadow">
+          <thead>
+            <tr className="bg-gray-100 text-left">
+              <th className="py-3 px-4">Nombre</th>
+              <th className="py-3 px-4">Precio</th>
+              <th className="py-3 px-4">Descripción</th>
+              <th className="py-3 px-4">Imagen</th>
+              <th className="py-3 px-4">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.isArray(rooms) &&
+              rooms.map((room) => (
+                <tr key={room._id} className="border-t">
+                  <td className="py-3 px-4">{room.name}</td>
+                  <td className="py-3 px-4">${room.price}</td>
+                  <td className="py-3 px-4">{room.description}</td>
+                  <td className="py-3 px-4">
+                    {room.images?.length > 0 ? (
+                      <img
+                        src={room.images[0]}
+                        alt="preview"
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                    ) : (
+                      <span className="text-gray-400">Sin imagen</span>
+                    )}
+                  </td>
+                  <td className="py-3 px-4 align-top">
+                    <div className="flex flex-col gap-2 w-max">
+                      <button
+                        onClick={() => openModal(room)}
+                        style={{ backgroundColor: "#968260" }}
+                        className="text-white px-3 py-1 rounded hover:opacity-90"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDelete(room._id)}
+                        style={{ backgroundColor: "#ceb996" }}
+                        className="text-white px-3 py-1 rounded hover:opacity-90"
+                      >
+                        Borrar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
 
-      {/* Tabla de habitaciones */}
-      <Card className="w-full mb-8">
-        <div className="flex flex-col space-y-1.5 px-6 pt-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative md:col-span-2">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                placeholder="Buscar por nombre, descripción o tipo de cama..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+      {/* Mobile */}
+      <div className="grid gap-4 md:hidden">
+        {Array.isArray(rooms) &&
+          rooms.map((room) => (
+            <div key={room._id} className="bg-white rounded-lg shadow p-4">
+              <h3 className="text-lg font-bold">{room.name}</h3>
+              <p className="text-gray-600">Precio: ${room.price}</p>
+              <p className="text-gray-500">{room.description}</p>
+              {room.images?.length > 0 && (
+                <img
+                  src={room.images[0]}
+                  alt="preview"
+                  className="w-16 h-16 object-cover rounded mt-2"
+                />
+              )}
+              <div className="flex gap-2 mt-3">
+                <button
+                  onClick={() => openModal(room)}
+                  style={{ backgroundColor: "#968260" }}
+                  className="text-white px-3 py-1 rounded hover:opacity-90"
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => handleDelete(room._id)}
+                  style={{ backgroundColor: "#ceb996" }}
+                  className="text-white px-3 py-1 rounded hover:opacity-90"
+                >
+                  Borrar
+                </button>
+              </div>
             </div>
-
-            <div className="flex gap-2">
-              <Button
-                onClick={() => openModal()}
-                className="flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                Nueva Habitación
-              </Button>
-            </div>
-          </div>
-        </div>
-        <CardContent className="pt-4">
-          <div style={{ maxHeight: '47vh' }} className="overflow-y-auto">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left px-6 py-4 font-medium">Habitación</th>
-                    <th className="text-left px-6 py-4 font-medium">Detalles</th>
-                    <th className="text-left px-6 py-4 font-medium">Precio</th>
-                    <th className="text-left px-6 py-4 font-medium">Amenidades</th>
-                    <th className="text-left px-6 py-4 font-medium">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRooms.map((room) => (
-                    <tr key={room.id} className="border-b hover:bg-gray-50">
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div>
-                            <p className="font-medium">{room.name}</p>
-                            <p className="text-sm text-gray-600 line-clamp-1">{room.description}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 text-sm">
-                            <Users className="w-4 h-4 text-gray-400" />
-                            <span>{room.capacity} personas</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm">
-                            <Bed className="w-4 h-4 text-gray-400" />
-                            <span>{room.bedType}</span>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <p className="font-medium text-green-600">{formatPrice(room.price)}</p>
-                        <p className="text-xs text-gray-500">por noche</p>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex flex-wrap gap-1 max-w-[200px]">
-                          {(room.amenities || []).slice(0, 2).map((amenity, index) => (
-                            <span key={index} className="inline-block px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                              {formatAmenityName(amenity)}
-                            </span>
-                          ))}
-                          {(room.amenities || []).length > 2 && (
-                            <span className="inline-block px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                              +{room.amenities.length - 2}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => openGallery(room.images, 0, room.name)}
-                            title="Ver imágenes"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => openModal(room)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDelete(room.id)}
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          ))}
+      </div>
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow w-full max-w-4xl max-h-[85vh] flex flex-col">
-            <div className="p-4 md:p-6 overflow-auto">
-              <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">
-                {editingRoom ? "Editar Habitación" : "Agregar Habitación"}
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Nombre"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full border p-2 rounded mb-3 text-sm md:text-base"
-                    maxLength={25}
-                  />
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Precio</label>
-                  <input
-                    type="number"
-                    name="price"
-                    placeholder="Precio"
-                    value={formData.price}
-                    onChange={handleChange}
-                    className="w-full border p-2 rounded mb-3 text-sm md:text-base"
-                  />
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-                  <textarea
-                    name="description"
-                    placeholder="Descripción"
-                    value={formData.description}
-                    onChange={handleChange}
-                    className="w-full border p-2 rounded mb-1 min-h-[140px] text-sm md:text-base"
-                    maxLength={440}
-                  />
-                  <p className="text-xs text-gray-500 mb-2">Máximo 440 caracteres.</p>
-                </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded w-full max-w-lg">
+            <h2 className="text-xl font-bold mb-4">
+              {editingRoom ? "Editar Habitación" : "Nueva Habitación"}
+            </h2>
+            <div className="flex flex-col gap-3">
+              <input
+                type="text"
+                name="name"
+                placeholder="Nombre"
+                value={formData.name}
+                onChange={handleChange}
+                className="border p-2 rounded"
+              />
+              <input
+                type="number"
+                name="price"
+                placeholder="Precio"
+                value={formData.price}
+                onChange={handleChange}
+                className="border p-2 rounded"
+              />
+              <textarea
+                name="description"
+                placeholder="Descripción"
+                value={formData.description}
+                onChange={handleChange}
+                className="border p-2 rounded"
+              />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Imágenes</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleImagesChange}
-                    className="w-full border p-2 rounded text-sm md:text-base"
-                  />
+              <label className="block text-gray-700 font-medium mb-2">
+                Subir imagen
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="border p-2 rounded"
+              />
 
-                  {formData.images?.length > 0 && (
-                    <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
-                      {formData.images.map((img, idx) => (
-                        <div key={idx} className="relative group">
-                          {idx === 0 && (
-                            <span className="absolute -top-2 -left-2 z-10 bg-resort-olive text-white text-[10px] px-2 py-0.5 rounded-full shadow">Portada</span>
-                          )}
-                          <img
-                            src={img}
-                            alt={`image-${idx}`}
-                            onClick={() => openGallery(formData.images, idx, formData.name || "Imágenes")}
-                            className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 object-cover rounded-md ring-1 ring-gray-200 cursor-zoom-in"
-                          />
-                          <div className="absolute inset-0 flex items-start justify-end gap-1 p-1 opacity-0 group-hover:opacity-100 transition">
-                            <button
-                              type="button"
-                              onClick={() => setCoverImage(idx)}
-                              className="bg-white/90 hover:bg-white text-gray-800 text-[10px] px-2 py-0.5 rounded shadow"
-                            >
-                              Portada
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => removeImage(idx)}
-                              className="bg-red-500 hover:bg-red-600 text-white text-[10px] w-6 h-6 rounded-full grid place-items-center shadow"
-                              aria-label="Eliminar"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        </div>
-                      ))}
+              {/* Previews */}
+              {localImages.length > 0 && (
+                <div className="flex gap-2 overflow-x-auto py-2">
+                  {localImages.map((img) => (
+                    <div key={img.preview} className="relative">
+                      <img
+                        src={img.preview}
+                        alt="preview"
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(img.preview)}
+                        className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full p-1"
+                      >
+                        X
+                      </button>
                     </div>
-                  )}
+                  ))}
                 </div>
+              )}
+
+              {/* Imágenes ya subidas */}
+              {formData.images?.length > 0 && (
+                <div className="flex gap-2 overflow-x-auto py-2">
+                  {formData.images.map((img) => (
+                    <div key={img} className="relative">
+                      <img
+                        src={img}
+                        alt="preview"
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(img)}
+                        className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full p-1"
+                      >
+                        X
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  onClick={closeModal}
+                  className="px-4 py-2 rounded border hover:bg-gray-100"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-4 py-2 rounded text-white bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9]"
+                >
+                  Guardar
+                </button>
               </div>
             </div>
-            <div className="px-6 py-4 border-t flex justify-end gap-2">
-              <Button variant="ghost" onClick={closeModal}>Cancelar</Button>
-              <Button onClick={handleSave}>Guardar</Button>
-            </div>
           </div>
         </div>
       )}
 
-      {/* Confirm */}
+      {/* Confirm Dialog */}
       {confirmData.open && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center p-4">
-          <div className="bg-white p-6 rounded-lg shadow w-full max-w-md">
-            <h3 className="text-lg">{confirmData.message}</h3>
-            <div className="flex justify-end gap-2 mt-4">
-              <Button
-                variant="ghost"
-                onClick={() =>
-                  setConfirmData({ open: false, action: null, message: "" })
-                }
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded w-full max-w-md">
+            <p className="mb-4">{confirmData.message}</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setConfirmData({ open: false })}
+                className="px-4 py-2 rounded border hover:bg-gray-100"
               >
                 Cancelar
-              </Button>
-              <Button
+              </button>
+              <button
                 onClick={() => {
                   confirmData.action();
-                  setConfirmData({ open: false, action: null, message: "" });
+                  setConfirmData({ open: false });
                 }}
+                className="px-4 py-2 rounded text-white bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9]"
               >
-                Confirmar
-              </Button>
+                Aceptar
+              </button>
             </div>
           </div>
         </div>
       )}
-
-      {/* Galería */}
-      <ImageGalleryModal
-        isOpen={gallery.open}
-        onClose={closeGallery}
-        images={gallery.images}
-        currentIndex={gallery.index}
-        onIndexChange={(newIndex) => setGallery(g => ({ ...g, index: newIndex }))}
-        title={gallery.title}
-      />
     </div>
   );
 }

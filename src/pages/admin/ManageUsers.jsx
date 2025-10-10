@@ -9,7 +9,15 @@ import { Input } from "../../components/ui/Input";
 import PageHeader from "../../components/admin/PageHeader";
 import StatsGrid from "../../components/admin/StatsGrid";
 import StatsCard from "../../components/admin/StatsCard";
-import { Users, Shield, User, CheckCircle, Edit, Trash2, Search } from "lucide-react";
+import {
+  Users,
+  Shield,
+  User,
+  CheckCircle,
+  Edit,
+  Trash2,
+  Search,
+} from "lucide-react";
 
 export default function ManageUsers() {
   const [users, setUsers] = useState([]);
@@ -154,16 +162,18 @@ export default function ManageUsers() {
 
   // Estadísticas calculadas
   const totalUsers = users.length;
-  const adminUsers = users.filter(u => u.role === 'admin').length;
-  const regularUsers = users.filter(u => u.role === 'user').length;
-  const activeUsers = users.filter(u => u.isActive !== false).length; // Asumiendo que existe esta propiedad
+  const adminUsers = users.filter((u) => u.role === "admin").length;
+  const regularUsers = users.filter((u) => u.role === "user").length;
+  const activeUsers = users.filter((u) => u.isActive !== false).length; // Asumiendo que existe esta propiedad
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
       {/* Header */}
       <PageHeader
         title="Panel de Administración - Usuarios"
-        subtitle={`Gestiona todos los usuarios del sistema • ${totalUsers} usuario${totalUsers !== 1 ? 's' : ''} registrado${totalUsers !== 1 ? 's' : ''}`}
+        subtitle={`Gestiona todos los usuarios del sistema • ${totalUsers} usuario${
+          totalUsers !== 1 ? "s" : ""
+        } registrado${totalUsers !== 1 ? "s" : ""}`}
       />
 
       {/* Estadísticas */}
@@ -211,7 +221,7 @@ export default function ManageUsers() {
           </div>
         </div>
         <CardContent className="pt-4">
-          <div style={{ maxHeight: '47vh' }} className="overflow-y-auto">
+          <div style={{ maxHeight: "47vh" }} className="overflow-y-auto">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -219,7 +229,9 @@ export default function ManageUsers() {
                     <th className="text-left px-6 py-4 font-medium">Usuario</th>
                     <th className="text-left px-6 py-4 font-medium">Email</th>
                     <th className="text-left px-6 py-4 font-medium">Rol</th>
-                    <th className="text-left px-6 py-4 font-medium">Acciones</th>
+                    <th className="text-left px-6 py-4 font-medium">
+                      Acciones
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -230,7 +242,8 @@ export default function ManageUsers() {
                         <td className="p-4">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold text-sm">
-                              {initials || user.username?.charAt(0).toUpperCase()}
+                              {initials ||
+                                user.username?.charAt(0).toUpperCase()}
                             </div>
                             <p className="font-medium">{user.username}</p>
                           </div>
@@ -239,12 +252,19 @@ export default function ManageUsers() {
                           <p className="text-sm text-gray-600">{user.email}</p>
                         </td>
                         <td className="p-4">
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${user.role === 'admin'
-                            ? 'bg-purple-100 text-purple-800 border border-purple-200'
-                            : 'bg-blue-100 text-blue-800 border border-blue-200'
-                            }`}>
-                            {user.role === 'admin' && <Shield className="w-3 h-3 mr-1" />}
-                            {user.role === 'user' && <User className="w-3 h-3 mr-1" />}
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              user.role === "admin"
+                                ? "bg-purple-100 text-purple-800 border border-purple-200"
+                                : "bg-blue-100 text-blue-800 border border-blue-200"
+                            }`}
+                          >
+                            {user.role === "admin" && (
+                              <Shield className="w-3 h-3 mr-1" />
+                            )}
+                            {user.role === "user" && (
+                              <User className="w-3 h-3 mr-1" />
+                            )}
                             {user.role}
                           </span>
                         </td>
@@ -307,7 +327,11 @@ export default function ManageUsers() {
               </div>
 
               <div className="flex justify-end gap-2 mt-4">
-                <Button type="button" variant="ghost" onClick={() => setEditingUser(null)}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setEditingUser(null)}
+                >
                   Cancelar
                 </Button>
                 <Button type="submit">Guardar</Button>
@@ -318,13 +342,29 @@ export default function ManageUsers() {
       )}
 
       {userToDelete && (
-        <Modal open={isDeleteModalOpen} onClose={closeDeleteModal} size="sm" lockScroll trapFocus>
+        <Modal
+          open={isDeleteModalOpen}
+          onClose={closeDeleteModal}
+          size="sm"
+          lockScroll
+          trapFocus
+        >
           <Card className="w-full">
             <CardContent className="space-y-4 p-4">
-              <p>¿Estás seguro de que quieres eliminar a {userToDelete.username}?</p>
+              <p>
+                ¿Estás seguro de que quieres eliminar a {userToDelete.username}?
+              </p>
               <div className="flex justify-end gap-2">
-                <Button size="sm" variant="ghost" onClick={closeDeleteModal}>Cancelar</Button>
-                <Button size="sm" variant="secondary" onClick={handleConfirmDelete}>Eliminar</Button>
+                <Button size="sm" variant="ghost" onClick={closeDeleteModal}>
+                  Cancelar
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={handleConfirmDelete}
+                >
+                  Eliminar
+                </Button>
               </div>
             </CardContent>
           </Card>
