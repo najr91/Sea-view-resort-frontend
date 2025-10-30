@@ -12,7 +12,7 @@ import SuccessModal from '../booking/SuccessModal';
 import LoginRequiredModal from '../auth/LoginRequiredModal';
 import { useAuth } from '../../context/AuthContext';
 import { useRooms } from '../../context/RoomsContext';
-import { toast} from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 
 export default function SearchFilters() {
   const navigate = useNavigate();
@@ -216,7 +216,7 @@ export default function SearchFilters() {
     }
   };
 
-    return (
+  return (
     <>
       <Card className="max-w-6xl mx-auto shadow-lg">
         <CardContent className="p-4 md:p-6">

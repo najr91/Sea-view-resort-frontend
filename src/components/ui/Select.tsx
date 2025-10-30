@@ -6,6 +6,7 @@ interface SelectProps {
   children: React.ReactNode;
   onValueChange?: (value: string) => void;
   defaultValue?: string;
+  value?: string; // Agrego esta prop para modo controlado
 }
 
 interface SelectTriggerProps {
@@ -34,13 +35,14 @@ const SelectContext = React.createContext<{
 }>({
   isOpen: false,
   selectedValue: '',
-  onSelect: () => {},
-  onToggle: () => {}
+  onSelect: () => { },
+  onToggle: () => { }
 });
 
-export function Select({ children, onValueChange, defaultValue = '' }: SelectProps) {
+export function Select({ children, onValueChange, defaultValue = '', value }: SelectProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState(defaultValue);
+  const [internalValue, setInternalValue] = useState(defaultValue);
+  const selectedValue = value !== undefined ? value : internalValue; // Usa value si proporcionado, sino internal
   const selectRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -55,7 +57,9 @@ export function Select({ children, onValueChange, defaultValue = '' }: SelectPro
   }, []);
 
   const handleSelect = (value: string) => {
-    setSelectedValue(value);
+    if (value !== undefined) {
+      setInternalValue(value);
+    }
     setIsOpen(false);
     onValueChange?.(value);
   };
@@ -122,9 +126,13 @@ export function SelectItem({ value, children }: SelectItemProps) {
 export function SelectValue({ placeholder }: SelectValueProps) {
   const { selectedValue } = React.useContext(SelectContext);
 
+  const formatLabel = (text: string) => {
+    return text.replace(/(^|[\s-_])([a-z])/g, (match, prefix: string, char: string) => `${prefix}${char.toUpperCase()}`);
+  };
+
   return (
-    <span className={clsx(!selectedValue && 'text-gray-500')}>
-      {selectedValue || placeholder}
+    <span className={clsx('flex-1 min-w-0 truncate', !selectedValue && 'text-gray-500')}>
+      {selectedValue ? formatLabel(selectedValue) : placeholder}
     </span>
   );
 }

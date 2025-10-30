@@ -6,16 +6,18 @@ import { X, LogIn, UserPlus } from 'lucide-react';
 export default function LoginRequiredModal({ isOpen, onClose, onNavigateToLogin, onNavigateToRegister }) {
     return (
         <Modal open={isOpen} onClose={onClose} size="sm" lockScroll trapFocus>
-            <Card className="w-full">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <Card className="w-full relative">
+                <CardHeader className="pb-4">
                     <CardTitle className="text-xl font-semibold text-center w-full">
                         Inicia Sesión para Continuar
                     </CardTitle>
                     <Button
                         variant="ghost"
                         size="sm"
+                        radius="full"
                         onClick={onClose}
-                        className="h-8 w-8 p-0"
+                        aria-label="Cerrar"
+                        className="absolute top-3 right-3 h-8 w-8 p-0 rounded-full bg-white/90 hover:bg-white text-gray-700 shadow-md ring-1 ring-black/10"
                     >
                         <X className="h-4 w-4" />
                     </Button>
@@ -54,16 +56,7 @@ export default function LoginRequiredModal({ isOpen, onClose, onNavigateToLogin,
                         </Button>
                     </div>
 
-                    <div className="text-center">
-                        <Button
-                            onClick={onClose}
-                            variant="ghost"
-                            size="sm"
-                            className="text-gray-500 hover:text-gray-700 underline"
-                        >
-                            Continuar sin iniciar sesión
-                        </Button>
-                    </div>
+                    
                 </CardContent>
             </Card>
         </Modal>

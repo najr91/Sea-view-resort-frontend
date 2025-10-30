@@ -3,14 +3,17 @@ import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/Select';
-import { 
-  Calendar, 
-  Users, 
-  Bed, 
-  Search, 
-  Edit, 
-  Trash2, 
-  Eye, 
+import PageHeader from '../../components/admin/PageHeader';
+import StatsGrid from '../../components/admin/StatsGrid';
+import StatsCard from '../../components/admin/StatsCard';
+import {
+  Calendar,
+  Users,
+  Bed,
+  Search,
+  Edit,
+  Trash2,
+  Eye,
   Filter,
   Plus,
   CheckCircle,
@@ -44,47 +47,54 @@ export default function AdminReservations() {
   // Simular datos de reservas para demostración usando habitaciones del contexto
   useEffect(() => {
     if (rooms.length === 0) return; // Esperar a que las habitaciones se carguen
-    
-    const mockGuests = [
+
+    const extraGuests = [
       { name: 'María González', email: 'maria@email.com', phone: '+34 123 456 789' },
       { name: 'Carlos Rodríguez', email: 'carlos@email.com', phone: '+34 987 654 321' },
       { name: 'Ana Martínez', email: 'ana@email.com', phone: '+34 555 123 456' },
       { name: 'Luis Fernández', email: 'luis@email.com', phone: '+34 777 888 999' },
-      { name: 'Sofia García', email: 'sofia@email.com', phone: '+34 111 222 333' },
-      { name: 'Miguel López', email: 'miguel@email.com', phone: '+34 444 555 666' }
+      { name: 'Sofía García', email: 'sofia@email.com', phone: '+34 111 222 333' },
+      { name: 'Miguel López', email: 'miguel@email.com', phone: '+34 444 555 666' },
+      { name: 'Isabel Ruiz', email: 'isabel@email.com', phone: '+34 333 444 555' },
+      { name: 'Pablo Méndez', email: 'pablo@email.com', phone: '+34 222 333 444' },
+      { name: 'Clara Campos', email: 'clara@email.com', phone: '+34 999 888 777' },
+      { name: 'Daniel Vega', email: 'daniel@example.com', phone: '+34 101 202 303' },
+      { name: 'Laura Ramos', email: 'laura@example.com', phone: '+34 404 505 606' },
+      { name: 'Santiago Ruiz', email: 'santiago@example.com', phone: '+34 505 606 707' },
+      { name: 'Fernanda Soto', email: 'fernanda@example.com', phone: '+34 606 707 808' },
+      { name: 'Marco Diaz', email: 'marco@example.com', phone: '+34 707 808 909' }
     ];
-    
+
     const mockReservations = [];
-    
-    // Crear reservas para cada habitación disponible
-    rooms.forEach((room, index) => {
-      if (index < mockGuests.length) {
-        const guest = mockGuests[index];
-        const checkIn = new Date('2025-08-20');
-        checkIn.setDate(checkIn.getDate() + (index * 2)); // Fechas escalonadas
-        const checkOut = new Date(checkIn);
-        checkOut.setDate(checkOut.getDate() + (index % 3 + 2)); // 2-4 noches
-        
-        const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-        const totalPrice = room.price * nights;
-        
-        mockReservations.push({
-          id: index + 1,
-          guestName: guest.name,
-          email: guest.email,
-          phone: guest.phone,
-          checkIn: checkIn.toISOString().split('T')[0],
-          checkOut: checkOut.toISOString().split('T')[0],
-          roomType: room.name,
-          guests: (index % 3) + 1, // 1-3 huéspedes
-          status: ['confirmed', 'pending', 'cancelled'][index % 3],
-          specialRequests: index % 2 === 0 ? 'Vista al mar preferida' : '',
-          totalPrice,
-          createdAt: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toISOString().split('T')[0]
-        });
-      }
-    });
-    
+    const totalToCreate = Math.max(rooms.length * 10, 60); // más pruebas de scroll
+
+    for (let i = 0; i < totalToCreate; i++) {
+      const room = rooms[i % rooms.length];
+      const guest = extraGuests[i % extraGuests.length];
+      const base = new Date('2025-08-15');
+      base.setDate(base.getDate() + i); // fechas escalonadas
+      const nights = (i % 5) + 2; // 2-6 noches
+      const checkIn = new Date(base);
+      const checkOut = new Date(base);
+      checkOut.setDate(checkOut.getDate() + nights);
+      const totalPrice = room.price * nights;
+
+      mockReservations.push({
+        id: i + 1,
+        guestName: guest.name,
+        email: guest.email,
+        phone: guest.phone,
+        checkIn: checkIn.toISOString().split('T')[0],
+        checkOut: checkOut.toISOString().split('T')[0],
+        roomType: room.name,
+        guests: ((i % 4) + 1),
+        status: ['confirmed', 'pending', 'cancelled'][i % 3],
+        specialRequests: i % 3 === 0 ? 'Vista al mar' : '',
+        totalPrice,
+        createdAt: new Date(Date.now() - (i * 24 * 60 * 60 * 1000)).toISOString().split('T')[0]
+      });
+    }
+
     setReservations(mockReservations);
     setFilteredReservations(mockReservations);
     setIsLoading(false);
@@ -132,7 +142,7 @@ export default function AdminReservations() {
       try {
         // Simular llamada a la API
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
         setReservations(prev => prev.filter(r => r.id !== reservationId));
         toast.success('Reserva eliminada exitosamente');
       } catch (error) {
@@ -160,11 +170,11 @@ export default function AdminReservations() {
       if (editingReservation) {
         // Simular actualización
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
         const totalPrice = calculateTotalPrice(formData.roomType, formData.checkIn, formData.checkOut);
-        
-        setReservations(prev => prev.map(r => 
-          r.id === editingReservation.id 
+
+        setReservations(prev => prev.map(r =>
+          r.id === editingReservation.id
             ? { ...r, ...formData, guests: parseInt(formData.guests), totalPrice }
             : r
         ));
@@ -172,9 +182,9 @@ export default function AdminReservations() {
       } else {
         // Simular creación
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
         const totalPrice = calculateTotalPrice(formData.roomType, formData.checkIn, formData.checkOut);
-        
+
         const newReservation = {
           id: Date.now(),
           ...formData,
@@ -182,11 +192,11 @@ export default function AdminReservations() {
           totalPrice,
           createdAt: new Date().toISOString().split('T')[0]
         };
-        
+
         setReservations(prev => [...prev, newReservation]);
         toast.success('Reserva creada exitosamente');
       }
-      
+
       setIsModalOpen(false);
       setEditingReservation(null);
       setFormData({
@@ -229,10 +239,12 @@ export default function AdminReservations() {
   };
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-ES', {
+    const formatted = new Intl.NumberFormat('es-ES', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'USD',
+      currencyDisplay: 'narrowSymbol'
     }).format(price);
+    return formatted.replace('US$', '$').replace('USD', '$');
   };
 
   // Función para obtener el precio de la habitación seleccionada
@@ -244,19 +256,19 @@ export default function AdminReservations() {
   // Función para calcular el precio total de la reserva
   const calculateTotalPrice = (roomType, checkIn, checkOut) => {
     if (!roomType || !checkIn || !checkOut) return 0;
-    
+
     const pricePerNight = getRoomPrice(roomType);
     const start = new Date(checkIn);
     const end = new Date(checkOut);
     const diffTime = Math.abs(end - start);
     const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     return pricePerNight * nights;
   };
 
   if (isLoading || rooms.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex-y flex items-center justify-center h-screen overflow-hidden">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
           <p className="text-gray-600">
@@ -268,19 +280,48 @@ export default function AdminReservations() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="w-full min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Panel de Administración - Reservas</h1>
-        <p className="text-gray-600">
-          Gestiona todas las reservas del hotel • {rooms.length} habitación{rooms.length !== 1 ? 'es' : ''} disponible{rooms.length !== 1 ? 's' : ''} en el sistema
-        </p>
-      </div>
+      <PageHeader
+        title="Panel de Administración - Reservas"
+        subtitle={`Gestiona todas las reservas del hotel • ${rooms.length} habitación${rooms.length !== 1 ? 'es' : ''} disponible${rooms.length !== 1 ? 's' : ''} en el sistema`}
+      />
 
-      {/* Filtros y búsqueda */}
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Estadísticas */}
+      <StatsGrid>
+        <StatsCard
+          label="Total Reservas"
+          value={reservations.length}
+          icon={Calendar}
+          iconColor="text-green-600"
+        />
+        <StatsCard
+          label="Confirmadas"
+          value={reservations.filter(r => r.status === 'confirmed').length}
+          icon={CheckCircle}
+          iconColor="text-green-600"
+          valueColor="text-green-600"
+        />
+        <StatsCard
+          label="Pendientes"
+          value={reservations.filter(r => r.status === 'pending').length}
+          icon={Clock}
+          iconColor="text-yellow-600"
+          valueColor="text-yellow-600"
+        />
+        <StatsCard
+          label="Canceladas"
+          value={reservations.filter(r => r.status === 'cancelled').length}
+          icon={XCircle}
+          iconColor="text-red-600"
+          valueColor="text-red-600"
+        />
+      </StatsGrid>
+
+      {/* Tabla de reservas */}
+      <Card className="w-full mb-8">
+        <div className="flex flex-col space-y-1.5 px-6 pt-4">
+          <div className="grid grid-cols-P md:grid-cols-4 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
@@ -290,7 +331,7 @@ export default function AdminReservations() {
                 className="pl-10"
               />
             </div>
-            
+
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
                 <SelectValue placeholder="Filtrar por estado" />
@@ -327,145 +368,83 @@ export default function AdminReservations() {
               </Button>
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Estadísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Reservas</p>
-                <p className="text-2xl font-bold text-gray-900">{reservations.length}</p>
-              </div>
-              <Calendar className="w-8 h-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Confirmadas</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {reservations.filter(r => r.status === 'confirmed').length}
-                </p>
-              </div>
-              <CheckCircle className="w-8 h-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Pendientes</p>
-                <p className="text-2xl font-bold text-yellow-600">
-                  {reservations.filter(r => r.status === 'pending').length}
-                </p>
-              </div>
-              <Clock className="w-8 h-8 text-yellow-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Canceladas</p>
-                <p className="text-2xl font-bold text-red-600">
-                  {reservations.filter(r => r.status === 'cancelled').length}
-                </p>
-              </div>
-              <XCircle className="w-8 h-8 text-red-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Tabla de reservas */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Lista de Reservas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-4 font-medium">Huésped</th>
-                  <th className="text-left p-4 font-medium">Fechas</th>
-                  <th className="text-left p-4 font-medium">Habitación</th>
-                  <th className="text-left p-4 font-medium">Estado</th>
-                  <th className="text-left p-4 font-medium">Precio</th>
-                  <th className="text-left p-4 font-medium">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredReservations.map((reservation) => (
-                  <tr key={reservation.id} className="border-b hover:bg-gray-50">
-                    <td className="p-4">
-                      <div>
-                        <p className="font-medium">{reservation.guestName}</p>
-                        <p className="text-sm text-gray-600">{reservation.email}</p>
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-gray-400" />
-                        <div>
-                          <p className="text-sm">{formatDate(reservation.checkIn)}</p>
-                          <p className="text-sm text-gray-600">a {formatDate(reservation.checkOut)}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-2">
-                        <Bed className="w-4 h-4 text-gray-400" />
-                        <div>
-                          <p className="font-medium">{reservation.roomType}</p>
-                          <p className="text-sm text-gray-600">{reservation.guests} huéspedes</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(reservation.status)}`}>
-                        {getStatusIcon(reservation.status)}
-                        {reservation.status === 'confirmed' && 'Confirmada'}
-                        {reservation.status === 'pending' && 'Pendiente'}
-                        {reservation.status === 'cancelled' && 'Cancelada'}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <p className="font-medium">{formatPrice(reservation.totalPrice)}</p>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(reservation)}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDelete(reservation.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </td>
+        </div>
+        <CardContent className="pt-4">
+          <div style={{ maxHeight: '47vh' }} className="overflow-y-auto">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left px-6 py-4 font-medium">Huésped</th>
+                    <th className="text-left px-6 py-4 font-medium">Fechas</th>
+                    <th className="text-left px-8 py-6 font-medium">Habitación</th>
+                    <th className="text-left px-2 py-2 font-medium">Estado</th>
+                    <th className="text-left px-6 py-4 font-medium">Precio</th>
+                    <th className="text-left px-6 py-4 font-medium">Acciones</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filteredReservations.map((reservation) => (
+                    <tr key={reservation.id} className="border-b hover:bg-gray-50">
+                      <td className="p-4">
+                        <div>
+                          <p className="font-medium">{reservation.guestName}</p>
+                          <p className="text-sm text-gray-600">{reservation.email}</p>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-gray-400" />
+                          <div>
+                            <p className="text-sm">{formatDate(reservation.checkIn)}</p>
+                            <p className="text-sm text-gray-600">a {formatDate(reservation.checkOut)}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex items-center gap-2">
+                          <Bed className="w-4 h-4 text-gray-400" />
+                          <div>
+                            <p className="font-medium">{reservation.roomType}</p>
+                            <p className="text-sm text-gray-600">{reservation.guests} huéspedes</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(reservation.status)}`}>
+                          {getStatusIcon(reservation.status)}
+                          {reservation.status === 'confirmed' && 'Confirmada'}
+                          {reservation.status === 'pending' && 'Pendiente'}
+                          {reservation.status === 'cancelled' && 'Cancelada'}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <p className="font-medium">{formatPrice(reservation.totalPrice)}</p>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEdit(reservation)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDelete(reservation.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -479,23 +458,23 @@ export default function AdminReservations() {
                 {editingReservation ? 'Editar Reserva' : 'Nueva Reserva'}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">Nombre del huésped</label>
                   <Input
                     value={formData.guestName}
-                    onChange={(e) => setFormData({...formData, guestName: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, guestName: e.target.value })}
                     placeholder="Nombre completo"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium mb-2">Email</label>
                   <Input
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="email@ejemplo.com"
                   />
                 </div>
@@ -504,14 +483,14 @@ export default function AdminReservations() {
                   <label className="block text-sm font-medium mb-2">Teléfono</label>
                   <Input
                     value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="+34 123 456 789"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-2">Estado</label>
-                  <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value})}>
+                  <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -528,7 +507,7 @@ export default function AdminReservations() {
                   <Input
                     type="date"
                     value={formData.checkIn}
-                    onChange={(e) => setFormData({...formData, checkIn: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, checkIn: e.target.value })}
                     min="2025-08-20"
                   />
                 </div>
@@ -538,14 +517,14 @@ export default function AdminReservations() {
                   <Input
                     type="date"
                     value={formData.checkOut}
-                    onChange={(e) => setFormData({...formData, checkOut: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, checkOut: e.target.value })}
                     min="2025-08-21"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-2">Tipo de habitación</label>
-                  <Select value={formData.roomType} onValueChange={(value) => setFormData({...formData, roomType: value})}>
+                  <Select value={formData.roomType} onValueChange={(value) => setFormData({ ...formData, roomType: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar tipo" />
                     </SelectTrigger>
@@ -567,7 +546,7 @@ export default function AdminReservations() {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">Número de huéspedes</label>
-                  <Select value={formData.guests} onValueChange={(value) => setFormData({...formData, guests: value})}>
+                  <Select value={formData.guests} onValueChange={(value) => setFormData({ ...formData, guests: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar" />
                     </SelectTrigger>
@@ -585,7 +564,7 @@ export default function AdminReservations() {
                 <label className="block text-sm font-medium mb-2">Solicitudes especiales</label>
                 <textarea
                   value={formData.specialRequests}
-                  onChange={(e) => setFormData({...formData, specialRequests: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, specialRequests: e.target.value })}
                   placeholder="Solicitudes especiales o comentarios..."
                   className="w-full p-3 border border-gray-300 rounded-lg resize-none"
                   rows="3"

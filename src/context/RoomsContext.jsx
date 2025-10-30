@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { apiUrl } from "../services/http";
 import axios from "axios";
 
 import standard1 from "../assets/Habitaciones/StandardRoom/pexels-siddanth-sawant-178759136-28464712.webp";
@@ -98,7 +99,7 @@ export function RoomsProvider({ children }) {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const { data } = await axios.get("/api/rooms");
+        const { data } = await axios.get(apiUrl("/api/rooms"));
         if (Array.isArray(data) && data.length > 0) {
           setRooms(data);
         }

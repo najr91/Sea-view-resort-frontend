@@ -6,7 +6,12 @@ export const formatDate = (dateString, locale = 'es-ES', options) => {
 
 export const formatPrice = (price, currency = 'USD', locale = 'es-ES') => {
     if (price == null || Number.isNaN(Number(price))) return '';
-    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(price);
+    const formatted = new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency,
+        currencyDisplay: 'narrowSymbol'
+    }).format(price);
+    return formatted.replace('US$', '$').replace('USD', '$');
 };
 
 
@@ -20,4 +25,9 @@ export const getInitials = (nameOrEmail = '') => {
     return initials || source[0]?.toUpperCase() || '';
 };
 
-
+export const formatMemberSince = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const options = { year: 'numeric', month: 'long' };
+    return new Intl.DateTimeFormat('es-ES', options).format(date);
+};

@@ -1,29 +1,18 @@
-import React from "react";
 import { useAuth } from "../context/AuthContext";
+import { ProfileHeader } from "../components/profile/ProfileHeader";
+import { ProfileInfo } from "../components/profile/ProfileInfo";
 
 function Profile() {
   const { user, profileImage } = useAuth();
 
-  console.log(profileImage);
-
   return (
-    <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-center">Perfil de Usuario</h2>
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        <ProfileHeader user={user} profileImage={profileImage} />
 
-      <div className="flex flex-col items-center gap-4">
-        {profileImage && (
-          <img
-            src={profileImage}
-            alt="Imagen de perfil"
-            className="w-32 h-32  object-cover shadow rounded-2xl"
-          />
-        )}
-        <p>
-          <strong>Usuario:</strong> {user?.username}
-        </p>
-        <small>
-          <strong>Email:</strong> {user?.email}
-        </small>
+        <div className="mt-8">
+          <ProfileInfo user={user} />
+        </div>
       </div>
     </div>
   );

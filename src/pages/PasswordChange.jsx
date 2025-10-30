@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Button } from "../components/ui/Button";
 import { useSearchParams, useNavigate } from "react-router-dom";
-
-const API = "/api/v1";
+import { apiUrl } from "../services/http";
 
 function PasswordChange() {
   const [params] = useSearchParams();
@@ -17,7 +16,7 @@ function PasswordChange() {
     setMessage(null);
     setError(null);
 
-    const res = await fetch(`${API}/password-change/${token}`, {
+    const res = await fetch(apiUrl(`/api/v1/password-change/${token}`), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ newPassword: password }),
