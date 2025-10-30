@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useRooms } from "../../context/RoomsContext";
 import axios from "axios";
-import { apiUrl } from "../../services/http";
+import {
+  getRooms,
+  crearRoom,
+  updateRoom,
+  deleteRoom,
+  deleteImage,
+} from "../../services/app.js";
 
 export default function AdminRooms() {
   const { rooms, setRooms } = useRooms();
@@ -14,14 +20,25 @@ export default function AdminRooms() {
     description: "",
     images: [],
   });
+  const [localImages, setLocalImages] = useState([]);
   const [confirmData, setConfirmData] = useState({
     open: false,
     action: null,
     message: "",
   });
 
-  const API_URL = apiUrl("/api/rooms");
+  const API_URL = "http://localhost:4002";
 
+  useEffect(() => {
+    (async () => {
+      const res = await getRooms();
+      if (res.ok) {
+        setRooms(Array.isArray(res.data) ? res.data : []);
+      } else toast.error("Error al cargar habitaciones");
+    })();
+  }, []);
+
+  // --- Modal ---
   const openModal = (room = null) => {
     if (room) {
       setEditingRoom(room);
@@ -31,9 +48,11 @@ export default function AdminRooms() {
         description: room.description,
         images: room.images || [],
       });
+      setLocalImages([]); // limpiar previews locales
     } else {
       setEditingRoom(null);
       setFormData({ name: "", price: "", description: "", images: [] });
+      setLocalImages([]);
     }
     setIsModalOpen(true);
   };
@@ -44,7 +63,7 @@ export default function AdminRooms() {
       formData.price !== (editingRoom?.price || "") ||
       formData.description !== (editingRoom?.description || "") ||
       JSON.stringify(formData.images) !==
-      JSON.stringify(editingRoom?.images || [])
+        JSON.stringify(editingRoom?.images || [])
     ) {
       setConfirmData({
         open: true,
@@ -59,6 +78,7 @@ export default function AdminRooms() {
     }
   };
 
+  // --- Form ---
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -68,45 +88,36 @@ export default function AdminRooms() {
     const file = e.target.files[0];
     if (!file) return;
 
-    const data = new FormData();
-    data.append("image", file);
-
-    if (editingRoom) {
-      axios
-        .post(`${API_URL}/${editingRoom.id}/images`, data)
-        .then((res) => {
-          setRooms(rooms.map((r) => (r.id === editingRoom.id ? res.data : r)));
-          setFormData({ ...formData, images: res.data.images });
-          toast.success("Imagen subida");
-        })
-        .catch(() => toast.error("Error al subir la imagen"));
-    } else {
-      // aún no existe en DB, solo vista previa
-      setFormData({
-        ...formData,
-        images: [...formData.images, URL.createObjectURL(file)],
-      });
-    }
+    const previewURL = URL.createObjectURL(file);
+    setLocalImages([...localImages, { file, preview: previewURL }]);
   };
 
-  const removeImage = (index) => {
-    if (editingRoom) {
-      const imageToDelete = formData.images[index];
-      axios
-        .delete(`${API_URL}/${editingRoom.id}/images/${index}`)
-        .then((res) => {
-          setRooms(rooms.map((r) => (r.id === editingRoom.id ? res.data : r)));
-          setFormData({ ...formData, images: res.data.images });
-          toast("Imagen eliminada", { icon: "🗑️" });
-        })
-        .catch(() => toast.error("Error al eliminar la imagen"));
-    } else {
-      const newImages = [...formData.images];
-      newImages.splice(index, 1);
-      setFormData({ ...formData, images: newImages });
+  const removeImage = async (img) => {
+    const local = localImages.find((i) => i.preview === img);
+    if (local) {
+      setLocalImages(localImages.filter((i) => i.preview !== img));
+      return;
+    }
+
+    // Si es imagen subida
+    try {
+      const res = await deleteImage(editingRoom._id, img);
+      const updatedRoom = res?.data;
+      if (!updatedRoom) throw new Error("Error al eliminar imagen");
+
+      updatedRoom.images = updatedRoom.images.map((i) =>
+        i.startsWith("http") ? i : `${API_URL}${i}`
+      );
+
+      setFormData({ ...formData, images: updatedRoom.images });
+      setRooms(rooms.map((r) => (r._id === editingRoom._id ? updatedRoom : r)));
+      setEditingRoom(updatedRoom);
+      toast.success("Imagen eliminada");
+    } catch (err) {
+      console.error(err);
+      toast.error("Error al eliminar la imagen");
     }
   };
-
   const handleSave = () => {
     if (
       !formData.name.trim() ||
@@ -116,33 +127,52 @@ export default function AdminRooms() {
       toast.error("Por favor completa todos los campos obligatorios");
       return;
     }
-    if (formData.name.length > 25) {
-      toast.error("El nombre no puede tener más de 25 caracteres");
-      return;
-    }
-    if (formData.description.length > 440) {
-      toast.error("La descripción no puede tener más de 440 caracteres");
-      return;
-    }
 
     setConfirmData({
       open: true,
       message: "¿Quieres guardar los cambios?",
       action: async () => {
         try {
+          let savedRoom;
+
           if (editingRoom) {
-            const { data } = await axios.put(
-              `${API_URL}/${editingRoom.id}`,
-              formData
+            const res = await updateRoom(editingRoom._id, formData);
+            if (res.ok) savedRoom = res.data?.datos || res.data;
+          } else {
+            const res = await crearRoom({ ...formData, images: [] });
+            if (res.ok) savedRoom = res.data?.datos || res.data;
+          }
+
+          if (!savedRoom) throw new Error("No se pudo guardar la habitación");
+
+          for (const { file } of localImages) {
+            const data = new FormData();
+            data.append("images", file);
+
+            const uploadRes = await axios.post(
+              `${API_URL}/api/rooms/${savedRoom._id}/images`,
+              data
             );
-            setRooms(rooms.map((r) => (r.id === editingRoom.id ? data : r)));
+            savedRoom = uploadRes.data?.datos || uploadRes.data;
+          }
+
+          savedRoom.images =
+            savedRoom.images?.map((img) =>
+              img.startsWith("http") ? img : `${API_URL}${img}`
+            ) || [];
+
+          if (editingRoom) {
+            setRooms(
+              rooms.map((r) => (r._id === savedRoom._id ? savedRoom : r))
+            );
             toast.success("Habitación actualizada");
           } else {
-            const { data } = await axios.post(API_URL, formData);
-            setRooms([...rooms, data]);
+            setRooms([...rooms, savedRoom]);
             toast.success("Habitación agregada");
           }
+
           setIsModalOpen(false);
+          setLocalImages([]);
         } catch (err) {
           console.error(err);
           toast.error("Error guardando habitación");
@@ -151,15 +181,16 @@ export default function AdminRooms() {
     });
   };
 
+  // --- Eliminar habitación ---
   const handleDelete = (id) => {
     setConfirmData({
       open: true,
       message: "¿Seguro que deseas borrar esta habitación?",
       action: async () => {
         try {
-          await axios.delete(`${API_URL}/${id}`);
-          setRooms(rooms.filter((r) => r.id !== id));
-          toast.error("Habitación eliminada");
+          const res = await deleteRoom(id);
+          if (res.ok) setRooms(rooms.filter((r) => r._id !== id));
+          toast.success("Habitación eliminada");
         } catch (err) {
           console.error(err);
           toast.error("Error eliminando habitación");
@@ -180,7 +211,7 @@ export default function AdminRooms() {
         + Agregar Habitación
       </button>
 
-      {/* Tabla */}
+      {/* Tabla Desktop */}
       <div className="overflow-x-auto hidden md:block">
         <table className="min-w-full bg-white rounded-lg shadow">
           <thead>
@@ -193,137 +224,137 @@ export default function AdminRooms() {
             </tr>
           </thead>
           <tbody>
-            {rooms.map((room) => (
-              <tr key={room.id} className="border-t">
-                <td className="py-3 px-4">{room.name}</td>
-                <td className="py-3 px-4">${room.price}</td>
-                <td className="py-3 px-4">{room.description}</td>
-                <td className="py-3 px-4">
-                  {room.images?.length > 0 ? (
-                    <img
-                      src={room.images[0]}
-                      alt="preview"
-                      className="w-16 h-16 object-cover rounded"
-                    />
-                  ) : (
-                    <span className="text-gray-400">Sin imagen</span>
-                  )}
-                </td>
-                <td className="py-3 px-4 align-top">
-                  <div className="flex flex-col gap-2 w-max">
-                    <button
-                      onClick={() => openModal(room)}
-                      style={{ backgroundColor: "#968260" }}
-                      className="text-white px-3 py-1 rounded hover:opacity-90"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => handleDelete(room.id)}
-                      style={{ backgroundColor: "#ceb996" }}
-                      className="text-white px-3 py-1 rounded hover:opacity-90"
-                    >
-                      Borrar
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {Array.isArray(rooms) &&
+              rooms.map((room) => (
+                <tr key={room._id} className="border-t">
+                  <td className="py-3 px-4">{room.name}</td>
+                  <td className="py-3 px-4">${room.price}</td>
+                  <td className="py-3 px-4">{room.description}</td>
+                  <td className="py-3 px-4">
+                    {room.images?.length > 0 ? (
+                      <img
+                        src={room.images[0]}
+                        alt="preview"
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                    ) : (
+                      <span className="text-gray-400">Sin imagen</span>
+                    )}
+                  </td>
+                  <td className="py-3 px-4 align-top">
+                    <div className="flex flex-col gap-2 w-max">
+                      <button
+                        onClick={() => openModal(room)}
+                        style={{ backgroundColor: "#968260" }}
+                        className="text-white px-3 py-1 rounded hover:opacity-90"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDelete(room._id)}
+                        style={{ backgroundColor: "#ceb996" }}
+                        className="text-white px-3 py-1 rounded hover:opacity-90"
+                      >
+                        Borrar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
 
       {/* Mobile */}
       <div className="grid gap-4 md:hidden">
-        {rooms.map((room) => (
-          <div key={room.id} className="bg-white rounded-lg shadow p-4">
-            <h3 className="text-lg font-bold">{room.name}</h3>
-            <p className="text-gray-600">Precio: ${room.price}</p>
-            <p className="text-gray-500">{room.description}</p>
-            {room.images?.length > 0 && (
-              <div className="flex gap-2">
+        {Array.isArray(rooms) &&
+          rooms.map((room) => (
+            <div key={room._id} className="bg-white rounded-lg shadow p-4">
+              <h3 className="text-lg font-bold">{room.name}</h3>
+              <p className="text-gray-600">Precio: ${room.price}</p>
+              <p className="text-gray-500">{room.description}</p>
+              {room.images?.length > 0 && (
                 <img
                   src={room.images[0]}
                   alt="preview"
-                  className="w-16 h-16 object-cover rounded"
+                  className="w-16 h-16 object-cover rounded mt-2"
                 />
+              )}
+              <div className="flex gap-2 mt-3">
+                <button
+                  onClick={() => openModal(room)}
+                  style={{ backgroundColor: "#968260" }}
+                  className="text-white px-3 py-1 rounded hover:opacity-90"
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => handleDelete(room._id)}
+                  style={{ backgroundColor: "#ceb996" }}
+                  className="text-white px-3 py-1 rounded hover:opacity-90"
+                >
+                  Borrar
+                </button>
               </div>
-            )}
-            <div className="mt-3 flex space-x-2">
-              <button
-                onClick={() => openModal(room)}
-                style={{ backgroundColor: "#968260" }}
-                className="flex-1 text-white px-3 py-2 rounded hover:opacity-90 text-sm"
-              >
-                Editar
-              </button>
-              <button
-                onClick={() => handleDelete(room.id)}
-                style={{ backgroundColor: "#ceb996" }}
-                className="flex-1 text-white px-3 py-2 rounded hover:opacity-90 text-sm"
-              >
-                Borrar
-              </button>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
-          <div className="bg-white p-6 rounded-lg shadow w-full max-w-md">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded w-full max-w-lg">
             <h2 className="text-xl font-bold mb-4">
-              {editingRoom ? "Editar Habitación" : "Agregar Habitación"}
+              {editingRoom ? "Editar Habitación" : "Nueva Habitación"}
             </h2>
-            <input
-              type="text"
-              name="name"
-              placeholder="Nombre"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full border p-2 rounded mb-3"
-              maxLength={25}
-            />
-            <input
-              type="number"
-              name="price"
-              placeholder="Precio"
-              value={formData.price}
-              onChange={handleChange}
-              className="w-full border p-2 rounded mb-3"
-            />
-            <textarea
-              name="description"
-              placeholder="Descripción"
-              value={formData.description}
-              onChange={handleChange}
-              className="w-full border p-2 rounded mb-3"
-              maxLength={440}
-            />
+            <div className="flex flex-col gap-3">
+              <input
+                type="text"
+                name="name"
+                placeholder="Nombre"
+                value={formData.name}
+                onChange={handleChange}
+                className="border p-2 rounded"
+              />
+              <input
+                type="number"
+                name="price"
+                placeholder="Precio"
+                value={formData.price}
+                onChange={handleChange}
+                className="border p-2 rounded"
+              />
+              <textarea
+                name="description"
+                placeholder="Descripción"
+                value={formData.description}
+                onChange={handleChange}
+                className="border p-2 rounded"
+              />
 
-            <div className="mb-4">
               <label className="block text-gray-700 font-medium mb-2">
-                Imagen
+                Subir imagen
               </label>
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
-                className="w-full border p-2 rounded"
+                className="border p-2 rounded"
               />
-              {formData.images?.length > 0 && (
+
+              {/* Previews */}
+              {localImages.length > 0 && (
                 <div className="flex gap-2 overflow-x-auto py-2">
-                  {formData.images.map((img, idx) => (
-                    <div key={idx} className="relative">
+                  {localImages.map((img) => (
+                    <div key={img.preview} className="relative">
                       <img
-                        src={img}
-                        alt={`image-${idx}`}
+                        src={img.preview}
+                        alt="preview"
                         className="w-16 h-16 object-cover rounded"
                       />
                       <button
                         type="button"
-                        onClick={() => removeImage(idx)}
+                        onClick={() => removeImage(img.preview)}
                         className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full p-1"
                       >
                         X
@@ -332,48 +363,68 @@ export default function AdminRooms() {
                   ))}
                 </div>
               )}
-            </div>
 
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={closeModal}
-                className="bg-gray-500 text-white px-4 py-2 rounded"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleSave}
-                className="bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white px-4 py-2 rounded"
-              >
-                Guardar
-              </button>
+              {/* Imágenes ya subidas */}
+              {formData.images?.length > 0 && (
+                <div className="flex gap-2 overflow-x-auto py-2">
+                  {formData.images.map((img) => (
+                    <div key={img} className="relative">
+                      <img
+                        src={img}
+                        alt="preview"
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(img)}
+                        className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full p-1"
+                      >
+                        X
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  onClick={closeModal}
+                  className="px-4 py-2 rounded border hover:bg-gray-100"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-4 py-2 rounded text-white bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9]"
+                >
+                  Guardar
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Confirm */}
+      {/* Confirm Dialog */}
       {confirmData.open && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
-          <div className="bg-white p-6 rounded-lg shadow w-full max-w-md">
-            <h3 className="text-lg">{confirmData.message}</h3>
-            <div className="flex justify-end gap-2 mt-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded w-full max-w-md">
+            <p className="mb-4">{confirmData.message}</p>
+            <div className="flex justify-end gap-2">
               <button
-                onClick={() =>
-                  setConfirmData({ open: false, action: null, message: "" })
-                }
-                className="bg-gray-500 text-white px-4 py-2 rounded"
+                onClick={() => setConfirmData({ open: false })}
+                className="px-4 py-2 rounded border hover:bg-gray-100"
               >
                 Cancelar
               </button>
               <button
                 onClick={() => {
                   confirmData.action();
-                  setConfirmData({ open: false, action: null, message: "" });
+                  setConfirmData({ open: false });
                 }}
-                className="bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9] text-white px-4 py-2 rounded"
+                className="px-4 py-2 rounded text-white bg-[rgb(150,130,96)] hover:bg-[rgb(150,130,96)/0.9]"
               >
-                Confirmar
+                Aceptar
               </button>
             </div>
           </div>

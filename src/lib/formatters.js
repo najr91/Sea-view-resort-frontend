@@ -25,4 +25,9 @@ export const getInitials = (nameOrEmail = '') => {
     return initials || source[0]?.toUpperCase() || '';
 };
 
-
+export const formatMemberSince = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const options = { year: 'numeric', month: 'long' };
+    return new Intl.DateTimeFormat('es-ES', options).format(date);
+};

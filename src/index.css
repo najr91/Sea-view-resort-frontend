@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
 :root {
   --radius: 0.5rem;
   /* 8px, radio suave por defecto para rounded-lg */
@@ -26,5 +37,11 @@
   .section-standard {
     /* Altura mínima para secciones de contenido */
     @apply min-h-[600px] py-16;
+  }
+
+  /* Oculta el icono nativo del datepicker en WebKit para inputs con clase date-input */
+  .date-input::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    display: none;
   }
 }

@@ -13,6 +13,7 @@ export default function MainLayout() {
   const headerRef = useRef(null);
   const { user, logout } = useAuth();
   const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
 
   useEffect(() => {
     const updateHeaderHeightVar = () => {
@@ -96,7 +97,7 @@ export default function MainLayout() {
         <Outlet />
       </main>
 
-      {location.pathname !== "/404" && <Footer />}
+      {location.pathname !== "/404" && !isAdminRoute && <Footer />}
     </div>
   );
 }

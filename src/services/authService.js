@@ -1,6 +1,6 @@
 import axios from "axios";
 import { apiUrl } from "./http";
-const API_PREFIX = "/api/v1";
+const API_PREFIX = "/api/auth";
 const getToken = () => localStorage.getItem("token");
 
 export const register = async (userData) => {
