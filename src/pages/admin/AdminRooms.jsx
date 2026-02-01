@@ -11,7 +11,7 @@ import {
 } from "../../services/app.js";
 
 export default function AdminRooms() {
-  const { rooms, setRooms } = useRooms();
+  const { rooms, setRooms } = useRooms([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
   const [formData, setFormData] = useState({
@@ -135,16 +135,28 @@ export default function AdminRooms() {
         try {
           let savedRoom;
 
+          // Crear o actualizar habitación
           if (editingRoom) {
-            const res = await updateRoom(editingRoom._id, formData);
+            const res = await updateRoom(editingRoom._id, {
+              name: formData.name,
+              price: formData.price,
+              description: formData.description,
+              images: formData.images,
+            });
             if (res.ok) savedRoom = res.data?.datos || res.data;
           } else {
-            const res = await crearRoom({ ...formData, images: [] });
+            const res = await crearRoom({
+              name: formData.name,
+              price: formData.price,
+              description: formData.description,
+              images: [],
+            });
             if (res.ok) savedRoom = res.data?.datos || res.data;
           }
 
           if (!savedRoom) throw new Error("No se pudo guardar la habitación");
 
+          // Subir imágenes nuevas
           for (const { file } of localImages) {
             const data = new FormData();
             data.append("images", file);
@@ -156,11 +168,13 @@ export default function AdminRooms() {
             savedRoom = uploadRes.data?.datos || uploadRes.data;
           }
 
+          // Normalizar URLs
           savedRoom.images =
             savedRoom.images?.map((img) =>
               img.startsWith("http") ? img : `${API_URL}${img}`
             ) || [];
 
+          // Actualizar contexto
           if (editingRoom) {
             setRooms(
               rooms.map((r) => (r._id === savedRoom._id ? savedRoom : r))
@@ -170,6 +184,13 @@ export default function AdminRooms() {
             setRooms([...rooms, savedRoom]);
             toast.success("Habitación agregada");
           }
+
+          setFormData({
+            name: "",
+            price: "",
+            description: "",
+            images: savedRoom.images,
+          });
 
           setIsModalOpen(false);
           setLocalImages([]);

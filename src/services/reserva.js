@@ -21,18 +21,19 @@ import { fetchApi } from "./http";
 export const createReservation = async (reservationData) => {
   try {
     // Buscar la habitación para obtener el roomId
-    const roomsResponse = await fetchApi('/api/rooms');
+    const roomsResponse = await fetchApi("/api/rooms");
     const rooms = await roomsResponse.json();
-    const room = rooms.find(r => r.name === reservationData.habitacion);
+    const room = rooms.find((r) => r.name === reservationData.habitacion);
 
     if (!room) {
-      throw new Error('Habitación no encontrada');
+      throw new Error("Habitación no encontrada");
     }
 
-    const response = await fetchApi('/api/reserva', { //  Cambiar de 'reservas' a 'reserva'
-      method: 'POST',
+    const response = await fetchApi("/api/reserva", {
+      //  Cambiar de 'reservas' a 'reserva'
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         roomId: room._id,
@@ -40,18 +41,18 @@ export const createReservation = async (reservationData) => {
         huespedes: parseInt(reservationData.huespedes),
         checkIn: reservationData.checkIn,
         checkOut: reservationData.checkOut,
-        precioPorNoche: reservationData.precioPorNoche
-      })
+        precioPorNoche: reservationData.precioPorNoche,
+      }),
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || 'Error al crear la reserva');
+      throw new Error(errorData.error || "Error al crear la reserva");
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Error creating reservation:', error);
+    console.error("Error creating reservation:", error);
     throw error;
   }
 };
@@ -62,13 +63,13 @@ export const createReservation = async (reservationData) => {
  */
 export const getReservations = async () => {
   try {
-    const response = await fetchApi('/api/reservas'); //  Esta URL está bien
+    const response = await fetchApi("/api/reservas"); //  Esta URL está bien
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     return await response.json();
   } catch (error) {
-    console.error('Error fetching reservations:', error);
+    console.error("Error fetching reservations:", error);
     throw error;
   }
 };
@@ -82,13 +83,16 @@ export const getReservations = async () => {
  */
 export const checkAvailability = async (roomId, checkIn, checkOut) => {
   try {
-    const response = await fetchApi(`/api/rooms/${roomId}/disponibilidad?checkIn=${checkIn}&checkOut=${checkOut}`);
+    const response = await fetchApi(
+      `/api/rooms/${roomId}/disponibilidad?checkIn=${checkIn}&checkOut=${checkOut}`,
+    );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    return await response.json();
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error('Error checking availability:', error);
+    console.error("Error checking availability:", error);
     throw error;
   }
 };
@@ -102,21 +106,21 @@ export const checkAvailability = async (roomId, checkIn, checkOut) => {
 export const updateReservation = async (reservationId, updateData) => {
   try {
     const response = await fetchApi(`/api/reservas/${reservationId}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(updateData)
+      body: JSON.stringify(updateData),
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || 'Error al actualizar la reserva');
+      throw new Error(errorData.error || "Error al actualizar la reserva");
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Error updating reservation:', error);
+    console.error("Error updating reservation:", error);
     throw error;
   }
 };
@@ -129,17 +133,17 @@ export const updateReservation = async (reservationId, updateData) => {
 export const deleteReservation = async (reservationId) => {
   try {
     const response = await fetchApi(`/api/reservas/${reservationId}`, {
-      method: 'DELETE'
+      method: "DELETE",
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || 'Error al eliminar la reserva');
+      throw new Error(errorData.error || "Error al eliminar la reserva");
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Error deleting reservation:', error);
+    console.error("Error deleting reservation:", error);
     throw error;
   }
 };

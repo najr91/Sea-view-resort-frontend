@@ -1,7 +1,13 @@
 export const formatDate = (dateString, locale = 'es-ES', options) => {
     if (!dateString) return '';
     const defaultOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(locale, options || defaultOptions);
+    // Si la fecha viene en formato ISO 'YYYY-MM-DD', crear la fecha como local
+    // para evitar desfases por zona horaria (new Date('YYYY-MM-DD') se trata como UTC)
+    const isoDateOnly = /^\d{4}-\d{2}-\d{2}$/;
+    const d = isoDateOnly.test(String(dateString))
+        ? new Date(String(dateString) + 'T00:00:00')
+        : new Date(dateString);
+    return d.toLocaleDateString(locale, options || defaultOptions);
 };
 
 export const formatPrice = (price, currency = 'USD', locale = 'es-ES') => {

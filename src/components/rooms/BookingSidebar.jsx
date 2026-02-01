@@ -2,13 +2,20 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/Select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/Select";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
 import AvailabilityModal from "../booking/AvailabilityModal";
 import SuccessModal from "../booking/SuccessModal";
 import LoginRequiredModal from "../auth/LoginRequiredModal";
+import { checkAvailability } from "../../services/reserva";
 
 /**
  * Sidebar de reserva con cálculo de costos.
@@ -18,17 +25,23 @@ import LoginRequiredModal from "../auth/LoginRequiredModal";
  * @component
  * @param {Object} props - Propiedades del componente.
  * @param {number} props.pricePerNight - Precio por noche de la habitación.
+ * @param {string} props.roomName - Nombre de la habitación.
+ * @param {string} props.roomId - ID de la habitación.
  * @returns {JSX.Element}
  */
-export default function BookingSidebar({ pricePerNight, roomName }) {
+export default function BookingSidebar({ pricePerNight, roomName, roomId }) {
   const navigate = useNavigate();
   const { user } = useAuth();
 
   const [bookingData, setBookingData] = useState({
-    destino: '',
-    checkIn: '2025-08-20',
-    checkOut: '2025-08-25',
-    huespedes: '2'
+    destino: "",
+    checkIn: new Date().toISOString().split("T")[0],
+    checkOut: (() => {
+      const d = new Date();
+      d.setDate(d.getDate() + 1);
+      return d.toISOString().split("T")[0];
+    })(),
+    huespedes: "2",
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,7 +49,8 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [confirmedReservation, setConfirmedReservation] = useState(null);
-  const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] = useState(false);
+  const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] =
+    useState(false);
 
   // Calcular noches
   const calculateNights = (checkIn, checkOut) => {
@@ -53,13 +67,13 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
   const total = subtotal + serviceFee + taxes;
 
   const handleChange = (field, value) => {
-    setBookingData(prev => ({ ...prev, [field]: value }));
+    setBookingData((prev) => ({ ...prev, [field]: value }));
   };
 
   const generateAvailableDates = (checkIn, checkOut) => {
     const dates = [];
     const startDate = new Date(checkIn);
-    const minDate = new Date('2025-08-20');
+    const minDate = new Date();
 
     const ranges = [
       { start: 1, end: 3 },
@@ -67,15 +81,15 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
       { start: 14, end: 17 },
       { start: 21, end: 24 },
       { start: 30, end: 35 },
-      { start: 60, end: 65 }
+      { start: 60, end: 65 },
     ];
 
-    ranges.forEach(range => {
+    ranges.forEach((range) => {
       for (let i = range.start; i <= range.end; i++) {
         const newDate = new Date(startDate);
         newDate.setDate(startDate.getDate() + i);
         if (newDate >= minDate) {
-          dates.push(newDate.toISOString().split('T')[0]);
+          dates.push(newDate.toISOString().split("T")[0]);
         }
       }
     });
@@ -85,27 +99,36 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
 
   const handleSearch = async () => {
     if (!bookingData.destino) {
-      alert('Por favor selecciona un destino');
+      alert("Por favor selecciona un destino");
       return;
     }
 
     setIsLoading(true);
     try {
-      // Simular búsqueda de disponibilidad
+      // Consultar disponibilidad en la API
+      const availabilityResponse = await checkAvailability(
+        roomId,
+        bookingData.checkIn,
+        bookingData.checkOut,
+      );
+
+      // Procesar la respuesta
       const mockData = {
         ...bookingData,
         habitacion: roomName,
-        disponible: Math.random() > 0.5,
+        roomId: roomId,
+        disponible:
+          availabilityResponse.disponible || availabilityResponse.available,
         precioPorNoche: pricePerNight,
         noches: nights,
         precioTotal: total,
-        diasDisponibles: generateAvailableDates(bookingData.checkIn, bookingData.checkOut)
       };
 
       setAvailabilityData(mockData);
       setIsModalOpen(true);
     } catch (error) {
-      console.error('Error en la búsqueda:', error);
+      console.error("Error en la búsqueda:", error);
+      toast.error("Error al verificar disponibilidad: " + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -118,15 +141,15 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
     }
 
     try {
-      console.log('Confirmando reserva:', data);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log("Confirmando reserva:", data);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       setConfirmedReservation(data);
       setIsSuccessModalOpen(true);
       setIsModalOpen(false);
     } catch (error) {
-      console.error('Error al confirmar la reserva:', error);
-      toast.error('Error al crear la reserva: ' + error.message);
+      console.error("Error al confirmar la reserva:", error);
+      toast.error("Error al crear la reserva: " + error.message);
       throw error;
     }
   };
@@ -134,13 +157,13 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
   const handleNavigateToLogin = () => {
     setIsLoginRequiredModalOpen(false);
     setIsModalOpen(false);
-    navigate('/login');
+    navigate("/login");
   };
 
   const handleNavigateToRegister = () => {
     setIsLoginRequiredModalOpen(false);
     setIsModalOpen(false);
-    navigate('/register');
+    navigate("/register");
   };
 
   const handleSelectAlternativeDate = async (selectedDate) => {
@@ -148,7 +171,9 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
       const checkInDate = new Date(selectedDate);
       const originalCheckIn = new Date(bookingData.checkIn);
       const originalCheckOut = new Date(bookingData.checkOut);
-      const nightsDiff = Math.ceil((originalCheckOut - originalCheckIn) / (1000 * 60 * 60 * 24));
+      const nightsDiff = Math.ceil(
+        (originalCheckOut - originalCheckIn) / (1000 * 60 * 60 * 24),
+      );
 
       const newCheckOutDate = new Date(checkInDate);
       newCheckOutDate.setDate(checkInDate.getDate() + nightsDiff);
@@ -156,25 +181,41 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
       const updatedBookingData = {
         ...bookingData,
         checkIn: selectedDate,
-        checkOut: newCheckOutDate.toISOString().split('T')[0]
+        checkOut: newCheckOutDate.toISOString().split("T")[0],
       };
 
       setBookingData(updatedBookingData);
       setIsLoading(true);
 
+      // Consultar disponibilidad con las nuevas fechas
+      const availabilityResponse = await checkAvailability(
+        roomId,
+        selectedDate,
+        newCheckOutDate.toISOString().split("T")[0],
+      );
+
+      const newNights = calculateNights(
+        selectedDate,
+        newCheckOutDate.toISOString().split("T")[0],
+      );
+      const newSubtotal = pricePerNight * newNights;
+      const newTotal = newSubtotal + 25000 + 30000;
+
       const mockData = {
         ...updatedBookingData,
         habitacion: roomName,
-        disponible: Math.random() > 0.3,
+        roomId: roomId,
+        disponible:
+          availabilityResponse.disponible || availabilityResponse.available,
         precioPorNoche: pricePerNight,
-        noches: calculateNights(selectedDate, newCheckOutDate.toISOString().split('T')[0]),
-        precioTotal: total,
-        diasDisponibles: generateAvailableDates(selectedDate, newCheckOutDate.toISOString().split('T')[0])
+        noches: newNights,
+        precioTotal: newTotal,
       };
 
       setAvailabilityData(mockData);
     } catch (error) {
-      console.error('Error al seleccionar fecha alternativa:', error);
+      console.error("Error al seleccionar fecha alternativa:", error);
+      toast.error("Error al verificar disponibilidad: " + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -205,7 +246,10 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
               <label className="text-sm font-medium text-gray-900">
                 Destino
               </label>
-              <Select value={bookingData.destino} onValueChange={v => handleChange('destino', v)}>
+              <Select
+                value={bookingData.destino}
+                onValueChange={(v) => handleChange("destino", v)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccione un destino" />
                 </SelectTrigger>
@@ -226,8 +270,8 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
                 <Input
                   type="date"
                   value={bookingData.checkIn}
-                  min="2025-08-20"
-                  onChange={e => handleChange('checkIn', e.target.value)}
+                  min={new Date().toISOString().split("T")[0]}
+                  onChange={(e) => handleChange("checkIn", e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -237,8 +281,12 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
                 <Input
                   type="date"
                   value={bookingData.checkOut}
-                  min="2025-08-21"
-                  onChange={e => handleChange('checkOut', e.target.value)}
+                  min={(() => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + 1);
+                    return d.toISOString().split("T")[0];
+                  })()}
+                  onChange={(e) => handleChange("checkOut", e.target.value)}
                 />
               </div>
             </div>
@@ -248,7 +296,7 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
               <label className="text-sm font-medium text-gray-900">
                 Huéspedes
               </label>
-              <Select onValueChange={v => handleChange('huespedes', v)}>
+              <Select onValueChange={(v) => handleChange("huespedes", v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="2 Adultos" />
                 </SelectTrigger>
@@ -285,12 +333,16 @@ export default function BookingSidebar({ pricePerNight, roomName }) {
           </div>
 
           <Button
-            className={`w-full ${!bookingData.destino ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`w-full ${!bookingData.destino ? "opacity-50 cursor-not-allowed" : ""}`}
             size="lg"
             onClick={handleSearch}
             disabled={isLoading || !bookingData.destino}
           >
-            {isLoading ? 'Buscando...' : !bookingData.destino ? 'Selecciona un destino' : 'Verificar disponibilidad'}
+            {isLoading
+              ? "Buscando..."
+              : !bookingData.destino
+                ? "Selecciona un destino"
+                : "Verificar disponibilidad"}
           </Button>
           <p className="text-xs text-resort-slate text-center mt-4">
             Aún no se realizará ningún cargo

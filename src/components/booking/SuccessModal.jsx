@@ -3,8 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import Modal from '../ui/Modal';
 import { CheckCircle, X } from 'lucide-react';
 import { formatDate, formatPrice } from '../../lib/formatters';
+import { useNavigate } from 'react-router-dom';
 
 export default function SuccessModal({ isOpen, onClose, reservationData }) {
+    const navigate = useNavigate();
+
+    const handleViewReservation = () => {
+        onClose();
+        navigate('/profile');
+    };
+
     return (
         <Modal open={isOpen} onClose={onClose} size="sm" lockScroll trapFocus>
             <Card className="w-full">
@@ -67,9 +75,7 @@ export default function SuccessModal({ isOpen, onClose, reservationData }) {
                         </Button>
                         <Button
                             variant="outline"
-                            onClick={() => {
-                                console.log('Ver reserva');
-                            }}
+                            onClick={handleViewReservation}
                             className="flex-1"
                         >
                             Ver Reserva

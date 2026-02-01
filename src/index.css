@@ -10,7 +10,8 @@ body,
 
 body {
   margin: 0;
-  overflow: hidden;
+  /* Allow page scrolling by default; modals will temporarily lock scroll when needed */
+  overflow: auto;
 }
 
 :root {

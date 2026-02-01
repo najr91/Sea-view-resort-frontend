@@ -99,7 +99,7 @@ export default function Modal({
         >
             <div
                 ref={containerRef}
-                className={`w-full ${sizeClasses[size] || sizeClasses.md} mx-auto transform transition-all outline-none ${containerClassName}`}
+                className={`w-full ${sizeClasses[size] || sizeClasses.md} mx-auto max-h-[90vh] overflow-y-auto transform transition-all outline-none ${containerClassName}`}
                 onClick={(e) => e.stopPropagation()}
                 tabIndex={-1}
             >
